@@ -5,6 +5,7 @@
 //============================================================================
 
 /// @author Juan Pablo García Plaza Pérez @ 2ºGIIIS/GrupoA
+/// @author José Ángel Concha Carrasco @ 2ºGIIIS/GrupoA
 
 #include <stdio.h>
 #include <conio.h>
@@ -16,26 +17,46 @@ using namespace std;
 
 HANDLE PuertoCOM;                                // Manejador del puerto COM global
 
+struct TramaControl {
+	unsigned char S;                // Sincronismo
+	unsigned char D;                // Dirección
+	unsigned char C;                // Control
+	unsigned char NT;                // Número de trama
+};
+
 int main() {
 
 	/*	CONSTANTES	*/
 
 	// Mensaje para mostrar las opciones de seleccionar un puerto COM
 	const char MSJ_SEL_COM[] = "Seleccionar el puerto a utilizar:\n1. COM1\n2. COM2\n3. COM3\n4. COM4";
+	//Mensaje para mostrar las opciones de seleccionar tipo de trama de control
+	const char MSJ_SEL_TC[] = "Trama de control a enviar:\n1: Trama ENQ.\n2: Trama EOT.\n3: Trama ACK.\n4: Trama NACK.";
 	// Mensaje para indicar opción inválida en la elección de puerto COM
 	const char MSJ_ERROR_SEL_COM[] = "Puerto COM incorrecto";
+	// Mensaje para indicar opción inválida en la elección de tipo de trama de control
+	const char MSJ_ERROR_SEL_TC[] = "Tipo de trama incorreccta";
 	// Colección de constantes de cadenas puerto COM
 	const string COM[] = {"COM1", "COM2", "COM3", "COM4"};
+	// Colección de identificadores de tipos de TC
+	const string tiposTC[] = {"ENQ", "EOT", "ACK", "NACK"};
+	// Colección de códigos ASCII de cada tipo de TC
+	const unsigned char codTiposTC[] = {5, 4, 6, 21};
 	const int MAX_CAR_BUFFERESC = 700;            // Número máximo de caracteres del buffer de cadena a enviar
-	const int NUM_FINLINEA = 2;                    // Número de caracteres fin de línea a insertar al final de la cadena
+	const int NUM_SALTOLINEA = 2;                    // Número de caracteres de salto de línea a insertar al final de la cadena
 
 	/*	VARIABLES LOCALES	*/
 
 	bool selCOMCorrecta = false;                // Bandera de selección correcta de puerto COM
+	bool selTipoTCCorrecta = false;                    // Bandera de selección correcta del tipo de TC
 	char *cadPuertoCOM = new char;                // Cadena auxiliar para leer la entrada de usuario
-	int nPuertoCOM;                                // Número de puerto COM elejido por el usuario
+	char *cadTipoTC = new char;                    // Cadena auxiliar para leer la entrada de usuario
+	int nPuertoCOM;                                // Número de puerto COM elegido por el usuario
+	int nTipoTC;                                // Número de opción de TR elegida por el usuario
+	int campo = 1;                                    // Índice de campo TR leído
+	TramaControl TRAux;                            // Trama de control auxiliar
 
-	char bufferEsc[MAX_CAR_BUFFERESC + NUM_FINLINEA + 1];    // Buffer de escritura
+	char bufferEsc[MAX_CAR_BUFFERESC + NUM_SALTOLINEA + 1];    // Buffer de escritura
 	int iBufferEsc = 0;                            // Índice del buffer de escritura
 	char car = 0;                                // Auxiliar para leer / escribir caracteres del / al puerto COM
 
@@ -72,33 +93,80 @@ int main() {
 	// Lectura y escritura simultánea de caracteres:
 	while (car != 27) {
 		car = RecibirCaracter(PuertoCOM);
-		if (car)
-			printf("%c", car);                    //Recepción
+		if (car) {
+			switch (campo) {
+				case 1:
+					if (car == 22) {                // Detecta caracter de sincronismo. Es trama
+						TRAux.S = static_cast<unsigned char>(car);
+						campo++;
+					} else {                        // No es trama
+						printf("%c", car);
+					}
+					break;
+				case 2:
+					TRAux.D = static_cast<unsigned char>(car);
+					campo++;
+					break;
+				case 3:
+					TRAux.C = static_cast<unsigned char>(car);
+					campo++;
+					break;
+				case 4:
+					TRAux.NT = static_cast<unsigned char>(car);
+					printf("%s %s\n\n", "Se ha recibido una trama de control", tiposTC[TRAux.C - 1].c_str());
+					campo = 1;
+					break;
+				default:
+					break;
+			}
+		}                    //Recepción
 		if (kbhit()) {                            // Envío
-			car = getch();                        // Lee la tecla pulsada
+			car = static_cast<char>(getch());         // Lee la tecla pulsada
 			switch (car) {
 				case 27:                        // ESCAPE
 					break;
 				case '\0':                        // Es tecla de función
-					if (getch() == 59) {        // ENVIAR
-						if (iBufferEsc > 0) {        // Comprueba que el mensaje tenga contenido
-							for (int i = 0; i < NUM_FINLINEA; i++) {    // Inserta los saltos de línea indicados
-								bufferEsc[iBufferEsc] = '\n';
-								iBufferEsc++;
+					switch (getch()) {        // ENVIAR
+						case 59:                    // F1
+							if (iBufferEsc > 0) {        // Comprueba que el mensaje tenga contenido
+								for (int i = 0; i < NUM_SALTOLINEA; i++) {    // Inserta los saltos de línea indicados
+									bufferEsc[iBufferEsc] = '\n';
+									iBufferEsc++;
+								}
+								bufferEsc[iBufferEsc] = '\0';                // Delimitador de cadena
+								EnviarCadena(PuertoCOM, bufferEsc,
+											 static_cast<int>(strlen(bufferEsc)));    // Envía el mensaje
+								printf("%c", '\n');        // Salta a la siguiente línea para seguir escribiendo
+								iBufferEsc = 0;            // Reinicia el índice del buffer de escritura
 							}
-							bufferEsc[iBufferEsc] = '\0';                // Delimitador de cadena
-							EnviarCadena(PuertoCOM, bufferEsc,
-										 static_cast<int>(strlen(bufferEsc)));    // Envía el mensaje
-							printf("%c", '\n');        // Salta a la siguiente línea para seguir escribiendo
-							iBufferEsc = 0;            // Reinicia el índice del buffer de escritura
-						}
+							break;
+						case 60:                    // F2
+							// Manejador de selección del tipo de TC
+							do {
+								printf("%s\n\n",
+									   MSJ_SEL_TC);            // Muestra el mensaje de selección de tipo de TC
+								cin >> cadTipoTC;                    // Lee la entrada de usuario
+								nTipoTC = strtol(cadTipoTC, nullptr,
+												 10);    // Intenta convertir a número la entrada de usuario
+
+								if (nTipoTC >= 1 && nTipoTC <= 4)            // Control de opción
+									selTipoTCCorrecta = true;
+								else                                    // Opción inválida. Se muestra msj error y se vuelve a leer opción
+									printf("%s (%s)\n", MSJ_ERROR_SEL_TC, cadTipoTC);
+							} while (!selTipoTCCorrecta);
+
+							TramaControl tramaControl{22, 'T', codTiposTC[nTipoTC - 1], '0'};
+
+							EnviarCaracter(PuertoCOM, tramaControl.S);
+							EnviarCaracter(PuertoCOM, tramaControl.D);
+							EnviarCaracter(PuertoCOM, tramaControl.C);
+							EnviarCaracter(PuertoCOM, tramaControl.NT);
+							break;
 					}
 					break;
 				case '\b':                        // BORRADO
 					if (iBufferEsc > 0) {        // Comprobación de no retroceder más allá del tamaño del buffer
-						printf("%c", '\b');
-						printf("%c", ' ');
-						printf("%c", '\b');
+						printf("%s", "\b \b");
 						iBufferEsc--;
 					}
 					break;
@@ -106,8 +174,8 @@ int main() {
 					if (iBufferEsc < MAX_CAR_BUFFERESC) {            // Control de longitud máxima de la cadena a enviar
 						switch (car) {            // Determinación de otra pulsación
 							case 13:            // RETORNO DEL CARRO
-								printf("%c", '\n');                    // Echo de la nueva línea
 								bufferEsc[iBufferEsc] = '\n';        // Escritura en el buffer de la nueva línea
+								printf("%c", '\n');                    // Echo de la nueva línea
 								break;
 							default:            // OTRA PULSACIÓN
 								bufferEsc[iBufferEsc] = car;        // Escritura en el buffer del nuevo caracter
