@@ -6,6 +6,21 @@ set(CMAKE_CXX_STANDARD 14)
 include_directories(.)
 
 add_executable(PracticaPuertoCOM
-        Sesion1.cpp
         PuertoSerie.cpp
-        PuertoSerie.h)
+        PuertoSerie.h
+        CargadorManejadorPuertoCOM.cpp
+        CargadorManejadorPuertoCOM.h
+        EscritorPuertoCOM.cpp
+        EscritorPuertoCOM.h
+        LectorPuertoCOM.cpp
+        LectorPuertoCOM.h
+        ManejadorEntradaUsuario.cpp
+        ManejadorEntradaUsuario.h
+        ManejadorPuertoCOM.cpp
+        ManejadorPuertoCOM.h
+        ManejadorSalida.cpp
+        ManejadorSalida.h
+        Principal.cpp
+        Principal.h
+        Trama.cpp
+        Trama.h)
