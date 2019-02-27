@@ -49,12 +49,12 @@ int main() {
 
 	bool selCOMCorrecta = false;                // Bandera de selección correcta de puerto COM
 	bool selTipoTCCorrecta = false;                    // Bandera de selección correcta del tipo de TC
-	char *cadPuertoCOM = new char;                // Cadena auxiliar para leer la entrada de usuario
-	char *cadTipoTC = new char;                    // Cadena auxiliar para leer la entrada de usuario
+	char cadPuertoCOM[10];                // Cadena auxiliar para leer la entrada de usuario
+	char cadTipoTC[10];                    // Cadena auxiliar para leer la entrada de usuario
 	int nPuertoCOM;                                // Número de puerto COM elegido por el usuario
 	int nTipoTC;                                // Número de opción de TR elegida por el usuario
 	int campo = 1;                                    // Índice de campo TR leído
-	TramaControl TRAux;                            // Trama de control auxiliar
+	TramaControl TRAux{};                            // Trama de control auxiliar
 
 	char bufferEsc[MAX_CAR_BUFFERESC + NUM_SALTOLINEA + 1];    // Buffer de escritura
 	int iBufferEsc = 0;                            // Índice del buffer de escritura
@@ -113,11 +113,26 @@ int main() {
 					break;
 				case 4:
 					TRAux.NT = static_cast<unsigned char>(car);
-					printf("%s %s\n\n", "Se ha recibido una trama de control", tiposTC[TRAux.C - 1].c_str());
+
+					string cteTRControl;
+					// Encuentra el índice asociado a una constante de tipo de trama de contol a partir de su caracter ASCII equivalente
+					switch (TRAux.C) {
+						case 5:
+							cteTRControl = tiposTC[0];
+							break;
+						case 4:
+							cteTRControl = tiposTC[1];
+							break;
+						case 6:
+							cteTRControl = tiposTC[2];
+							break;
+						case 21:
+							cteTRControl = tiposTC[3];
+					}
+
+					printf("%s %s\n\n", "Se ha recibido una trama de control",
+						   cteTRControl.c_str());
 					campo = 1;
-					break;
-				default:
-					break;
 			}
 		}                    //Recepción
 		if (kbhit()) {                            // Envío
