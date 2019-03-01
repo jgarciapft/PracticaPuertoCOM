@@ -43,7 +43,7 @@ public:
 	/**
 	 * Intenta abrir el manejador en el puerto COM deseado. Devuelve 'VERDADERO' si el manejador fue correctamente inicializado, 'FALSO' en otro caso
 	 */
-	static bool
+	bool
 	abrirManejador(/* Constante que indica el puerto COM a elegir */LPCSTR nombrePuerto, /* Tasa de baudios */
 																	DWORD velocidad, /* Número de bits en cada byte enviado o recibido. Valor entre 4 y 8, ambos inclusive */
 																	BYTE numBitsXByte, /* Bit de paridad.
@@ -56,12 +56,15 @@ public:
         1 = 1.5 bits
         2 = 2 bits */BYTE bitsParada);
 
-	static void cerrarManejador();
+	/**
+	 * Cierra el manejador del puerto COM
+	 */
+	void cerrarManejador();
 
 	/**
 	 * Devuelve la instancia Singleton de la clase o 'nullptr' si no está operativa
 	 */
-	static ManejadorPuertoCOM recuperarInstancia();
+	static ManejadorPuertoCOM *recuperarInstancia();
 
 	/**
 	 * Método accesor del atributo 'handle'
