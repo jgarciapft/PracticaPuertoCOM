@@ -1,56 +1,72 @@
 #include "Trama.h"
 
+const std::string Trama::CONST_CONTROL_TRAMA[] = {"ENQ", "EOT", "ACK", "NACK", "DESCONOCIDA"};
+
 Trama::Trama() {
-	// TODO - implement Trama::Trama
-	throw "Not yet implemented";
+	S = 0;
+	D = 0;
+	C = 0;
+	NT = 0;
 }
 
-Trama::Trama(unsigned char S, unsigned char D, unsigned char C, unsigned char N) {
-	// TODO - implement Trama::Trama
-	throw "Not yet implemented";
+Trama::Trama(unsigned char S, unsigned char D, unsigned char C, unsigned char NT) {
+	this->S = S;
+	this->D = D;
+	this->C = C;
+	this->NT = NT;
 }
 
 unsigned char Trama::getS() {
-	// TODO - implement Trama::getS
-	throw "Not yet implemented";
+	return S;
 }
 
 unsigned char Trama::getD() {
-	// TODO - implement Trama::getD
-	throw "Not yet implemented";
+	return D;
 }
 
 unsigned char Trama::getC() {
-	// TODO - implement Trama::getC
-	throw "Not yet implemented";
+	return C;
 }
 
 unsigned char Trama::getNT() {
-	// TODO - implement Trama::getNT
-	throw "Not yet implemented";
+	return NT;
 }
 
 void Trama::setS(/* Nuevo valor del caracter de sincronismo */unsigned char S) {
-	// TODO - implement Trama::setS
-	throw "Not yet implemented";
+	this->S = S;
 }
 
 void Trama::setD(/* Nuevo valor del caracter de dirección */unsigned char D) {
-	// TODO - implement Trama::setD
-	throw "Not yet implemented";
+	this->D = D;
 }
 
 void Trama::setC(/* Nuevo valor del caracter de control */unsigned char C) {
-	// TODO - implement Trama::setC
-	throw "Not yet implemented";
+	this->C = C;
 }
 
 void Trama::setNT(/* Nuevo valor del número de trama */unsigned char NT) {
-	// TODO - implement Trama::setNT
-	throw "Not yet implemented";
+	this->NT = NT;
 }
 
 std::string Trama::toString() {
-	// TODO - implement Trama::toString
-	throw "Not yet implemented";
+	std::string tipoTrama;
+
+	switch (getC()) {
+		case ENQ:
+			tipoTrama = CONST_CONTROL_TRAMA[0];
+			break;
+		case EOT:
+			tipoTrama = CONST_CONTROL_TRAMA[1];
+			break;
+		case ACK:
+			tipoTrama = CONST_CONTROL_TRAMA[2];
+			break;
+		case NACK:
+			tipoTrama = CONST_CONTROL_TRAMA[3];
+			break;
+		default:
+			tipoTrama = CONST_CONTROL_TRAMA[4];
+	}
+
+	return "trama " + tipoTrama;
 }

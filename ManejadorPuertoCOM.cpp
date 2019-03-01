@@ -1,13 +1,10 @@
 #include "ManejadorPuertoCOM.h"
 
-ManejadorPuertoCOM::ManejadorPuertoCOM() {
-	// TODO - implement ManejadorPuertoCOM::ManejadorPuertoCOM()
-	throw "Not yet implemented";
-}
+ManejadorPuertoCOM *ManejadorPuertoCOM::instancia = nullptr;
 
-void ManejadorPuertoCOM::setEstadoAbierto(/* Nuevo valor de la bandera de estado */boolean estadoAbierto) {
-	// TODO - implement ManejadorPuertoCOM::setEstadoAbierto
-	throw "Not yet implemented";
+ManejadorPuertoCOM::ManejadorPuertoCOM() {
+	estadoAbierto = false;
+	handle = nullptr;
 }
 
 bool ManejadorPuertoCOM::abrirManejador(/* Constante que indica el puerto COM a elegir */
@@ -22,24 +19,34 @@ bool ManejadorPuertoCOM::abrirManejador(/* Constante que indica el puerto COM a 
         0 = 1 bit
         1 = 1.5 bits
         2 = 2 bits */BYTE bitsParada) {
-	// TODO - implement ManejadorPuertoCOM::abrirManejador
-	throw "Not yet implemented";
+	if (!getEstadoAbierto()) {	// Comprueba que el puerto no esté abierto ya
+		handle = AbrirPuerto(nombrePuerto, velocidad, numBitsXByte, paridad, bitsParada);
+		if (getHandle() != nullptr)	// Si el se pudo abrir el manejador se actualiza la bandera de estado
+			setEstadoAbierto(true);
+	}
+
+	return getEstadoAbierto();
 }
 
 void ManejadorPuertoCOM::cerrarManejador() {
-	// TODO - implement ManejadorPuertoCOM::cerrarManejador
-	throw "Not yet implemented";
+	CerrarPuerto(handle);
+	setEstadoAbierto(false);
 }
 
-ManejadorPuertoCOM ManejadorPuertoCOM::recuperarInstancia() {
-	// TODO - implement ManejadorPuertoCOM::recuperarInstancia
-	throw "Not yet implemented";
+ManejadorPuertoCOM *ManejadorPuertoCOM::recuperarInstancia() {
+	if (instancia == nullptr)
+		instancia = new ManejadorPuertoCOM();
+	return instancia;
 }
 
 HANDLE ManejadorPuertoCOM::getHandle() {
-	return nullptr;
+	return handle;
 }
 
 bool ManejadorPuertoCOM::getEstadoAbierto() {
-	return this->estadoAbierto;
+	return estadoAbierto;
+}
+
+void ManejadorPuertoCOM::setEstadoAbierto(/* Nuevo valor de la bandera de estado */boolean estadoAbierto) {
+	this->estadoAbierto = estadoAbierto;
 }
