@@ -4,7 +4,6 @@ LectorPuertoCOM::LectorPuertoCOM() {
 	mPuertoCOM = nullptr;
 
 	esTrama = false;
-	finTrama = false;
 	idxTrama = 1;
 	tramaAux = Trama();
 }
@@ -13,15 +12,24 @@ LectorPuertoCOM::LectorPuertoCOM(ManejadorPuertoCOM *mPuertoCOM) {
 	this->mPuertoCOM = mPuertoCOM;
 
 	esTrama = false;
-	finTrama = false;
 	idxTrama = 1;
 	tramaAux = Trama();
 }
 
 void LectorPuertoCOM::lectura() {
-	char contenido = hayContenido();
-	if (contenido) {
-		printf("%c", contenido);
+	char car = hayContenido(); // Comprueba si hay car. Si lo hay lo lee
+
+	if (car) {
+		if (!getEsTrama()) { // Comprueba si está en proceso de leer una trama
+			if (car == 22) { // Detecta caracter de sincronismo. Es trama
+				setEsTrama(true);
+				leerTrama(car);
+			} else {
+				printf("%c", car); // No es trama. Es un caracter
+			}
+		} else { // Está en proceso de leer una trama
+			leerTrama(car);
+		}
 	}
 }
 
@@ -39,10 +47,6 @@ bool LectorPuertoCOM::getEsTrama() {
 	return this->esTrama;
 }
 
-bool LectorPuertoCOM::getFinTrama() {
-	return this->finTrama;
-}
-
 int LectorPuertoCOM::getIdxTrama() {
 	return this->idxTrama;
 }
@@ -55,10 +59,32 @@ void LectorPuertoCOM::setEsTrama(/* Nuevo valor de la bandera */bool esTrama) {
 	this->esTrama = esTrama;
 }
 
-void LectorPuertoCOM::setFinTrama(/* Nuevo valor de la bandera */bool finTrama) {
-	this->finTrama = finTrama;
-}
-
 void LectorPuertoCOM::setIdxTrama(/* Nuevo valor del índice */int idxTrama) {
 	this->idxTrama = idxTrama;
+}
+
+void LectorPuertoCOM::leerTrama(char car) {
+	switch (getIdxTrama()) { // Determina en qué campo de la trama hay que escribir
+		case 1: // Campo de Sincronismo
+			tramaAux.setS(car);
+			setIdxTrama(getIdxTrama() + 1);
+			break;
+		case 2: // Campo de Dirección
+			tramaAux.setD(car);
+			setIdxTrama(getIdxTrama() + 1);
+			break;
+		case 3: // Campo de Control
+			tramaAux.setC(car);
+			setIdxTrama(getIdxTrama() + 1);
+			break;
+		case 4: // Campo de Número de Trama
+			tramaAux.setNT(car);
+
+			// Imprime la trama recibida
+			printf("%s [%s]", "Recibido", tramaAux.toString().c_str());
+
+			// Reinicia las banderas de trama
+			setIdxTrama(1);
+			setEsTrama(false);
+	}
 }

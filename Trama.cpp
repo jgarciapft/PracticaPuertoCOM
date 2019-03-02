@@ -68,5 +68,5 @@ std::string Trama::toString() {
 			tipoTrama = CONST_CONTROL_TRAMA[4];
 	}
 
-	return "trama " + tipoTrama;
+	return "Trama " + tipoTrama;
 }

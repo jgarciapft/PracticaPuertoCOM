@@ -45,14 +45,16 @@ private:
 	char hayContenido();
 
 	/**
+	 * Maneja el procesamiento de una trama
+	 *
+	 * @param car Caracter recibido relacionado con la trama
+	 */
+	void leerTrama(char car);
+
+	/**
 	 * Método modificador del atributo 'esTrama'
 	 */
 	void setEsTrama(/* Nuevo valor de la bandera */bool esTrama);
-
-	/**
-	 * Método modificador del atributo 'finTrama'
-	 */
-	void setFinTrama(/* Nuevo valor de la bandera */bool finTrama);
 
 	/**
 	 * Método modificador del atributo 'idxTrama'
@@ -60,6 +62,7 @@ private:
 	void setIdxTrama(/* Nuevo valor del índice */int idxTrama);
 
 public:
+
 	LectorPuertoCOM();
 
 	explicit LectorPuertoCOM(ManejadorPuertoCOM *mPuertoCOM);
@@ -73,11 +76,6 @@ public:
 	 * Método accesor del atributo 'esTrama'
 	 */
 	bool getEsTrama();
-
-	/**
-	 * Método accesor del atributo 'finTrama'
-	 */
-	bool getFinTrama();
 
 	/**
 	 * Método accesor del atributo 'idxTrama'
