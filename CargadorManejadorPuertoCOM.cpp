@@ -19,9 +19,19 @@ CargadorManejadorPuertoCOM::CargadorManejadorPuertoCOM(LPCSTR nombrePuerto, DWOR
 }
 
 bool CargadorManejadorPuertoCOM::inicializarManejador() {
-	return ManejadorPuertoCOM::recuperarInstancia()->abrirManejador(getNombrePuerto(), getVelocidad(),
-																	getNumBitsXByte(), getParidad(),
-																	getBitsParada());
+	bool abrirManejador = ManejadorPuertoCOM::recuperarInstancia()->abrirManejador(getNombrePuerto(), getVelocidad(),
+																				   getNumBitsXByte(), getParidad(),
+																				   getBitsParada());
+	if (abrirManejador) // Informa sobre el resultado del intento de apertura
+		printf("%s\n", "Puerto abierto correctamente");
+	else
+		printf("%s\n", "Error al abrir el puerto");
+
+	return abrirManejador;
+}
+
+LPCSTR CargadorManejadorPuertoCOM::getNombrePuerto() {
+	return this->nombrePuerto;
 }
 
 DWORD CargadorManejadorPuertoCOM::getVelocidad() {
@@ -40,6 +50,10 @@ BYTE CargadorManejadorPuertoCOM::getBitsParada() {
 	return this->bitsParada;
 }
 
+void CargadorManejadorPuertoCOM::setNombrePuerto(LPCSTR nombrePuerto) {
+	this->nombrePuerto = nombrePuerto;
+}
+
 void CargadorManejadorPuertoCOM::setVelocidad(/* Nueva tasa de baudios */DWORD velocidad) {
 	this->velocidad = velocidad;
 }
@@ -55,12 +69,4 @@ void CargadorManejadorPuertoCOM::setParidad(/* Nuevo modo de paridad */BYTE pari
 
 void CargadorManejadorPuertoCOM::setBitsParada(/* Nuevo número de bits de parada */BYTE bitsParada) {
 	this->bitsParada = bitsParada;
-}
-
-LPCSTR CargadorManejadorPuertoCOM::getNombrePuerto() {
-	return this->nombrePuerto;
-}
-
-void CargadorManejadorPuertoCOM::setNombrePuerto(LPCSTR nombrePuerto) {
-	this->nombrePuerto = nombrePuerto;
 }

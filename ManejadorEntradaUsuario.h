@@ -1,6 +1,8 @@
 #ifndef MANEJADORENTRADAUSUARIO_H
 #define MANEJADORENTRADAUSUARIO_H
 
+#include <iostream>
+
 /**
  * Clase de utilidad para manejar la entrada de usuario por consola
  * 
@@ -17,7 +19,8 @@ public:
 	 * Obtiene una respuesta numérica del usuario a una pregunta
 	 */
 	static int preguntarRespEntRang(/* Mensaje que mostrar al usuario */
-			const char pregunta[], /* Límite inferior del rango numérico permitido (inclusive) */
+			const char pregunta[], /* Mensaje de error */
+			const char msjError[], /* Límite inferior del rango numérico permitido (inclusive) */
 			int limInf, /* Limite superior del rango numérico permitido (inclusive) */int limSup);
 };
 

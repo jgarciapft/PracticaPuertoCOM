@@ -18,8 +18,6 @@ add_executable(PracticaPuertoCOM
         ManejadorEntradaUsuario.h
         ManejadorPuertoCOM.cpp
         ManejadorPuertoCOM.h
-        ManejadorSalida.cpp
-        ManejadorSalida.h
         Principal.cpp
         Principal.h
         Trama.cpp
