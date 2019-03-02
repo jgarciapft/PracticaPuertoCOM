@@ -1,11 +1,8 @@
+#include <cstdio>
 #include "ManejadorSalida.h"
 
-ManejadorSalida::ManejadorSalida() {
-	// TODO - implement ManejadorSalida::ManejadorSalida
-	throw "Not yet implemented";
-}
+ManejadorSalida::ManejadorSalida() = default;
 
 void ManejadorSalida::imprimirConsola(/* mensaje a imprimir por consola */const char mensaje[]) {
-	// TODO - implement ManejadorSalida::imprimirConsola
-	throw "Not yet implemented";
+	std::printf("%s\n", mensaje);
 }

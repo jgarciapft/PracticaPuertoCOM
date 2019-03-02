@@ -14,7 +14,7 @@ public:
 	ManejadorSalida();
 
 	/**
-	 * Imprime por consola un determinado mensaje
+	 * Imprime por consola en una línea un determinado mensaje
 	 */
 	static void imprimirConsola(/* mensaje a imprimir por consola */const char mensaje[]);
 };
