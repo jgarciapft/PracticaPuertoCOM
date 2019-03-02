@@ -3,7 +3,6 @@
 
 #include <string>
 
-
 /**
  * Clase que modela una trama genérica. Contiene:
  *

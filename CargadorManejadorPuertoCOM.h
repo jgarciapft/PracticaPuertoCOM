@@ -15,6 +15,16 @@ class CargadorManejadorPuertoCOM {
 
 private:
 	/**
+	 * Mensaje de éxito al abrir el puerto COM
+	 */
+	static const char MSJ_PUERTO_ABIERTO[];
+	/**
+	 * Mensaje de error al abrir el puerto COM
+	 */
+	static const char MSJ_ERROR_ABRIR_PUERTO[];
+
+private:
+	/**
 	 * Constante asociada al puerto COM
 	 */
 	LPCSTR nombrePuerto;

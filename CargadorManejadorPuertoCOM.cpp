@@ -1,5 +1,8 @@
 #include "CargadorManejadorPuertoCOM.h"
 
+const char CargadorManejadorPuertoCOM::MSJ_PUERTO_ABIERTO[] = "Puerto abierto correctamente";
+const char CargadorManejadorPuertoCOM::MSJ_ERROR_ABRIR_PUERTO[] = "Error al abrir el puerto";
+
 CargadorManejadorPuertoCOM::CargadorManejadorPuertoCOM() {
 	nombrePuerto = "UNKNOWN";
 	velocidad = 0;
@@ -23,9 +26,9 @@ bool CargadorManejadorPuertoCOM::inicializarManejador() {
 																				   getNumBitsXByte(), getParidad(),
 																				   getBitsParada());
 	if (abrirManejador) // Informa sobre el resultado del intento de apertura
-		printf("%s\n", "Puerto abierto correctamente");
+		printf("%s\n", MSJ_PUERTO_ABIERTO);
 	else
-		printf("%s\n", "Error al abrir el puerto");
+		printf("%s\n", MSJ_ERROR_ABRIR_PUERTO);
 
 	return abrirManejador;
 }
