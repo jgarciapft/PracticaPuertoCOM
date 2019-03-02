@@ -15,6 +15,10 @@ class CargadorManejadorPuertoCOM {
 
 private:
 	/**
+	 * Constante asociada al puerto COM
+	 */
+	LPCSTR nombrePuerto;
+	/**
 	 * Tasa de baudios
 	 */
 	DWORD velocidad;
@@ -42,7 +46,7 @@ private:
 public:
 	CargadorManejadorPuertoCOM();
 
-	CargadorManejadorPuertoCOM(DWORD velocidad, BYTE numBitsXByte, BYTE paridad, BYTE bitsParada);
+	CargadorManejadorPuertoCOM(LPCSTR nombrePuerto, DWORD velocidad, BYTE numBitsXByte, BYTE paridad, BYTE bitsParada);
 
 	/**
 	 * Intenta inicializar el manejador del puerto COM con los valores indicados. Devuelve 'TRUE' si el manejador fue correctamente inicializado, 'FALSO' en otro caso
@@ -88,6 +92,16 @@ public:
 	 * Método modificador del atributo 'bitsParada'
 	 */
 	void setBitsParada(/* Nuevo número de bits de parada */BYTE bitsParada);
+
+	/**
+	 * Método accesor del atributo 'nombrePuerto'
+	 */
+	LPCSTR getNombrePuerto();
+
+	/**
+	 * Método modificador del atributo 'nombrePuerto'
+	 */
+	void setNombrePuerto(LPCSTR nombrePuerto);
 };
 
 #endif

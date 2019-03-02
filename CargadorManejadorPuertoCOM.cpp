@@ -1,19 +1,27 @@
 #include "CargadorManejadorPuertoCOM.h"
 
 CargadorManejadorPuertoCOM::CargadorManejadorPuertoCOM() {
-	// TODO - implement CargadorManejadorPuertoCOM::CargadorManejadorPuertoCOM
-	throw "Not yet implemented";
+	nombrePuerto = "UNKNOWN";
+	velocidad = 0;
+	numBitsXByte = 0;
+	paridad = 0;
+	bitsParada = 0;
 }
 
-CargadorManejadorPuertoCOM::CargadorManejadorPuertoCOM(DWORD velocidad, BYTE numBitsXByte, BYTE paridad,
+CargadorManejadorPuertoCOM::CargadorManejadorPuertoCOM(LPCSTR nombrePuerto, DWORD velocidad, BYTE numBitsXByte,
+													   BYTE paridad,
 													   BYTE bitsParada) {
-	// TODO - implement CargadorManejadorPuertoCOM::CargadorManejadorPuertoCOM
-	throw "Not yet implemented";
+	this->nombrePuerto = nombrePuerto;
+	this->velocidad = velocidad;
+	this->numBitsXByte = numBitsXByte;
+	this->paridad = paridad;
+	this->bitsParada = bitsParada;
 }
 
 bool CargadorManejadorPuertoCOM::inicializarManejador() {
-	// TODO - implement CargadorManejadorPuertoCOM::inicializarManejador
-	throw "Not yet implemented";
+	return ManejadorPuertoCOM::recuperarInstancia()->abrirManejador(getNombrePuerto(), getVelocidad(),
+																	getNumBitsXByte(), getParidad(),
+																	getBitsParada());
 }
 
 DWORD CargadorManejadorPuertoCOM::getVelocidad() {
@@ -47,4 +55,12 @@ void CargadorManejadorPuertoCOM::setParidad(/* Nuevo modo de paridad */BYTE pari
 
 void CargadorManejadorPuertoCOM::setBitsParada(/* Nuevo número de bits de parada */BYTE bitsParada) {
 	this->bitsParada = bitsParada;
+}
+
+LPCSTR CargadorManejadorPuertoCOM::getNombrePuerto() {
+	return this->nombrePuerto;
+}
+
+void CargadorManejadorPuertoCOM::setNombrePuerto(LPCSTR nombrePuerto) {
+	this->nombrePuerto = nombrePuerto;
 }
