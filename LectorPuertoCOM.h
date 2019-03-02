@@ -35,6 +35,16 @@ private:
 	Trama tramaAux;
 
 	/**
+	 * Comprueba si el manejador del puerto COM está inicializado
+	 */
+	bool manPrtoCOMAbierto();
+
+	/**
+	 * Comprueba si hay algún elemento en el buffer de lectura, y si lo hay lo devuelve
+	 */
+	char hayContenido();
+
+	/**
 	 * Método modificador del atributo 'esTrama'
 	 */
 	void setEsTrama(/* Nuevo valor de la bandera */bool esTrama);
@@ -52,12 +62,12 @@ private:
 public:
 	LectorPuertoCOM();
 
-	LectorPuertoCOM(ManejadorPuertoCOM mPuertoCOM);
+	explicit LectorPuertoCOM(ManejadorPuertoCOM *mPuertoCOM);
 
 	/**
 	 * Maneja la función de lectura del puerto COM. Maneja la lectura de un caracter y la lectura de una trama
 	 */
-	char lectura();
+	void lectura();
 
 	/**
 	 * Método accesor del atributo 'esTrama'

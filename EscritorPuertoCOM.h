@@ -23,6 +23,11 @@ private:
 	bool finCaracter;
 
 	/**
+	 * Comprueba si el manejador del puerto COM está inicializado
+	 */
+	bool manPrtoCOMAbierto();
+
+	/**
 	 * Método modificador del atributo 'finCaracter'
 	 */
 	void setFinCaracter(/* Nuevo valor de la bandera */bool finCaracter);
@@ -30,7 +35,7 @@ private:
 public:
 	EscritorPuertoCOM();
 
-	EscritorPuertoCOM(ManejadorPuertoCOM mPuertoCOM);
+	explicit EscritorPuertoCOM(ManejadorPuertoCOM *mPuertoCOM);
 
 	/**
 	 * Maneja la función de escritura del puerto COM. Maneja los casos de elección de fin del programa, enviar mensaje, borrado de caracter y escritura de caracter

@@ -1,24 +1,38 @@
 #include "EscritorPuertoCOM.h"
 
-void EscritorPuertoCOM::setFinCaracter(/* Nuevo valor de la bandera */bool finCaracter) {
-	this->finCaracter = finCaracter;
-}
-
 EscritorPuertoCOM::EscritorPuertoCOM() {
-	// TODO - implement EscritorPuertoCOM::EscritorPuertoCOM
-	throw "Not yet implemented";
+	mPuertoCOM = nullptr;
+
+	finCaracter = false;
 }
 
-EscritorPuertoCOM::EscritorPuertoCOM(ManejadorPuertoCOM mPuertoCOM) {
-	// TODO - implement EscritorPuertoCOM::EscritorPuertoCOM
-	throw "Not yet implemented";
+EscritorPuertoCOM::EscritorPuertoCOM(ManejadorPuertoCOM *mPuertoCOM) {
+	this->mPuertoCOM = mPuertoCOM;
+
+	finCaracter = false;
 }
 
 void EscritorPuertoCOM::escritura() {
-	// TODO - implement EscritorPuertoCOM::escritura
-	throw "Not yet implemented";
+	char car = static_cast<char>(getch());
+
+	if (car == 27) setFinCaracter(true);
+
+	if (manPrtoCOMAbierto() && !getFinCaracter()) {
+		HANDLE com = mPuertoCOM->getHandle();
+
+		printf("%c", car);
+		EnviarCaracter(com, car);
+	}
 }
 
 bool EscritorPuertoCOM::getFinCaracter() {
 	return this->finCaracter;
+}
+
+bool EscritorPuertoCOM::manPrtoCOMAbierto() {
+	return mPuertoCOM != nullptr ? mPuertoCOM->getEstadoAbierto() : false;
+}
+
+void EscritorPuertoCOM::setFinCaracter(/* Nuevo valor de la bandera */bool finCaracter) {
+	this->finCaracter = finCaracter;
 }
