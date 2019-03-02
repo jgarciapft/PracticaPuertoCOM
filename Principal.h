@@ -17,6 +17,13 @@
 class CONSTANTES {
 public:
 	/**
+	 * Tipo enumerado de códigos ASCII útiles para todo el programa
+	 */
+	enum COD_ASCII {
+		ESCAPE = 27, SINCRONISMO = 22
+	};
+
+	/**
 	 * Colección de constantes de cadenas puerto COM
 	 */
 	static const LPCSTR COM[];

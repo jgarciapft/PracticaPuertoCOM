@@ -15,13 +15,10 @@ EscritorPuertoCOM::EscritorPuertoCOM(ManejadorPuertoCOM *mPuertoCOM) {
 void EscritorPuertoCOM::escritura() {
 	char car = static_cast<char>(getch());
 
-	if (car == 27) setFinCaracter(true);
-
-	if (manPrtoCOMAbierto() && !getFinCaracter()) {
-		HANDLE com = mPuertoCOM->getHandle();
-
-		printf("%c", car);
-		EnviarCaracter(com, car);
+	switch (car) {
+		case CONSTANTES::ESCAPE:
+			setFinCaracter(true);
+			break;
 	}
 }
 

@@ -3,6 +3,7 @@
 
 #include "ManejadorPuertoCOM.h"
 #include "ManejadorEntradaUsuario.h"
+#include "Principal.h"
 
 /**
  * Manejador responsable de la escritura sobre el puerto COM

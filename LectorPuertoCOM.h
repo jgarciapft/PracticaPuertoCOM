@@ -3,6 +3,7 @@
 
 #include "ManejadorPuertoCOM.h"
 #include "Trama.h"
+#include "Principal.h"
 
 /**
  * Manejador responsable de la lectura sobre el puertoCOM
