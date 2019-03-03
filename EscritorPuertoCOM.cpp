@@ -23,7 +23,6 @@ EscritorPuertoCOM::EscritorPuertoCOM(ManejadorPuertoCOM *mPuertoCOM) {
 
 void EscritorPuertoCOM::escritura() {
 	char car = static_cast<char>(getch()); // Lee la tecla pulsada
-	HANDLE com = mPuertoCOM->getHandle();
 
 	switch (car) { // Determina qué tecla fue pulsada
 		case CONSTANTES::ESCAPE: // ESCAPE. Fin del programa
@@ -32,48 +31,10 @@ void EscritorPuertoCOM::escritura() {
 		case CONSTANTES::TECLA_FUNCION: // TECLA FUNCIÓN
 			switch (static_cast<char>(getch())) {
 				case CONSTANTES::TECLA_F1: // Es F1
-					for (int i = 0; i < MSJ_NUM_CRLF; i++) { // Inserta los saltos de línea indicados
-						buffer[getIdxBuffer()] = CONSTANTES::CRLN;
-						setIdxBuffer(getIdxBuffer() + 1);
-					}
-					buffer[getIdxBuffer()] = CONSTANTES::DELIM_CAD; // Delimitador de cadena
-
-					EnviarCadena(com, buffer,
-								 static_cast<int>(strlen(buffer))); // Envía el mensaje
-
-					printf("%c", CONSTANTES::CRLN); // Salta a la siguiente línea para seguir escribiendo
-					setIdxBuffer(0); // Reinicia el índice del buffer de escritura
+					enviarMensaje();
 					break;
 				case CONSTANTES::TECLA_F2: // Es F2
-					Trama tramaAux = Trama(); // Trama a cosnturir
-					unsigned char C;
-
-					switch (ManejadorEntradaUsuario::preguntarRespEntRang(MSJ_SEL_TC,
-																		  MSJ_ERROR_SEL_TC,
-																		  1,
-																		  4)) {
-						case 1:
-							C = Trama::ENQ;
-							break;
-						case 2:
-							C = Trama::EOT;
-							break;
-						case 3:
-							C = Trama::ACK;
-							break;
-						case 4:
-							C = Trama::NACK;
-					}
-
-					tramaAux.setS(CONSTANTES::SINCRONISMO);
-					tramaAux.setD(TC_DEF_DIRECCION);
-					tramaAux.setC(C);
-					tramaAux.setNT(TC_DEF_NT);
-
-					EnviarCaracter(com, tramaAux.getS());
-					EnviarCaracter(com, tramaAux.getD());
-					EnviarCaracter(com, tramaAux.getC());
-					EnviarCaracter(com, tramaAux.getNT());
+					enviarTrama();
 			}
 			break;
 		case CONSTANTES::TECLA_RETROCESO: // RETROCESO
@@ -83,17 +44,79 @@ void EscritorPuertoCOM::escritura() {
 			}
 			break;
 		default: // OTRA PULSACIÓN. Debe ser almacenada en el buffer con 'echo'
-			if (!bufferLleno()) { // Comprueba que el buffer no esté lleno
-				switch (car) { // Determina tratamiento del caracter a almacenar
-					case CONSTANTES::TECLA_RETORNO:
-						car = CONSTANTES::CRLN;
-					default: // Otro caracter
-						buffer[getIdxBuffer()] = car;
-						setIdxBuffer(getIdxBuffer() + 1);
-				}
+			leerCarEcho(car);
+	}
+}
 
-				printf("%c", car); // 'echo' del caracter leído
-			}
+void EscritorPuertoCOM::enviarMensaje() {
+	HANDLE com = mPuertoCOM->getHandle();
+
+	/** FORMATO DE MENSAJE */
+
+	for (int i = 0; i < MSJ_NUM_CRLF; i++) { // Inserta los saltos de línea indicados
+		buffer[getIdxBuffer()] = CONSTANTES::CRLN;
+		setIdxBuffer(getIdxBuffer() + 1);
+	}
+	buffer[getIdxBuffer()] = CONSTANTES::DELIM_CAD; // Delimitador de cadena
+
+	/** ENVÍO DE MENSAJE */
+
+	if (manPrtoCOMAbierto()) { // Comprueba que el puerto COM esté operativo
+		EnviarCadena(com, buffer,
+					 static_cast<int>(strlen(buffer))); // Envía el mensaje
+	}
+	printf("%c", CONSTANTES::CRLN); // Salta a la siguiente línea para seguir escribiendo
+
+	/** REINICIO DE BANDERAS */
+
+	setIdxBuffer(0); // Reinicia el índice del buffer de escritura
+}
+
+void EscritorPuertoCOM::enviarTrama() {
+	HANDLE com = mPuertoCOM->getHandle();
+	Trama tramaAux = Trama(); // Trama a cosnturir
+	unsigned char C; // Caracter para determinar el campo de control de la trama
+
+	// Pregunta al usuario el tipo de trama a enviar
+	switch (ManejadorEntradaUsuario::preguntarRespEntRang(MSJ_SEL_TC,
+														  MSJ_ERROR_SEL_TC,
+														  1,
+														  4)) {
+		case 1:
+			C = Trama::ENQ;
+			break;
+		case 2:
+			C = Trama::EOT;
+			break;
+		case 3:
+			C = Trama::ACK;
+			break;
+		case 4:
+			C = Trama::NACK;
+	}
+
+	tramaAux.setAttr(CONSTANTES::SINCRONISMO, TC_DEF_DIRECCION, C, TC_DEF_NT);
+
+	// Envía la trama formada
+	if (manPrtoCOMAbierto()) { // Comprueba que el puerto COM esté operativo
+		EnviarCaracter(com, tramaAux.getS());
+		EnviarCaracter(com, tramaAux.getD());
+		EnviarCaracter(com, tramaAux.getC());
+		EnviarCaracter(com, tramaAux.getNT());
+	}
+}
+
+void EscritorPuertoCOM::leerCarEcho(char car) {
+	if (!bufferLleno()) { // Comprueba que el buffer no esté lleno
+		switch (car) { // Determina tratamiento del caracter a almacenar
+			case CONSTANTES::TECLA_RETORNO:
+				car = CONSTANTES::CRLN;
+			default: // Otro caracter
+				buffer[getIdxBuffer()] = car;
+				setIdxBuffer(getIdxBuffer() + 1);
+		}
+
+		printf("%c", car); // 'echo' del caracter leído
 	}
 }
 

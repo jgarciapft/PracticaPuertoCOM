@@ -64,6 +64,24 @@ private:
 	bool bufferLleno();
 
 	/**
+	 * Formatea y envía el mensaje almacenado en el buffer de escritura por el puerto COM según el manejador
+	 * establecido
+	 */
+	void enviarMensaje();
+
+	/**
+	 * Formatea y envía una trama por el pueto COM según el manejador establecido
+	 */
+	void enviarTrama();
+
+	/**
+	 * Escribe en el buffer con 'echo' el caracter pasado
+	 *
+	 * @param car Caracter a tratar
+	 */
+	void leerCarEcho(char car);
+
+	/**
 	 * Método modificador del atributo 'finCaracter'
 	 */
 	void setFinCaracter(/* Nuevo valor de la bandera */bool finCaracter);

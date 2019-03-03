@@ -94,6 +94,15 @@ public:
 	void setNT(/* Nuevo valor del número de trama */unsigned char NT);
 
 	/**
+	 * Método modificador combinado de todos los atributos de la clase
+	 */
+	void
+	setAttr(/* Nuevo valor del caracter de sincronismo */unsigned char S,/* Nuevo valor del caracter de dirección */
+														 unsigned char D,/* Nuevo valor del caracter de control */
+														 unsigned char C, /* Nuevo valor del número de trama */
+														 unsigned char NT);
+
+	/**
 	 * Devuelve la representación en cadena de la trama
 	 */
 	std::string toString();

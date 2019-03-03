@@ -43,6 +43,13 @@ void Trama::setNT(/* Nuevo valor del número de trama */unsigned char NT) {
 	this->NT = NT;
 }
 
+void Trama::setAttr(unsigned char S, unsigned char D, unsigned char C, unsigned char NT) {
+	setS(S);
+	setD(D);
+	setC(C);
+	setNT(NT);
+}
+
 std::string Trama::toString() {
 	std::string tipoTrama;
 
