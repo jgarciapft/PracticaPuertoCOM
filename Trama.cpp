@@ -1,13 +1,8 @@
 #include "Trama.h"
 
-const std::string Trama::CONST_CONTROL_TRAMA[] = {"ENQ", "EOT", "ACK", "NACK", "DESCONOCIDA"};
+const std::string Trama::CONST_CONTROL_TRAMA[] = {"ENQ", "EOT", "ACK", "NACK", "DESCONOCIDO"};
 
-Trama::Trama() {
-	S = 0;
-	D = 0;
-	C = 0;
-	NT = 0;
-}
+Trama::Trama() = default;
 
 Trama::Trama(unsigned char S, unsigned char D, unsigned char C, unsigned char NT) {
 	this->S = S;

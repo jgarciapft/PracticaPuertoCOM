@@ -51,10 +51,6 @@ int LectorPuertoCOM::getIdxTrama() {
 	return this->idxTrama;
 }
 
-Trama LectorPuertoCOM::getTramaAux() {
-	return this->tramaAux;
-}
-
 void LectorPuertoCOM::setEsTrama(/* Nuevo valor de la bandera */bool esTrama) {
 	this->esTrama = esTrama;
 }
@@ -66,22 +62,22 @@ void LectorPuertoCOM::setIdxTrama(/* Nuevo valor del índice */int idxTrama) {
 void LectorPuertoCOM::leerTrama(char car) {
 	switch (getIdxTrama()) { // Determina en qué campo de la trama hay que escribir
 		case 1: // Campo de Sincronismo
-			getTramaAux().setS(car);
+			tramaAux.setS(car);
 			setIdxTrama(getIdxTrama() + 1);
 			break;
 		case 2: // Campo de Dirección
-			getTramaAux().setD(car);
+			tramaAux.setD(car);
 			setIdxTrama(getIdxTrama() + 1);
 			break;
 		case 3: // Campo de Control
-			getTramaAux().setC(car);
+			tramaAux.setC(car);
 			setIdxTrama(getIdxTrama() + 1);
 			break;
 		case 4: // Campo de Número de Trama
-			getTramaAux().setNT(car);
+			tramaAux.setNT(car);
 
 			// Imprime la trama recibida
-			printf("%s [%s]", "Recibido", getTramaAux().toString().c_str());
+			printf("%s [%s]\n", "Recibido", tramaAux.toString().c_str());
 
 			// Reinicia las banderas de trama
 			setIdxTrama(1);

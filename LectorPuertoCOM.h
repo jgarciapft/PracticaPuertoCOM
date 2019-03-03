@@ -82,11 +82,6 @@ public:
 	 * Método accesor del atributo 'idxTrama'
 	 */
 	int getIdxTrama();
-
-	/**
-	 * Método accesor del atributo 'tramaAux'
-	 */
-	Trama getTramaAux();
 };
 
 #endif

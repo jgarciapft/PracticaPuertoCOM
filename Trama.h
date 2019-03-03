@@ -19,17 +19,17 @@ class Trama {
 
 private:
 	/**
+	 * Colección de constantes alfabéticas de tipos de control de tramas
+	 */
+	static const std::string CONST_CONTROL_TRAMA[];
+
+public:
+	/**
 	 * Colección de códigos ASCII de tipos de trama
 	 */
 	enum COD_CONTROL_TRAMA {
 		ENQ = 5, EOT = 4, ACK = 6, NACK = 21
 	};
-
-	/**
-	 * Colección de constantes alfabéticas de tipos de control de tramas
-	 */
-	static const std::string CONST_CONTROL_TRAMA[];
-
 private:
 	/**
 	 * Caracter de sincronismo
