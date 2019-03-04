@@ -10,6 +10,8 @@ const unsigned char EscritorPuertoCOM::TC_DEF_NT = '0';
 EscritorPuertoCOM::EscritorPuertoCOM() {
 	mPuertoCOM = nullptr;
 
+	// Reserva el espacio necesario para el buffer de escritura
+	buffer = new char[BUFFER_MAX_CAR + MSJ_NUM_CRLF + 1];
 	idxBuffer = 0;
 	finCaracter = false;
 }
@@ -17,6 +19,8 @@ EscritorPuertoCOM::EscritorPuertoCOM() {
 EscritorPuertoCOM::EscritorPuertoCOM(ManejadorPuertoCOM *mPuertoCOM) {
 	this->mPuertoCOM = mPuertoCOM;
 
+	// Reserva el espacio necesario para el buffer de escritura
+	buffer = new char[BUFFER_MAX_CAR + MSJ_NUM_CRLF + 1];
 	idxBuffer = 0;
 	finCaracter = false;
 }
@@ -140,4 +144,9 @@ void EscritorPuertoCOM::setIdxBuffer(/* Nuevo valor del índice */int idxBuffer) 
 
 void EscritorPuertoCOM::setFinCaracter(/* Nuevo valor de la bandera */bool finCaracter) {
 	this->finCaracter = finCaracter;
+}
+
+EscritorPuertoCOM::~EscritorPuertoCOM() {
+	// Libera el buffer de escritura
+	delete[] buffer;
 }

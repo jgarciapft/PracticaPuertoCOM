@@ -51,7 +51,7 @@ private:
 	/**
 	 * Buffer de escritura
 	 */
-	char buffer[703]; // TODO Fix
+	char *buffer;
 
 	/**
 	 * Comprueba si el manejador del puerto COM está inicializado
@@ -96,6 +96,8 @@ public:
 	EscritorPuertoCOM();
 
 	explicit EscritorPuertoCOM(ManejadorPuertoCOM *mPuertoCOM);
+
+	~EscritorPuertoCOM();
 
 	/**
 	 * Maneja la función de escritura del puerto COM. Maneja los casos de elección de fin del programa, enviar mensaje, borrado de caracter y escritura de caracter
