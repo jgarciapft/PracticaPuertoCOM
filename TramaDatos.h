@@ -12,18 +12,10 @@
 class TramaDatos : Trama {
 
 private:
-	/**
-	 * Longitud del mensaje contenido en la trama
-	 */
-	unsigned char L;
-	/**
-	 * Mensaje contenido en la trama
-	 */
-	unsigned char *datos;
-	/**
-	 * Bloque de control de errores
-	 */
-	unsigned char BCE;
+
+	unsigned char L;			// Longitud del mensaje contenido en la trama
+	unsigned char *datos;		// Mensaje contenido en la trama
+	unsigned char BCE;			// Bloque de control de errores
 
 public:
 	TramaDatos();

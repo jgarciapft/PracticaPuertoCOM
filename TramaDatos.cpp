@@ -7,28 +7,30 @@ TramaDatos::TramaDatos() {
 
 void TramaDatos::Trama(unsigned char S, unsigned char D, unsigned char C, unsigned char NT, unsigned char L,
 					   unsigned char *datos) {
-	// TODO - implement TramaDatos::Trama
-	throw "Not yet implemented";
+	this->setS(S);
+	this->setD(D);
+	this->setC(C);
+	this->setNT(NT);
+	// Parte específica de las tramas de datos
+	this->L = L;
+	this->datos = datos;
+	this->BCE = datos[0];
 }
 
 unsigned char TramaDatos::getL() {
-	// TODO - implement TramaDatos::getL
-	throw "Not yet implemented";
+	return L;
 }
 
 unsigned char TramaDatos::getBCE() {
-	// TODO - implement TramaDatos::getBCE
-	throw "Not yet implemented";
+	return BCE;
 }
 
 void TramaDatos::setL(/* Nuevo valor de la longitud */unsigned char L) {
-	// TODO - implement TramaDatos::setL
-	throw "Not yet implemented";
+	this->L = L;
 }
 
 void TramaDatos::setBCE(/* Nuevo valor del BCE */unsigned char BCE) {
-	// TODO - implement TramaDatos::setBCE
-	throw "Not yet implemented";
+	this->BCE = BCE;
 }
 
 void TramaDatos::calcularBCE() {
@@ -38,8 +40,12 @@ void TramaDatos::calcularBCE() {
 
 void TramaDatos::setAttr(unsigned char S, unsigned char D, unsigned char C, unsigned char NT, unsigned char L,
 						 unsigned char *datos) {
-	// TODO - implement TramaDatos::setAttr
-	throw "Not yet implemented";
+	this->setS(S);
+	this->setD(D);
+	this->setC(C);
+	this->setNT(NT);
+	this->setL(L);
+	this->datos = datos;
 }
 
 std::string TramaDatos::toString() {
