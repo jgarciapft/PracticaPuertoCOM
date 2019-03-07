@@ -3,7 +3,7 @@
 const int EscritorPuertoCOM::BUFFER_MAX_CAR = 700;
 const int EscritorPuertoCOM::MSJ_NUM_CRLF = 2;
 const char EscritorPuertoCOM::MSJ_SEL_TC[] = "Trama de control a enviar:\n1: Trama ENQ.\n2: Trama EOT.\n3: Trama ACK.\n4: Trama NACK.";
-const char EscritorPuertoCOM::MSJ_ERROR_SEL_TC[] = "Tipo de trama incorreccta";
+const char EscritorPuertoCOM::MSJ_ERROR_SEL_TC[] = "Tipo de trama incorrecta";
 const unsigned char EscritorPuertoCOM::TC_DEF_DIRECCION = 'T';
 const unsigned char EscritorPuertoCOM::TC_DEF_NT = '0';
 
