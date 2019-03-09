@@ -14,7 +14,13 @@
 class EscritorPuertoCOM {
 
 private:
+	/**
+	 * Valor por defecto del campo de dirección
+	 */
 	static const unsigned char TC_DEF_DIRECCION;
+	/**
+	 * Valor por defecto del campo de número de trama
+	 */
 	static const unsigned char TC_DEF_NT;
 
 private:

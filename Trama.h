@@ -55,13 +55,6 @@ public:
 	Trama(unsigned char S, unsigned char D, unsigned char C, unsigned char NT);
 
 	/**
-	 * Devuelve la representación en cadena de la trama
-	 */
-	virtual std::string toString();
-
-protected:
-
-	/**
 	 * Método accesor del atributo 'S'
 	 */
 	unsigned char getS();
@@ -109,6 +102,11 @@ protected:
 														 unsigned char D,/* Nuevo valor del caracter de control */
 														 unsigned char C, /* Nuevo valor del número de trama */
 														 unsigned char NT);
+
+	/**
+	 * Devuelve la representación en cadena de la trama
+	 */
+	virtual std::string toString();
 };
 
 #endif
