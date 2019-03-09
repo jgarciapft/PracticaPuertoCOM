@@ -7,15 +7,21 @@ TramaDatos::TramaDatos() {
 }
 
 TramaDatos::TramaDatos(unsigned char S, unsigned char D, unsigned char C, unsigned char NT, unsigned char L,
-					   unsigned char *datos) : Trama(S, D, C, NT) {
+					   char *datos) : Trama(S, D, C, NT) {
 	this->L = L;
 	this->datos = datos;
 	this->BCE = 0;
 }
 
 void TramaDatos::calcularBCE() {
-	// TODO - implement TramaDatos::calcularBCE
-	throw "Not yet implemented";
+	auto BCE = static_cast<unsigned char>(datos[0]);
+
+	// Calculo del BCE
+	for (int i = 1; i < getL(); i++)
+		BCE ^= datos[i];
+
+	// Actualiza el BCE. Controla que no valga 0 ni 255
+	setBCE(static_cast<unsigned char>(BCE == 0 || BCE == 255 ? 1 : BCE));
 }
 
 unsigned char TramaDatos::getL() {
@@ -35,7 +41,7 @@ void TramaDatos::setBCE(/* Nuevo valor del BCE */unsigned char BCE) {
 }
 
 void TramaDatos::setAttr(unsigned char S, unsigned char D, unsigned char C, unsigned char NT, unsigned char L,
-						 unsigned char *datos) {
+						 char *datos) {
 	this->setS(S);
 	this->setD(D);
 	this->setC(C);
@@ -45,6 +51,5 @@ void TramaDatos::setAttr(unsigned char S, unsigned char D, unsigned char C, unsi
 }
 
 std::string TramaDatos::toString() {
-	// TODO - implement TramaDatos::toString
-	throw "Not yet implemented";
+	return std::string(datos, getL());
 }

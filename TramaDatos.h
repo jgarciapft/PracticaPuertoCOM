@@ -20,7 +20,7 @@ private:
 	/**
 	 * Mensaje contenido en la trama
 	 */
-	unsigned char *datos;
+	char *datos;
 	/**
 	 * Bloque de control de errores
 	 */
@@ -46,7 +46,7 @@ public:
 	TramaDatos();
 
 	TramaDatos(unsigned char S, unsigned char D, unsigned char C, unsigned char NT, unsigned char L,
-			   unsigned char *datos);
+			   char *datos);
 
 	/**
 	 * Método accesor del atributo 'L'
@@ -66,12 +66,12 @@ public:
 														 unsigned char D,/* Nuevo valor del caracter de control */
 														 unsigned char C, /* Nuevo valor del número de trama */
 														 unsigned char NT,/* Nuevo valor de la longitud */
-														 unsigned char L, /* Nuevo mensaje */unsigned char *datos);
+														 unsigned char L, /* Nuevo mensaje */char *datos);
 
 	/**
 	 * Devuelve la representación en cadena de la trama de datos
 	 */
-	std::string toString();
+	std::string toString() override;
 };
 
 #endif
