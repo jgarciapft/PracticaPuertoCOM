@@ -1,9 +1,11 @@
 #ifndef ESCRITORPUERTOCOM_H
 #define ESCRITORPUERTOCOM_H
 
+
 #include "ManejadorPuertoCOM.h"
 #include "ManejadorEntradaUsuario.h"
 #include "Principal.h"
+#include "TramaDatos.h"
 
 /**
  * Manejador responsable de la escritura sobre el puerto COM
@@ -15,13 +17,26 @@ class EscritorPuertoCOM {
 
 private:
 	/**
-	 * Valor por defecto del campo de dirección
+	 * Valor por defecto del campo de dirección para tramas de control
 	 */
 	static const unsigned char TC_DEF_DIRECCION;
 	/**
-	 * Valor por defecto del campo de número de trama
+	 * Valor por defecto del campo de número de trama para tramas de control
 	 */
 	static const unsigned char TC_DEF_NT;
+	/**
+	 * Valor por defecto del campo deirección para tramas de datos
+	 */
+	static const unsigned char TD_DEF_DIRECCION;
+	/**
+	 * Valor por defecto del campo de control para tramas de datos
+	 */
+	static const unsigned char TD_DEF_CONTROL;
+	/**
+	 * Valor por defecto del campo de número de trama para tramas de datos
+	 */
+	static const unsigned char TD_DEF_NT;
+
 
 private:
 	/**
@@ -76,9 +91,21 @@ private:
 	void enviarMensaje();
 
 	/**
-	 * Formatea y envía una trama por el pueto COM según el manejador establecido
+	 * Formatea el mensaje y divide el buffer de escritura en tramas para después enviarlas por el puerto COM
 	 */
-	void enviarTrama();
+	void enviarBufferTramas();
+
+	/**
+	 * Envía una trama de datos por el puerto COM
+	 *
+	 * @param tramaDatos Trama de datos a enviar
+	 */
+	void enviarTramaDatos(TramaDatos tramaDatos);
+
+	/**
+	 * Formatea y envía una trama de control por el pueto COM según el manejador establecido
+	 */
+	void enviarTramaControl();
 
 	/**
 	 * Escribe en el buffer con 'echo' el caracter pasado

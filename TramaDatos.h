@@ -36,17 +36,17 @@ private:
 	 */
 	void setBCE(/* Nuevo valor del BCE */unsigned char BCE);
 
-	/**
-	 * Calcula el BCE para el mensaje contenido en la trama
-	 */
-	void calcularBCE();
-
 public:
 
 	TramaDatos();
 
 	TramaDatos(unsigned char S, unsigned char D, unsigned char C, unsigned char NT, unsigned char L,
 			   char *datos);
+
+	/**
+	 * Calcula el BCE para el mensaje contenido en la trama
+	 */
+	void calcularBCE();
 
 	/**
 	 * Método accesor del atributo 'L'
@@ -57,6 +57,11 @@ public:
 	 * Método accesor del atributo 'BCE'
 	 */
 	unsigned char getBCE();
+
+	/**
+	 * Método accesor del atributo 'datos'
+	 */
+	const char *getDatos();
 
 	/**
 	 * Método modificador global

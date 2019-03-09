@@ -32,6 +32,10 @@ unsigned char TramaDatos::getBCE() {
 	return BCE;
 }
 
+const char *TramaDatos::getDatos() {
+	return datos;
+}
+
 void TramaDatos::setL(/* Nuevo valor de la longitud */unsigned char L) {
 	this->L = L;
 }

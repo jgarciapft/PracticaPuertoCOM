@@ -6,6 +6,9 @@ const char EscritorPuertoCOM::MSJ_SEL_TC[] = "Trama de control a enviar:\n1: Tra
 const char EscritorPuertoCOM::MSJ_ERROR_SEL_TC[] = "Tipo de trama incorrecta";
 const unsigned char EscritorPuertoCOM::TC_DEF_DIRECCION = 'T';
 const unsigned char EscritorPuertoCOM::TC_DEF_NT = '0';
+const unsigned char EscritorPuertoCOM::TD_DEF_DIRECCION = 'T';
+const unsigned char EscritorPuertoCOM::TD_DEF_CONTROL = 2;
+const unsigned char EscritorPuertoCOM::TD_DEF_NT = '0';
 
 EscritorPuertoCOM::EscritorPuertoCOM() {
 	mPuertoCOM = nullptr;
@@ -38,7 +41,7 @@ void EscritorPuertoCOM::escritura() {
 					enviarMensaje();
 					break;
 				case CONSTANTES::TECLA_F2: // Es F2
-					enviarTrama();
+					enviarTramaControl();
 			}
 			break;
 		case CONSTANTES::TECLA_RETROCESO: // RETROCESO
@@ -53,8 +56,6 @@ void EscritorPuertoCOM::escritura() {
 }
 
 void EscritorPuertoCOM::enviarMensaje() {
-	HANDLE com = mPuertoCOM->getHandle();
-
 	/** FORMATO DE MENSAJE */
 
 	for (int i = 0; i < MSJ_NUM_CRLF; i++) { // Inserta los saltos de línea indicados
@@ -66,8 +67,7 @@ void EscritorPuertoCOM::enviarMensaje() {
 	/** ENVÍO DE MENSAJE */
 
 	if (manPrtoCOMAbierto()) { // Comprueba que el puerto COM esté operativo
-		EnviarCadena(com, buffer,
-					 static_cast<int>(strlen(buffer))); // Envía el mensaje
+		enviarBufferTramas();
 	}
 	printf("%c", CONSTANTES::CRLN); // Salta a la siguiente línea para seguir escribiendo
 
@@ -76,7 +76,37 @@ void EscritorPuertoCOM::enviarMensaje() {
 	setIdxBuffer(0); // Reinicia el índice del buffer de escritura
 }
 
-void EscritorPuertoCOM::enviarTrama() {
+void EscritorPuertoCOM::enviarBufferTramas() {
+	int idx, auxLen;
+	TramaDatos tramaDatos;
+
+	// Divide el mensaje en las tramas necesarias mediante referencias desplazadas al puntero buffer
+	for (idx = 0; idx < strlen(buffer); idx += 254) {
+		auxLen = static_cast<int>(strlen(
+				buffer + idx)); // Auxiliar para comprobar la longitud real de la cadena de la sección buffer + idx
+
+		tramaDatos = TramaDatos(CONSTANTES::SINCRONISMO, TD_DEF_DIRECCION, TD_DEF_CONTROL, TD_DEF_NT,
+								static_cast<unsigned char>(auxLen > 254 ? 254 : auxLen), buffer + idx);
+		tramaDatos.calcularBCE(); // Calcula el BCE la trama antes de enviarla
+		enviarTramaDatos(tramaDatos);
+	}
+}
+
+void EscritorPuertoCOM::enviarTramaDatos(TramaDatos tramaDatos) {
+	HANDLE com = ManejadorPuertoCOM::recuperarInstancia()->getHandle();
+
+	// Envía el contenido de la trama por partes
+	EnviarCaracter(com, tramaDatos.getS());
+	EnviarCaracter(com, tramaDatos.getD());
+	EnviarCaracter(com, tramaDatos.getC());
+	EnviarCaracter(com, tramaDatos.getNT());
+	EnviarCaracter(com, tramaDatos.getL());
+	EnviarCadena(com, tramaDatos.getDatos(), tramaDatos.getL());
+	EnviarCaracter(com, CONSTANTES::TECLA_FUNCION); // Envía el fin de cadena '\0'
+	EnviarCaracter(com, tramaDatos.getBCE());
+}
+
+void EscritorPuertoCOM::enviarTramaControl() {
 	HANDLE com = mPuertoCOM->getHandle();
 	Trama tramaAux = Trama(); // Trama a cosnturir
 	unsigned char C; // Caracter para determinar el campo de control de la trama
