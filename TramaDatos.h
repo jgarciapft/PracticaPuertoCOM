@@ -4,36 +4,28 @@
 #include "Trama.h"
 
 /**
- * Clase que modela una trama de datos
+ * Clase que modela una trama de datos. Deriva de la clase Trama
  * 
  * @author Juan Pablo García Plaza Pérez @ 2ºGIIIS/GrupoA
  * @author José Ángel Concha Carrasco @ 2ºGIIIS/GrupoA
  */
-class TramaDatos : Trama {
+class TramaDatos : public Trama {
 
 private:
 
-	unsigned char L;			// Longitud del mensaje contenido en la trama
-	unsigned char *datos;		// Mensaje contenido en la trama
-	unsigned char BCE;			// Bloque de control de errores
-
-public:
-	TramaDatos();
-
-	void
-	Trama(unsigned char S, unsigned char D, unsigned char C, unsigned char NT, unsigned char L, unsigned char *datos);
-
 	/**
-	 * Método accesor del atributo 'L'
+	 * Longitud del mensaje contenido en la trama
 	 */
-	unsigned char getL();
-
+	unsigned char L;
 	/**
-	 * Método accesor del atributo 'BCE'
+	 * Mensaje contenido en la trama
 	 */
-	unsigned char getBCE();
+	unsigned char *datos;
+	/**
+	 * Bloque de control de errores
+	 */
+	unsigned char BCE;
 
-private:
 	/**
 	 * Método modificador del atributo 'L'
 	 */
@@ -50,6 +42,22 @@ private:
 	void calcularBCE();
 
 public:
+
+	TramaDatos();
+
+	TramaDatos(unsigned char S, unsigned char D, unsigned char C, unsigned char NT, unsigned char L,
+			   unsigned char *datos);
+
+	/**
+	 * Método accesor del atributo 'L'
+	 */
+	unsigned char getL();
+
+	/**
+	 * Método accesor del atributo 'BCE'
+	 */
+	unsigned char getBCE();
+
 	/**
 	 * Método modificador global
 	 */
