@@ -4,8 +4,10 @@ LectorPuertoCOM::LectorPuertoCOM() {
 	mPuertoCOM = nullptr;
 
 	esTrama = false;
+    esTramaDatos = false;
 	idxTrama = 1;
-	tramaAux = Trama();
+    tramaAux = TramaDatos();
+
 }
 
 LectorPuertoCOM::LectorPuertoCOM(ManejadorPuertoCOM *mPuertoCOM) {
@@ -13,7 +15,8 @@ LectorPuertoCOM::LectorPuertoCOM(ManejadorPuertoCOM *mPuertoCOM) {
 
 	esTrama = false;
 	idxTrama = 1;
-	tramaAux = Trama();
+    tramaAux = TramaDatos();
+
 }
 
 void LectorPuertoCOM::lectura() {
@@ -47,12 +50,20 @@ bool LectorPuertoCOM::getEsTrama() {
 	return this->esTrama;
 }
 
+bool LectorPuertoCOM::getEsTramaDatos() {
+    return this->esTramaDatos;
+}
+
 int LectorPuertoCOM::getIdxTrama() {
 	return this->idxTrama;
 }
 
 void LectorPuertoCOM::setEsTrama(/* Nuevo valor de la bandera */bool esTrama) {
 	this->esTrama = esTrama;
+}
+
+void LectorPuertoCOM::setEsTramaDatos(bool esTramaDatos) {
+    this->esTramaDatos = esTramaDatos;
 }
 
 void LectorPuertoCOM::setIdxTrama(/* Nuevo valor del índice */int idxTrama) {
@@ -75,12 +86,35 @@ void LectorPuertoCOM::leerTrama(char car) {
 			break;
 		case 4: // Campo de Número de Trama
 			tramaAux.setNT(car);
-
-			// Imprime la trama recibida
-			printf("%s [%s]\n", "Recibido", tramaAux.toString().c_str());
-
+            if (tramaAux.getC() != 2) {
+                setIdxTrama(1);
+                // Procesar Trama Control (imprime la trama recibida)
+                printf("%s [%s]\n", "Recibido", ((Trama) tramaAux).toString().c_str());
+            } else {
+                setEsTramaDatos(true);
+                setIdxTrama(getIdxTrama() + 1);
+            }
+            break;
+        case 5:
+            tramaAux.setL((unsigned char) car);
+            setIdxTrama(getIdxTrama() + 1);
+        case 6: // Datos
+            // RecibirCadena(mPuertoCOM, tramaAux.getDatos(), tramaAux.getL());
+            // Campo_Datos[Campo_Longitud] = '\0';
+            setIdxTrama(getIdxTrama() + 1);
+            break;
+        case 7:
+            tramaAux.calcularBCE();            // Calculamos y almacenamos el BCE de nuestra trama
+            setIdxTrama(1);
+            // Procesar Trama Datos
+            if (tramaAux.getBCE() == car) {    // Lo comparamos con el BCE de la trama enviada
+                printf("%s [%s]\n", "Recibido", tramaAux.toString().c_str());
+            } else {
+                printf("Error al recibir la trama");
+            }
 			// Reinicia las banderas de trama
-			setIdxTrama(1);
 			setEsTrama(false);
+            setEsTramaDatos(false);
+            break;
 	}
 }

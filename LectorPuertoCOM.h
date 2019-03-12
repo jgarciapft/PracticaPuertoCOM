@@ -23,6 +23,10 @@ private:
 	 */
 	bool esTrama;
 	/**
+	 * Bandera que indica si se está leyendo una trama de datos
+	 */
+	bool esTramaDatos;
+	/**
 	 * Bandera que indica si se ha terminado de leer la trama en progreso de envío
 	 */
 	bool finTrama;
@@ -33,7 +37,7 @@ private:
 	/**
 	 * Auxiliar sobre la que construir una trama
 	 */
-	Trama tramaAux;
+	TramaDatos tramaAux;
 
 	/**
 	 * Comprueba si el manejador del puerto COM está inicializado
@@ -58,6 +62,11 @@ private:
 	void setEsTrama(/* Nuevo valor de la bandera */bool esTrama);
 
 	/**
+	 * Método modificador del atributo 'esTramaDatos'
+	 */
+	void setEsTramaDatos(bool esTramaDatos);
+
+	/**
 	 * Método modificador del atributo 'idxTrama'
 	 */
 	void setIdxTrama(/* Nuevo valor del índice */int idxTrama);
@@ -77,6 +86,11 @@ public:
 	 * Método accesor del atributo 'esTrama'
 	 */
 	bool getEsTrama();
+
+	/**
+	 * Método accesor del atributo 'esTramaDatos'
+	 */
+	bool getEsTramaDatos();
 
 	/**
 	 * Método accesor del atributo 'idxTrama'
