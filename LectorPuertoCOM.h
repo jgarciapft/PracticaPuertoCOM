@@ -15,21 +15,15 @@ class LectorPuertoCOM {
 
 private:
 	/**
+	 * Mensaje de error cuando los BCE de la trama recibida y calculada no coinciden
+	 */
+	static const char MSJ_ERROR_BCE_INVALIDO[];
+
+private:
+	/**
 	 * Manejador del puerto COM del que leer
 	 */
 	ManejadorPuertoCOM *mPuertoCOM;
-	/**
-	 * Bandera que indica si se está leyendo una trama
-	 */
-	bool esTrama;
-	/**
-	 * Bandera que indica si se está leyendo una trama de datos
-	 */
-	bool esTramaDatos;
-	/**
-	 * Bandera que indica si se ha terminado de leer la trama en progreso de envío
-	 */
-	bool finTrama;
 	/**
 	 * ïndice de campo de la trama siguiente a leer
 	 */
@@ -37,7 +31,7 @@ private:
 	/**
 	 * Auxiliar sobre la que construir una trama
 	 */
-	TramaDatos tramaAux;
+	Trama *tramaAux;
 
 	/**
 	 * Comprueba si el manejador del puerto COM está inicializado
@@ -57,16 +51,6 @@ private:
 	void leerTrama(char car);
 
 	/**
-	 * Método modificador del atributo 'esTrama'
-	 */
-	void setEsTrama(/* Nuevo valor de la bandera */bool esTrama);
-
-	/**
-	 * Método modificador del atributo 'esTramaDatos'
-	 */
-	void setEsTramaDatos(bool esTramaDatos);
-
-	/**
 	 * Método modificador del atributo 'idxTrama'
 	 */
 	void setIdxTrama(/* Nuevo valor del índice */int idxTrama);
@@ -81,16 +65,6 @@ public:
 	 * Maneja la función de lectura del puerto COM. Maneja la lectura de un caracter y la lectura de una trama
 	 */
 	void lectura();
-
-	/**
-	 * Método accesor del atributo 'esTrama'
-	 */
-	bool getEsTrama();
-
-	/**
-	 * Método accesor del atributo 'esTramaDatos'
-	 */
-	bool getEsTramaDatos();
 
 	/**
 	 * Método accesor del atributo 'idxTrama'

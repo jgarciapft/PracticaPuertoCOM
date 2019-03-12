@@ -6,6 +6,12 @@ TramaDatos::TramaDatos() {
 	BCE = 0;
 }
 
+TramaDatos::TramaDatos(Trama *trama) : Trama(trama->getS(), trama->getD(), trama->getC(), trama->getNT()) {
+	datos = nullptr;
+	L = 0;
+	BCE = 0;
+}
+
 TramaDatos::TramaDatos(unsigned char S, unsigned char D, unsigned char C, unsigned char NT, unsigned char L,
 					   char *datos) : Trama(S, D, C, NT) {
 	this->L = L;
@@ -44,6 +50,10 @@ void TramaDatos::setBCE(/* Nuevo valor del BCE */unsigned char BCE) {
 	this->BCE = BCE;
 }
 
+void TramaDatos::setDatos(char *datos) {
+	this->datos = datos;
+}
+
 void TramaDatos::setAttr(unsigned char S, unsigned char D, unsigned char C, unsigned char NT, unsigned char L,
 						 char *datos) {
 	this->setS(S);
@@ -51,7 +61,7 @@ void TramaDatos::setAttr(unsigned char S, unsigned char D, unsigned char C, unsi
 	this->setC(C);
 	this->setNT(NT);
 	this->setL(L);
-	this->datos = datos;
+	this->setDatos(datos);
 }
 
 std::string TramaDatos::toString() {

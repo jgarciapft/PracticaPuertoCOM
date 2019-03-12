@@ -13,70 +13,77 @@ class TramaDatos : public Trama {
 
 private:
 
-    /**
-     * Longitud del mensaje contenido en la trama
-     */
-    unsigned char L;
-    /**
-     * Mensaje contenido en la trama
-     */
-    char *datos;
-    /**
-     * Bloque de control de errores
-     */
-    unsigned char BCE;
+	/**
+	 * Longitud del mensaje contenido en la trama
+	 */
+	unsigned char L;
+	/**
+	 * Mensaje contenido en la trama
+	 */
+	char *datos;
+	/**
+	 * Bloque de control de errores
+	 */
+	unsigned char BCE;
 
 public:
 
-    TramaDatos();
+	TramaDatos();
 
-    TramaDatos(unsigned char S, unsigned char D, unsigned char C, unsigned char NT, unsigned char L,
-               char *datos);
+	explicit TramaDatos(Trama *trama);
 
-    /**
-    * Método modificador del atributo 'L'
-    */
-    void setL(unsigned char L);
+	TramaDatos(unsigned char S, unsigned char D, unsigned char C, unsigned char NT, unsigned char L,
+			   char *datos);
 
-    /**
-     * Método modificador del atributo 'BCE'
-     */
-    void setBCE(unsigned char BCE);
+	/**
+	 * Calcula el BCE para el mensaje contenido en la trama
+	 */
+	void calcularBCE();
 
-    /**
-     * Calcula el BCE para el mensaje contenido en la trama
-     */
-    void calcularBCE();
+	/**
+	 * Método accesor del atributo 'L'
+	 */
+	unsigned char getL();
 
-    /**
-     * Método accesor del atributo 'L'
-     */
-    unsigned char getL();
+	/**
+	 * Método accesor del atributo 'BCE'
+	 */
+	unsigned char getBCE();
 
-    /**
-     * Método accesor del atributo 'BCE'
-     */
-    unsigned char getBCE();
+	/**
+	 * Método accesor del atributo 'datos'
+	 */
+	const char *getDatos();
 
-    /**
-     * Método accesor del atributo 'datos'
-     */
-    const char *getDatos();
+	/**
+	* Método modificador del atributo 'L'
+	*/
+	void setL(unsigned char L);
 
-    /**
-     * Método modificador global
-     */
-    void
-    setAttr(/* Nuevo valor del caracter de sincronismo */unsigned char S,/* Nuevo valor del caracter de dirección */
-                                                         unsigned char D,/* Nuevo valor del caracter de control */
-                                                         unsigned char C, /* Nuevo valor del número de trama */
-                                                         unsigned char NT,/* Nuevo valor de la longitud */
-                                                         unsigned char L, /* Nuevo mensaje */char *datos);
+	/**
+	 * Método modificador del atributo 'BCE'
+	 */
+	void setBCE(unsigned char BCE);
 
-    /**
-     * Devuelve la representación en cadena de la trama de datos
-     */
-    std::string toString() override;
+	/**
+	 * Método modificador del atributo 'datos'
+	 */
+	void setDatos(char *datos);
+
+	/**
+	 * Método modificador global
+	 */
+	void
+	setAttr(/* Nuevo valor del caracter de sincronismo */unsigned char S,/* Nuevo valor del caracter de dirección */
+														 unsigned char D,/* Nuevo valor del caracter de control */
+														 unsigned char C, /* Nuevo valor del número de trama */
+														 unsigned char NT,/* Nuevo valor de la longitud */
+														 unsigned char L, /* Nuevo mensaje */char *datos);
+
+	/**
+	 * Devuelve la representación en cadena de la trama de datos
+	 */
+	std::string toString() override;
 };
 
 #endif
