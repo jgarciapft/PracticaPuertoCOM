@@ -89,6 +89,7 @@ void LectorPuertoCOM::leerTrama(char car) {
 			dynamic_cast<TramaDatos *>(tramaAux)->setDatos(datosRecibidos); // Almacena el mensaje en la trama de datos
 
 			setIdxTrama(getIdxTrama() + 2);
+			delete[] datosRecibidos; // Libera la cadena auxiliar de lectura
 			break;
 		case 7:
 			dynamic_cast<TramaDatos *>(tramaAux)->calcularBCE(); // Calculamos y almacenamos el BCE de nuestra trama
