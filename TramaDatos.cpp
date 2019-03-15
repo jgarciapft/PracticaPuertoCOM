@@ -6,12 +6,6 @@ TramaDatos::TramaDatos() {
 	BCE = 0;
 }
 
-TramaDatos::TramaDatos(Trama *trama) : Trama(trama->getS(), trama->getD(), trama->getC(), trama->getNT()) {
-	datos = nullptr;
-	L = 0;
-	BCE = 0;
-}
-
 TramaDatos::TramaDatos(unsigned char S, unsigned char D, unsigned char C, unsigned char NT, unsigned char L,
 					   char *datos) : Trama(S, D, C, NT) {
 	this->L = L;

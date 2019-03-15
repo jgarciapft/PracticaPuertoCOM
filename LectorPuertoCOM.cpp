@@ -19,10 +19,8 @@ LectorPuertoCOM::LectorPuertoCOM(ManejadorPuertoCOM *mPuertoCOM) {
 void LectorPuertoCOM::lectura() {
 	char car = hayContenido(); // Comprueba si hay car. Si lo hay lo lee
 
-	if (car) {
-		if (car == 22) // Detecta caracter sincronismo. Es trama
-			leerTrama(car);
-	}
+	if (car)
+		leerTrama(car);
 }
 
 bool LectorPuertoCOM::manPrtoCOMAbierto() {
@@ -52,8 +50,13 @@ void LectorPuertoCOM::leerTrama(char car) {
 	switch (getIdxTrama()) { // Determina en qué campo de la trama hay que escribir
 		case 1: // Campo de Sincronismo
 			tramaAux = new Trama(); // Instancia la trama base genérica
-
-			tramaAux->setS(car);
+			if (car == CONSTANTES::SINCRONISMO) {
+				// Detecta caracter sincronismo. Es trama
+				tramaAux->setS(car);
+			} else {
+				printf("%s\n\tcar : %c\n", "ERROR : no es una trama", car);
+				setIdxTrama(1);
+			}
 			setIdxTrama(getIdxTrama() + 1);
 			break;
 		case 2: // Campo de Dirección
@@ -71,10 +74,17 @@ void LectorPuertoCOM::leerTrama(char car) {
 				// Procesar Trama Control (imprime la trama recibida)
 				printf("%s [%s]\n", "Recibido", tramaAux->toString().c_str());
 				setIdxTrama(1);
-				delete tramaAux; // Destruye la trama base genérica
+				delete tramaAux; // Destruye la trama base genérica tratada
 			} else {
-				tramaAux = new TramaDatos(tramaAux); // Copia de la trama genérica en una trama de datos
+				unsigned char getS = tramaAux->getS();
+				unsigned char getD = tramaAux->getD();
+				unsigned char getC = tramaAux->getC();
+				unsigned char getNT = tramaAux->getNT();
+
 				setIdxTrama(getIdxTrama() + 1);
+				delete tramaAux; // Libera la memoria asociada a la trama de datos genérica, ahora inútil
+				tramaAux = new TramaDatos(getS, getD, getC, getNT, 0,
+										  nullptr); // Copia de la trama genérica en una trama de datos
 			}
 			break;
 		case 5: // Longitud
@@ -93,13 +103,23 @@ void LectorPuertoCOM::leerTrama(char car) {
 			break;
 		case 7:
 			dynamic_cast<TramaDatos *>(tramaAux)->calcularBCE(); // Calculamos y almacenamos el BCE de nuestra trama
+			// INSTRUMENTACIÓN DE DEPURACIÓN ->
 
+
+			printf("1. SINCRONISMO : %d\n2. DIRECCION : %c\n3. CONTROL : %d\n4. NT : %c\n5. LON : %d\n",
+				   tramaAux->getS(), tramaAux->getD(), tramaAux->getC(), tramaAux->getNT(),
+				   dynamic_cast<TramaDatos *>(tramaAux)->getL());
+			printf("MSJ recibido : %s\nBCE recibido : %d\nBCE calculado : %d\n", tramaAux->toString().c_str(), car,
+				   dynamic_cast<TramaDatos *>(tramaAux)->getBCE());
+
+
+			// <- INSTRUMENTACIÓN DE DEPURACIÓN
 			// Procesar Trama Datos
 			if (dynamic_cast<TramaDatos *>(tramaAux)->getBCE() ==
 				static_cast<unsigned char>(car)) // Lo comparamos con el BCE de la trama enviada
 				printf("%s", tramaAux->toString().c_str());
 			else {
-				printf("%s", MSJ_ERROR_BCE_INVALIDO);
+				printf("%s\n", MSJ_ERROR_BCE_INVALIDO);
 			}
 			// Reinicia las banderas de trama
 			setIdxTrama(1);

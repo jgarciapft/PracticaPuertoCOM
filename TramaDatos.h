@@ -30,8 +30,6 @@ public:
 
 	TramaDatos();
 
-	explicit TramaDatos(Trama *trama);
-
 	TramaDatos(unsigned char S, unsigned char D, unsigned char C, unsigned char NT, unsigned char L,
 			   char *datos);
 
