@@ -103,16 +103,7 @@ void LectorPuertoCOM::leerTrama(char car) {
 			break;
 		case 7:
 			dynamic_cast<TramaDatos *>(tramaAux)->calcularBCE(); // Calculamos y almacenamos el BCE de nuestra trama
-			// INSTRUMENTACIÓN DE DEPURACIÓN ->
 
-			printf("1. SINCRONISMO : %d\n2. DIRECCION : %c\n3. CONTROL : %d\n4. NT : %c\n5. LON : %u\n",
-				   tramaAux->getS(), tramaAux->getD(), tramaAux->getC(), tramaAux->getNT(),
-				   dynamic_cast<TramaDatos *>(tramaAux)->getL());
-			printf("MSJ recibido : %s\nBCE recibido : %u\nBCE calculado : %u\n", tramaAux->toString().c_str(), car,
-				   dynamic_cast<TramaDatos *>(tramaAux)->getBCE());
-
-
-			// <- INSTRUMENTACIÓN DE DEPURACIÓN
 			// Procesar Trama Datos
 			if (dynamic_cast<TramaDatos *>(tramaAux)->getBCE() ==
 				static_cast<unsigned char>(car)) // Lo comparamos con el BCE de la trama enviada
