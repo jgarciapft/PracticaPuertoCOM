@@ -66,9 +66,8 @@ void EscritorPuertoCOM::enviarMensaje() {
 
 	/** ENVÍO DE MENSAJE */
 
-	if (manPrtoCOMAbierto()) { // Comprueba que el puerto COM esté operativo
+	if (manPrtoCOMAbierto()) // Comprueba que el puerto COM esté operativo
 		enviarBufferTramas();
-	}
 	printf("%c", CONSTANTES::CRLN); // Salta a la siguiente línea para seguir escribiendo
 
 	/** REINICIO DE BANDERAS */
@@ -87,6 +86,16 @@ void EscritorPuertoCOM::enviarBufferTramas() {
 
 		tramaDatos = TramaDatos(CONSTANTES::SINCRONISMO, TD_DEF_DIRECCION, TD_DEF_CONTROL, TD_DEF_NT,
 								static_cast<unsigned char>(auxLen > 254 ? 254 : auxLen), buffer + idx);
+
+		// INSTRUMENTACIÓN DE DEPURACIÓN ->
+
+		cout << endl << "TRAMA " << idx / 254 << endl;
+		for (int i = 0; i < tramaDatos.getL(); i++)
+			cout << tramaDatos.getDatos()[i];
+		cout << endl;
+
+		// <- INSTRUMENACIÓN DE DEPURACIÓN
+
 		tramaDatos.calcularBCE(); // Calcula el BCE la trama antes de enviarla
 		enviarTramaDatos(tramaDatos);
 	}
@@ -96,13 +105,27 @@ void EscritorPuertoCOM::enviarTramaDatos(TramaDatos tramaDatos) {
 	HANDLE com = ManejadorPuertoCOM::recuperarInstancia()->getHandle();
 
 	// Envía el contenido de la trama por partes
+
+	// INSTRUMENTACIÓN DE DEPURACIÓN ->
+
+	printf("1. SINCRONISMO %d\n2. DIRECCION %c\n3. CONTROL %d\n4. NT %c\n5. LONGITUD %u\n6. MENSAJE\n\t%s\n7. BCE %u\n",
+		   tramaDatos.getS(),
+		   tramaDatos.getD(),
+		   tramaDatos.getC(),
+		   tramaDatos.getNT(),
+		   tramaDatos.getL(),
+		   tramaDatos.toString().c_str(),
+		   tramaDatos.getBCE());
+
+	// <- INSTRUMENACIÓN DE DEPURACIÓN
+
 	EnviarCaracter(com, tramaDatos.getS());
 	EnviarCaracter(com, tramaDatos.getD());
 	EnviarCaracter(com, tramaDatos.getC());
 	EnviarCaracter(com, tramaDatos.getNT());
 	EnviarCaracter(com, tramaDatos.getL());
 	EnviarCadena(com, tramaDatos.getDatos(), tramaDatos.getL());
-	EnviarCaracter(com, CONSTANTES::TECLA_FUNCION); // Envía el fin de cadena '\0'
+	EnviarCaracter(com, CONSTANTES::DELIM_CAD); // Envía el fin de cadena '\0'
 	EnviarCaracter(com, tramaDatos.getBCE());
 }
 

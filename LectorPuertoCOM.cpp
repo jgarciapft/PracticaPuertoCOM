@@ -45,7 +45,7 @@ void LectorPuertoCOM::leerTrama(char car) {
 	HANDLE com = mPuertoCOM->getHandle();
 
 	int longitud;
-	char *datosRecibidos;
+	char *datosRecibidos = nullptr;
 
 	switch (getIdxTrama()) { // Determina en qué campo de la trama hay que escribir
 		case 1: // Campo de Sincronismo
@@ -96,20 +96,19 @@ void LectorPuertoCOM::leerTrama(char car) {
 			// Recibe el mensaje
 			RecibirCadena(com, datosRecibidos, longitud);
 			datosRecibidos[longitud] = CONSTANTES::DELIM_CAD; // Formatea el fin de cadena por seguridad
+
 			dynamic_cast<TramaDatos *>(tramaAux)->setDatos(datosRecibidos); // Almacena el mensaje en la trama de datos
 
 			setIdxTrama(getIdxTrama() + 2);
-			delete[] datosRecibidos; // Libera la cadena auxiliar de lectura
 			break;
 		case 7:
 			dynamic_cast<TramaDatos *>(tramaAux)->calcularBCE(); // Calculamos y almacenamos el BCE de nuestra trama
 			// INSTRUMENTACIÓN DE DEPURACIÓN ->
 
-
-			printf("1. SINCRONISMO : %d\n2. DIRECCION : %c\n3. CONTROL : %d\n4. NT : %c\n5. LON : %d\n",
+			printf("1. SINCRONISMO : %d\n2. DIRECCION : %c\n3. CONTROL : %d\n4. NT : %c\n5. LON : %u\n",
 				   tramaAux->getS(), tramaAux->getD(), tramaAux->getC(), tramaAux->getNT(),
 				   dynamic_cast<TramaDatos *>(tramaAux)->getL());
-			printf("MSJ recibido : %s\nBCE recibido : %d\nBCE calculado : %d\n", tramaAux->toString().c_str(), car,
+			printf("MSJ recibido : %s\nBCE recibido : %u\nBCE calculado : %u\n", tramaAux->toString().c_str(), car,
 				   dynamic_cast<TramaDatos *>(tramaAux)->getBCE());
 
 
@@ -123,6 +122,7 @@ void LectorPuertoCOM::leerTrama(char car) {
 			}
 			// Reinicia las banderas de trama
 			setIdxTrama(1);
+			delete[] datosRecibidos; // Libera la cadena auxiliar de lectura
 			delete tramaAux;
 			break;
 	}
