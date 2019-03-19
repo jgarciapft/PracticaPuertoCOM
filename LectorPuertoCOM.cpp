@@ -1,6 +1,8 @@
 #include "LectorPuertoCOM.h"
 
 const char LectorPuertoCOM::MSJ_ERROR_BCE_INVALIDO[] = "Error al recibir la trama";
+const char LectorPuertoCOM::MSJ_INICIO_REC_FICHERO[] = "Recibiendo fichero por";
+const char LectorPuertoCOM::MSJ_FIN_REC_FICHERO[] = "Fichero recibido";
 
 LectorPuertoCOM::LectorPuertoCOM() {
 	mPuertoCOM = nullptr;
@@ -19,7 +21,7 @@ LectorPuertoCOM::LectorPuertoCOM(ManejadorPuertoCOM *mPuertoCOM) {
 void LectorPuertoCOM::lectura() {
 	char car = hayContenido(); // Comprueba si hay car. Si lo hay lo lee
 
-	if (car) leerTrama(car);
+	if (car) procesarCar(car);
 }
 
 bool LectorPuertoCOM::manPrtoCOMAbierto() {
@@ -40,7 +42,7 @@ void LectorPuertoCOM::setIdxTrama(/* Nuevo valor del índice */int idxTrama) {
 	this->idxTrama = idxTrama;
 }
 
-void LectorPuertoCOM::leerTrama(char car) {
+void LectorPuertoCOM::procesarCar(char car) {
 	HANDLE com = mPuertoCOM->getHandle();
 
 	int longitud;
@@ -54,7 +56,16 @@ void LectorPuertoCOM::leerTrama(char car) {
 				tramaAux->setS(car);
 				setIdxTrama(getIdxTrama() + 1);
 			} else {
-				printf("%s\n\tcar : %c\n", "ERROR : no es una trama", car);
+				switch (car) {
+					case EscritorPuertoCOM::CHAR_INICIO_FICHERO:
+						printf("%s %s\n", MSJ_INICIO_REC_FICHERO, "Autor"); // TODO extraer el autor
+						break;
+					case EscritorPuertoCOM::CHAR_FIN_FICHERO:
+						printf("%s\n", MSJ_FIN_REC_FICHERO);
+						break;
+					default:
+						printf("%s\n\tcar : %c\n", "ERROR : no es una trama", car);
+				}
 				setIdxTrama(1); // Reinicia la bandera de campo
 				delete tramaAux; // Libera el espacio reservado para la trama auxiliar
 			}

@@ -14,8 +14,8 @@ const char EscritorPuertoCOM::MSJ_ERR_FICHERO_ENVIO_NO_ENCONTRADO[] = "Error al 
 const char EscritorPuertoCOM::MSJ_INICIO_ENV_FICHERO[] = "Enviando fichero por";
 const char EscritorPuertoCOM::MSJ_FIN_ENV_FICHERO[] = "Fichero enviado";
 const char EscritorPuertoCOM::RUTA_DEF_FICHERO_ENVIO[] = "Fenvio.txt";
-const char EscritorPuertoCOM::CHAR_INICIO_FICHERO = '#';
-const char EscritorPuertoCOM::CHAR_FIN_FICHERO = '@';
+const char EscritorPuertoCOM::CHAR_INICIO_FICHERO;
+const char EscritorPuertoCOM::CHAR_FIN_FICHERO;
 
 EscritorPuertoCOM::EscritorPuertoCOM() {
 	mPuertoCOM = nullptr;

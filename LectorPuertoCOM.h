@@ -18,6 +18,14 @@ private:
 	 * Mensaje de error cuando los BCE de la trama recibida y calculada no coinciden
 	 */
 	static const char MSJ_ERROR_BCE_INVALIDO[];
+	/**
+	 * Mensaje de inicio de recepción de fichero por parte del receptor
+	 */
+	static const char MSJ_INICIO_REC_FICHERO[];
+	/**
+	 * Mensaje de fin de recepción de fichero por parte del receptor
+	 */
+	static const char MSJ_FIN_REC_FICHERO[];
 
 private:
 	/**
@@ -44,11 +52,11 @@ private:
 	char hayContenido();
 
 	/**
-	 * Maneja el procesamiento de una trama
+	 * Maneja el procesamiento de un caracter
 	 *
-	 * @param car Caracter recibido relacionado con la trama
+	 * @param car Caracter recibido
 	 */
-	void leerTrama(char car);
+	void procesarCar(char car);
 
 	/**
 	 * Método modificador del atributo 'idxTrama'
