@@ -1,3 +1,4 @@
+#include <fstream>
 #include "EscritorPuertoCOM.h"
 
 const int EscritorPuertoCOM::BUFFER_MAX_CAR = 700;
@@ -9,6 +10,12 @@ const unsigned char EscritorPuertoCOM::TC_DEF_NT = '0';
 const unsigned char EscritorPuertoCOM::TD_DEF_DIRECCION = 'T';
 const unsigned char EscritorPuertoCOM::TD_DEF_CONTROL = 2;
 const unsigned char EscritorPuertoCOM::TD_DEF_NT = '0';
+const char EscritorPuertoCOM::MSJ_ERR_FICHERO_ENVIO_NO_ENCONTRADO[] = "Error al abrir el fichero de envío";
+const char EscritorPuertoCOM::MSJ_INICIO_ENV_FICHERO[] = "Enviando fichero por";
+const char EscritorPuertoCOM::MSJ_FIN_ENV_FICHERO[] = "Fichero enviado";
+const char EscritorPuertoCOM::RUTA_DEF_FICHERO_ENVIO[] = "Fenvio.txt";
+const char EscritorPuertoCOM::CHAR_INICIO_FICHERO = '#';
+const char EscritorPuertoCOM::CHAR_FIN_FICHERO = '@';
 
 EscritorPuertoCOM::EscritorPuertoCOM() {
 	mPuertoCOM = nullptr;
@@ -42,6 +49,9 @@ void EscritorPuertoCOM::escritura() {
 					break;
 				case CONSTANTES::TECLA_F2: // Es F2
 					enviarTramaControl();
+					break;
+				case CONSTANTES::TECLA_F3: // Es F3
+					enviarFichero();
 			}
 			break;
 		case CONSTANTES::TECLA_RETROCESO: // RETROCESO
@@ -52,6 +62,20 @@ void EscritorPuertoCOM::escritura() {
 			break;
 		default: // OTRA PULSACIÓN. Debe ser almacenada en el buffer con 'echo'
 			leerCarEcho(car);
+	}
+}
+
+void EscritorPuertoCOM::leerCarEcho(char car) {
+	if (!bufferLleno()) { // Comprueba que el buffer no esté lleno
+		switch (car) { // Determina tratamiento del caracter a almacenar
+			case CONSTANTES::TECLA_RETORNO:
+				car = CONSTANTES::CRLN;
+			default: // Otro caracter
+				buffer[getIdxBuffer()] = car;
+				setIdxBuffer(getIdxBuffer() + 1);
+		}
+
+		printf("%c", car); // 'echo' del caracter leído
 	}
 }
 
@@ -89,6 +113,9 @@ void EscritorPuertoCOM::enviarBufferTramas() {
 
 		tramaDatos.calcularBCE(); // Calcula el BCE la trama antes de enviarla
 		enviarTramaDatos(tramaDatos);
+
+		// Lectura de datos no exclusiva
+		LectorPuertoCOM(ManejadorPuertoCOM::recuperarInstancia()).lectura();
 	}
 }
 
@@ -140,17 +167,18 @@ void EscritorPuertoCOM::enviarTramaControl() {
 	}
 }
 
-void EscritorPuertoCOM::leerCarEcho(char car) {
-	if (!bufferLleno()) { // Comprueba que el buffer no esté lleno
-		switch (car) { // Determina tratamiento del caracter a almacenar
-			case CONSTANTES::TECLA_RETORNO:
-				car = CONSTANTES::CRLN;
-			default: // Otro caracter
-				buffer[getIdxBuffer()] = car;
-				setIdxBuffer(getIdxBuffer() + 1);
-		}
+void EscritorPuertoCOM::enviarFichero() {
+	HANDLE com = ManejadorPuertoCOM::recuperarInstancia()->getHandle();
+	fstream fFichero;
 
-		printf("%c", car); // 'echo' del caracter leído
+	fFichero.open(RUTA_DEF_FICHERO_ENVIO, ios::in);
+	if (fFichero.is_open()) {
+		printf("%s %s\n", MSJ_INICIO_ENV_FICHERO, "Autor"); // TODO extraer el autor
+		EnviarCaracter(com, CHAR_INICIO_FICHERO);
+		EnviarCaracter(com, CHAR_FIN_FICHERO);
+		printf("%s\n", MSJ_FIN_ENV_FICHERO);
+	} else {
+		printf("%s \n\tRuta relativa: %s", MSJ_ERR_FICHERO_ENVIO_NO_ENCONTRADO, RUTA_DEF_FICHERO_ENVIO);
 	}
 }
 

@@ -26,6 +26,7 @@ public:
 		TECLA_FUNCION = '\0',
 		TECLA_F1 = 59,
 		TECLA_F2 = 60,
+		TECLA_F3 = 61,
 		TECLA_RETROCESO = '\b',
 		TECLA_RETORNO = 13,
 		CRLN = '\n',

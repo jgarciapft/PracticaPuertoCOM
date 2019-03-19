@@ -19,8 +19,7 @@ LectorPuertoCOM::LectorPuertoCOM(ManejadorPuertoCOM *mPuertoCOM) {
 void LectorPuertoCOM::lectura() {
 	char car = hayContenido(); // Comprueba si hay car. Si lo hay lo lee
 
-	if (car)
-		leerTrama(car);
+	if (car) leerTrama(car);
 }
 
 bool LectorPuertoCOM::manPrtoCOMAbierto() {
@@ -53,11 +52,12 @@ void LectorPuertoCOM::leerTrama(char car) {
 			if (car == CONSTANTES::SINCRONISMO) {
 				// Detecta caracter sincronismo. Es trama
 				tramaAux->setS(car);
+				setIdxTrama(getIdxTrama() + 1);
 			} else {
 				printf("%s\n\tcar : %c\n", "ERROR : no es una trama", car);
-				setIdxTrama(1);
+				setIdxTrama(1); // Reinicia la bandera de campo
+				delete tramaAux; // Libera el espacio reservado para la trama auxiliar
 			}
-			setIdxTrama(getIdxTrama() + 1);
 			break;
 		case 2: // Campo de Dirección
 			tramaAux->setD(car);
@@ -81,8 +81,8 @@ void LectorPuertoCOM::leerTrama(char car) {
 				unsigned char getC = tramaAux->getC();
 				unsigned char getNT = tramaAux->getNT();
 
-				setIdxTrama(getIdxTrama() + 1);
 				delete tramaAux; // Libera la memoria asociada a la trama de datos genérica, ahora inútil
+				setIdxTrama(getIdxTrama() + 1);
 				tramaAux = new TramaDatos(getS, getD, getC, getNT, 0,
 										  nullptr); // Copia de la trama genérica en una trama de datos
 			}
@@ -113,8 +113,8 @@ void LectorPuertoCOM::leerTrama(char car) {
 			}
 			// Reinicia las banderas de trama
 			setIdxTrama(1);
-			delete[] datosRecibidos; // Libera la cadena auxiliar de lectura
 			delete tramaAux;
+			delete[] datosRecibidos; // Libera la cadena auxiliar de lectura
 			break;
 	}
 }

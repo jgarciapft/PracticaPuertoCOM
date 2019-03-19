@@ -36,7 +36,30 @@ private:
 	 * Valor por defecto del campo de número de trama para tramas de datos
 	 */
 	static const unsigned char TD_DEF_NT;
-
+	/**
+	 * Mensaje de error que mostrar al usuario si no se ha podido abrir el fichero de envío
+	 */
+	static const char MSJ_ERR_FICHERO_ENVIO_NO_ENCONTRADO[];
+	/**
+	 * Mensaje que envía el emisor del fichero para indicar el comienzo del envío de un fichero
+	 */
+	static const char MSJ_INICIO_ENV_FICHERO[];
+	/**
+	 * Mensaje que envía el emisor del fichero para indicar el fin del envío de un fichero
+	 */
+	static const char MSJ_FIN_ENV_FICHERO[];
+	/**
+	 * Ruta por defecto del fichero fuente enviado por el puerto COM
+	 */
+	static const char RUTA_DEF_FICHERO_ENVIO[];
+	/**
+	 * Caracter indicador del inicio del envío de un fichero
+	 */
+	static const char CHAR_INICIO_FICHERO;
+	/**
+	 * Caracter indicador del fin del envío de un fichero
+	 */
+	static const char CHAR_FIN_FICHERO;
 
 private:
 	/**
@@ -106,6 +129,11 @@ private:
 	 * Formatea y envía una trama de control por el pueto COM según el manejador establecido
 	 */
 	void enviarTramaControl();
+
+	/**
+	 * Maneja el evío de un fichero por el puerto COM según el manejador establecido
+	 */
+	void enviarFichero();
 
 	/**
 	 * Escribe en el buffer con 'echo' el caracter pasado
