@@ -174,6 +174,39 @@ void EscritorPuertoCOM::enviarFichero() {
 	if (fFichero.is_open()) {
 		printf("%s %s\n", MSJ_INICIO_ENV_FICHERO, "Autor"); // TODO extraer el autor
 		EnviarCaracter(com, CHAR_INICIO_FICHERO);
+
+		// INSTRUMENTACIÓN DE PRUEBA ->
+
+		string ruta = "F.txt";
+		string autor = "gpz";
+		string cuerpo = "HOLA";
+
+		EnviarCaracter(com, 22);
+		EnviarCaracter(com, 'T');
+		EnviarCaracter(com, 2);
+		EnviarCaracter(com, '0');
+		EnviarCaracter(com, 5);
+		EnviarCadena(com, ruta.c_str(), sizeof(ruta.c_str()));
+		EnviarCaracter(com, 'F' ^ '.' ^ 't' ^ 'x' ^ 't');
+
+		EnviarCaracter(com, 22);
+		EnviarCaracter(com, 'T');
+		EnviarCaracter(com, 2);
+		EnviarCaracter(com, '0');
+		EnviarCaracter(com, 3);
+		EnviarCadena(com, autor.c_str(), sizeof(autor.c_str()));
+		EnviarCaracter(com, 'g' ^ 'p' ^ 'z');
+
+		EnviarCaracter(com, 22);
+		EnviarCaracter(com, 'T');
+		EnviarCaracter(com, 2);
+		EnviarCaracter(com, '0');
+		EnviarCaracter(com, 4);
+		EnviarCadena(com, cuerpo.c_str(), sizeof(cuerpo.c_str()));
+		EnviarCaracter(com, 10);
+
+		// <- INSTRUMENTACIÓN DE PRUEBA
+
 		EnviarCaracter(com, CHAR_FIN_FICHERO);
 		printf("%s\n", MSJ_FIN_ENV_FICHERO);
 	} else {
