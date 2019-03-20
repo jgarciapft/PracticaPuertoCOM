@@ -8,6 +8,7 @@ LectorPuertoCOM::LectorPuertoCOM() {
 	mPuertoCOM = nullptr;
 
 	idxTrama = 1;
+	esTrama = false;
 	tramaAux = nullptr;
 }
 
@@ -15,6 +16,7 @@ LectorPuertoCOM::LectorPuertoCOM(ManejadorPuertoCOM *mPuertoCOM) {
 	this->mPuertoCOM = mPuertoCOM;
 
 	idxTrama = 1;
+	esTrama = false;
 	tramaAux = nullptr;
 }
 
@@ -34,15 +36,24 @@ char LectorPuertoCOM::hayContenido() {
 	return static_cast<char>(manPrtoCOMAbierto() ? RecibirCaracter(com) : 0);
 }
 
-int LectorPuertoCOM::getIdxTrama() {
-	return this->idxTrama;
+void LectorPuertoCOM::procesarCar(char car) { // Detecta caracter sincronismo. Es trama
+	if (car == CONSTANTES::SINCRONISMO || getEsTrama()) {
+		leerTrama(car);
+	} else {
+		switch (car) {
+			case EscritorPuertoCOM::CHAR_INICIO_FICHERO:
+				printf("%s %s\n", MSJ_INICIO_REC_FICHERO, "Autor"); // TODO extraer el autor
+				break;
+			case EscritorPuertoCOM::CHAR_FIN_FICHERO:
+				printf("%s\n", MSJ_FIN_REC_FICHERO);
+				break;
+			default:
+				printf("%s\n\tcar : %c\n", "ERROR : no es una trama", car);
+		}
+	}
 }
 
-void LectorPuertoCOM::setIdxTrama(/* Nuevo valor del índice */int idxTrama) {
-	this->idxTrama = idxTrama;
-}
-
-void LectorPuertoCOM::procesarCar(char car) {
+void LectorPuertoCOM::leerTrama(char car) {
 	HANDLE com = mPuertoCOM->getHandle();
 
 	int longitud;
@@ -51,24 +62,10 @@ void LectorPuertoCOM::procesarCar(char car) {
 	switch (getIdxTrama()) { // Determina en qué campo de la trama hay que escribir
 		case 1: // Campo de Sincronismo
 			tramaAux = new Trama(); // Instancia la trama base genérica
-			if (car == CONSTANTES::SINCRONISMO) {
-				// Detecta caracter sincronismo. Es trama
-				tramaAux->setS(car);
-				setIdxTrama(getIdxTrama() + 1);
-			} else {
-				switch (car) {
-					case EscritorPuertoCOM::CHAR_INICIO_FICHERO:
-						printf("%s %s\n", MSJ_INICIO_REC_FICHERO, "Autor"); // TODO extraer el autor
-						break;
-					case EscritorPuertoCOM::CHAR_FIN_FICHERO:
-						printf("%s\n", MSJ_FIN_REC_FICHERO);
-						break;
-					default:
-						printf("%s\n\tcar : %c\n", "ERROR : no es una trama", car);
-				}
-				setIdxTrama(1); // Reinicia la bandera de campo
-				delete tramaAux; // Libera el espacio reservado para la trama auxiliar
-			}
+			setEsTrama(true);
+
+			tramaAux->setS(car);
+			setIdxTrama(getIdxTrama() + 1);
 			break;
 		case 2: // Campo de Dirección
 			tramaAux->setD(car);
@@ -84,7 +81,9 @@ void LectorPuertoCOM::procesarCar(char car) {
 			if (tramaAux->getC() != 2) {
 				// Procesar Trama Control (imprime la trama recibida)
 				printf("%s [%s]\n", "Recibido", tramaAux->toString().c_str());
+				// Reinicio de las banderas de trama
 				setIdxTrama(1);
+				setEsTrama(false);
 				delete tramaAux; // Destruye la trama base genérica tratada
 			} else {
 				unsigned char getS = tramaAux->getS();
@@ -124,8 +123,25 @@ void LectorPuertoCOM::procesarCar(char car) {
 			}
 			// Reinicia las banderas de trama
 			setIdxTrama(1);
+			setEsTrama(false);
 			delete tramaAux;
 			delete[] datosRecibidos; // Libera la cadena auxiliar de lectura
 			break;
 	}
+}
+
+int LectorPuertoCOM::getIdxTrama() {
+	return this->idxTrama;
+}
+
+bool LectorPuertoCOM::getEsTrama() {
+	return esTrama;
+}
+
+void LectorPuertoCOM::setIdxTrama(/* Nuevo valor del índice */int idxTrama) {
+	this->idxTrama = idxTrama;
+}
+
+void LectorPuertoCOM::setEsTrama(bool esTrama) {
+	LectorPuertoCOM::esTrama = esTrama;
 }

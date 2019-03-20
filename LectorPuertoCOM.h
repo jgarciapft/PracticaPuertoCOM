@@ -7,7 +7,7 @@
 
 /**
  * Manejador responsable de la lectura sobre el puertoCOM
- * 
+ *
  * @author Juan Pablo García Plaza Pérez @ 2ºGIIIS/GrupoA
  * @author José Ángel Concha Carrasco @ 2ºGIIIS/GrupoA
  */
@@ -37,6 +37,12 @@ private:
 	 */
 	int idxTrama;
 	/**
+	 * Bandera para indicar si se está en proceso de procesar una trama
+	 */
+	bool esTrama;
+
+private:
+	/**
 	 * Auxiliar sobre la que construir una trama
 	 */
 	Trama *tramaAux;
@@ -59,9 +65,20 @@ private:
 	void procesarCar(char car);
 
 	/**
+	 * Maneja el procesamiento de una trama
+	 */
+	void leerTrama(char car);
+
+	/**
 	 * Método modificador del atributo 'idxTrama'
 	 */
 	void setIdxTrama(/* Nuevo valor del índice */int idxTrama);
+
+	/**
+	 * Método modificador del atributo 'esTrama'
+	 */
+	void setEsTrama(bool esTrama);
+
 
 public:
 
@@ -78,6 +95,12 @@ public:
 	 * Método accesor del atributo 'idxTrama'
 	 */
 	int getIdxTrama();
+
+	/**
+	 * Método accesor del atributo 'esTrama'
+	 */
+	bool getEsTrama();
+
 };
 
 #endif
