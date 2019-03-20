@@ -129,7 +129,6 @@ void EscritorPuertoCOM::enviarTramaDatos(TramaDatos tramaDatos) {
 	EnviarCaracter(com, tramaDatos.getNT());
 	EnviarCaracter(com, tramaDatos.getL());
 	EnviarCadena(com, tramaDatos.getDatos(), tramaDatos.getL());
-	EnviarCaracter(com, CONSTANTES::DELIM_CAD); // Envía el fin de cadena '\0'
 	EnviarCaracter(com, tramaDatos.getBCE());
 }
 
