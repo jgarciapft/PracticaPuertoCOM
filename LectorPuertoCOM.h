@@ -33,13 +33,17 @@ private:
 	 */
 	ManejadorPuertoCOM *mPuertoCOM;
 	/**
-	 * ïndice de campo de la trama siguiente a leer
+	 * Índice de campo de la trama siguiente a leer
 	 */
 	int idxTrama;
 	/**
 	 * Bandera para indicar si se está en proceso de procesar una trama
 	 */
 	bool esTrama;
+	/**
+	 * Bandera para indicar si se está en proceso de leer tramas de datos provenientes de la recepción de archivos
+	 */
+	bool recepFichero;
 
 private:
 	/**
@@ -48,26 +52,28 @@ private:
 	Trama *tramaAux;
 
 	/**
-	 * Comprueba si el manejador del puerto COM está inicializado
+	 * Maneja el procesamiento de un caracter
+	 *
+	 * @param car Caracter recibido
+	 */
+	void procesarCar(/* Caracter a procesar*/char car);
+
+	/**
+	 * Maneja el procesamiento de una trama
+	 */
+	void leerTrama(/* Caracter de trama*/char car);
+
+	/**
+	 * @return si el manejador del puerto COM está inicializado
 	 */
 	bool manPrtoCOMAbierto();
 
 	/**
 	 * Comprueba si hay algún elemento en el buffer de lectura, y si lo hay lo devuelve
+	 *
+	 * @return Caracter leído si existe, 0 si no se ha leído nada
 	 */
 	char hayContenido();
-
-	/**
-	 * Maneja el procesamiento de un caracter
-	 *
-	 * @param car Caracter recibido
-	 */
-	void procesarCar(char car);
-
-	/**
-	 * Maneja el procesamiento de una trama
-	 */
-	void leerTrama(char car);
 
 	/**
 	 * Método modificador del atributo 'idxTrama'
@@ -77,8 +83,14 @@ private:
 	/**
 	 * Método modificador del atributo 'esTrama'
 	 */
-	void setEsTrama(bool esTrama);
+	void setEsTrama(/* Nuevo valor de la bandera*/bool esTrama);
 
+	/**
+	 * Método modificador del atributo 'recepFichero'
+	 *
+	 * @param recepFichero Nuevo valor de la bandera
+	 */
+	void setRecepFichero(/* Nuevo valor de la bandera*/bool recepFichero);
 
 public:
 
@@ -100,6 +112,12 @@ public:
 	 * Método accesor del atributo 'esTrama'
 	 */
 	bool getEsTrama();
+
+	/**
+	 * Método accesor del atributo 'recepFichero'
+	 */
+	bool getRecepFichero();
+
 
 };
 

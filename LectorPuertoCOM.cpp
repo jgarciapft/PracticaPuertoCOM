@@ -9,6 +9,7 @@ LectorPuertoCOM::LectorPuertoCOM() {
 
 	idxTrama = 1;
 	esTrama = false;
+	recepFichero = false;
 	tramaAux = nullptr;
 }
 
@@ -17,6 +18,7 @@ LectorPuertoCOM::LectorPuertoCOM(ManejadorPuertoCOM *mPuertoCOM) {
 
 	idxTrama = 1;
 	esTrama = false;
+	recepFichero = false;
 	tramaAux = nullptr;
 }
 
@@ -26,26 +28,18 @@ void LectorPuertoCOM::lectura() {
 	if (car) procesarCar(car);
 }
 
-bool LectorPuertoCOM::manPrtoCOMAbierto() {
-	return mPuertoCOM != nullptr ? mPuertoCOM->getEstadoAbierto() : false;
-}
-
-char LectorPuertoCOM::hayContenido() {
-	HANDLE com = mPuertoCOM->getHandle();
-	// Comprueba que el manejador del puerto COM esté abierto
-	return static_cast<char>(manPrtoCOMAbierto() ? RecibirCaracter(com) : 0);
-}
-
-void LectorPuertoCOM::procesarCar(char car) { // Detecta caracter sincronismo. Es trama
+void LectorPuertoCOM::procesarCar(/* Caracter a procesar*/char car) { // Detecta caracter sincronismo. Es trama
 	if (car == CONSTANTES::SINCRONISMO || getEsTrama()) {
 		leerTrama(car);
 	} else {
 		switch (car) {
 			case EscritorPuertoCOM::CHAR_INICIO_FICHERO:
 				printf("%s %s\n", MSJ_INICIO_REC_FICHERO, "Autor"); // TODO extraer el autor
+				setRecepFichero(true); // Reinicia la bandera de procesamiento de fichero
 				break;
 			case EscritorPuertoCOM::CHAR_FIN_FICHERO:
 				printf("%s\n", MSJ_FIN_REC_FICHERO);
+				setRecepFichero(false); // Reinicia la bandera de procesamiento de fichero
 				break;
 			default:
 				printf("%s\n\tcar : %c\n", "ERROR : no es una trama", car);
@@ -53,7 +47,7 @@ void LectorPuertoCOM::procesarCar(char car) { // Detecta caracter sincronismo. E
 	}
 }
 
-void LectorPuertoCOM::leerTrama(char car) {
+void LectorPuertoCOM::leerTrama(/* Caracter de trama*/char car) {
 	HANDLE com = mPuertoCOM->getHandle();
 
 	int longitud;
@@ -62,9 +56,9 @@ void LectorPuertoCOM::leerTrama(char car) {
 	switch (getIdxTrama()) { // Determina en qué campo de la trama hay que escribir
 		case 1: // Campo de Sincronismo
 			tramaAux = new Trama(); // Instancia la trama base genérica
-			setEsTrama(true);
 
 			tramaAux->setS(car);
+			setEsTrama(true);
 			setIdxTrama(getIdxTrama() + 1);
 			break;
 		case 2: // Campo de Dirección
@@ -79,22 +73,24 @@ void LectorPuertoCOM::leerTrama(char car) {
 			tramaAux->setNT(car);
 
 			if (tramaAux->getC() != 2) {
-				// Procesar Trama Control (imprime la trama recibida)
+				// Procesar Trama Control (imprime el tipo de trama de control recibida)
 				printf("%s [%s]\n", "Recibido", tramaAux->toString().c_str());
 				// Reinicio de las banderas de trama
 				setIdxTrama(1);
 				setEsTrama(false);
 				delete tramaAux; // Destruye la trama base genérica tratada
 			} else {
+				// Temporales para copiar los datos de la trama genérica en trama de datos
 				unsigned char getS = tramaAux->getS();
 				unsigned char getD = tramaAux->getD();
 				unsigned char getC = tramaAux->getC();
 				unsigned char getNT = tramaAux->getNT();
-
 				delete tramaAux; // Libera la memoria asociada a la trama de datos genérica, ahora inútil
-				setIdxTrama(getIdxTrama() + 1);
+
+				// Copia de la trama genérica en una trama de datos
 				tramaAux = new TramaDatos(getS, getD, getC, getNT, 0,
-										  nullptr); // Copia de la trama genérica en una trama de datos
+										  nullptr);
+				setIdxTrama(getIdxTrama() + 1);
 			}
 			break;
 		case 5: // Longitud
@@ -106,7 +102,6 @@ void LectorPuertoCOM::leerTrama(char car) {
 			// Recibe el mensaje
 			RecibirCadena(com, datosRecibidos, longitud);
 			datosRecibidos[longitud] = CONSTANTES::DELIM_CAD; // Formatea el fin de cadena por seguridad
-
 			dynamic_cast<TramaDatos *>(tramaAux)->setDatos(datosRecibidos); // Almacena el mensaje en la trama de datos
 
 			setIdxTrama(getIdxTrama() + 2);
@@ -130,6 +125,16 @@ void LectorPuertoCOM::leerTrama(char car) {
 	}
 }
 
+bool LectorPuertoCOM::manPrtoCOMAbierto() {
+	return mPuertoCOM != nullptr ? mPuertoCOM->getEstadoAbierto() : false;
+}
+
+char LectorPuertoCOM::hayContenido() {
+	HANDLE com = mPuertoCOM->getHandle();
+	// Comprueba que el manejador del puerto COM esté abierto
+	return static_cast<char>(manPrtoCOMAbierto() ? RecibirCaracter(com) : 0);
+}
+
 int LectorPuertoCOM::getIdxTrama() {
 	return this->idxTrama;
 }
@@ -138,10 +143,18 @@ bool LectorPuertoCOM::getEsTrama() {
 	return esTrama;
 }
 
+bool LectorPuertoCOM::getRecepFichero() {
+	return recepFichero;
+}
+
 void LectorPuertoCOM::setIdxTrama(/* Nuevo valor del índice */int idxTrama) {
 	this->idxTrama = idxTrama;
 }
 
-void LectorPuertoCOM::setEsTrama(bool esTrama) {
+void LectorPuertoCOM::setEsTrama(/* Nuevo valor de la bandera*/bool esTrama) {
 	LectorPuertoCOM::esTrama = esTrama;
+}
+
+void LectorPuertoCOM::setRecepFichero(/* Nuevo valor de la bandera*/bool recepFichero) {
+	LectorPuertoCOM::recepFichero = recepFichero;
 }
