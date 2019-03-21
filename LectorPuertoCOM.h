@@ -98,6 +98,11 @@ private:
 	char hayContenido();
 
 	/**
+	 * @return Si se han leído los parámetros necesarios para abrir el fichero de recepción
+	 */
+	bool ficheroEstaConfigurado();
+
+	/**
 	 * Método modificador del atributo 'idxTrama'
 	 */
 	void setIdxTrama(/* Nuevo valor del índice */int idxTrama);
@@ -129,11 +134,6 @@ private:
 	 * entonces coge el valor del atributo 'rutaFchRecep' como ruta
 	 */
 	void setFicheroConfigurado(/* Nuevo valor de la bandera*/int ficheroConfigurado);
-
-	/**
-	 * @return Si se han leído los parámetros necesarios para abrir el fichero de recepción
-	 */
-	bool ficheroEstaConfigurado();
 
 public:
 	LectorPuertoCOM();

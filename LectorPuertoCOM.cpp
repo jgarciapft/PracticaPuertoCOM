@@ -37,7 +37,6 @@ void LectorPuertoCOM::procesarCar(/* Caracter a procesar*/char car) { // Detecta
 	} else {
 		switch (car) {
 			case EscritorPuertoCOM::CHAR_INICIO_FICHERO: // Se va a leer un fichero
-				printf("%s %s\n", MSJ_INICIO_REC_FICHERO, "Autor"); // TODO extraer el autor
 				setRecepFichero(true);
 				setFicheroConfigurado(0);
 				break;
@@ -113,17 +112,45 @@ void LectorPuertoCOM::leerTrama(/* Caracter de trama*/char car) {
 		case 7:
 			dynamic_cast<TramaDatos *>(tramaAux)->calcularBCE(); // Calculamos y almacenamos el BCE de nuestra trama
 
-			// Procesar Trama Datos
+			// Procesar Trama Datos. Comparamos con el BCE de la trama enviada
 			if (dynamic_cast<TramaDatos *>(tramaAux)->getBCE() ==
-				static_cast<unsigned char>(car)) { // Lo comparamos con el BCE de la trama enviada
-				if (getRecepFichero() && !ficheroEstaConfigurado()) { // Se está recibiendo la cabecera de un fichero
-					cout << "RECIBIENDO RUTA" << endl;
-					setRutaFchRecep("Frecep.txt"); // TODO Implementar
-					setFicheroConfigurado(1);
+				static_cast<unsigned char>(car)) {
 
-					cout << "RECIBIENDO AUTOR" << endl;
-					setAutorFchRecep("jgarciapft"); // TODO Implementar
-					setFicheroConfigurado(2);
+				if (getRecepFichero() && !ficheroEstaConfigurado()) { // Se está recibiendo la cabecera de un fichero
+					string datos = dynamic_cast<TramaDatos *>(tramaAux)->getDatos();
+					unsigned long long int pos = datos.find(CONSTANTES::CRLN); // Busca el delimitador de campo
+
+					switch (getFicheroConfigurado()) { // Determina qué campo se está esperando
+						case 0: // Campo de ruta
+							if (pos != std::__cxx11::string::npos) { // Comprueba que el campo de ruta esté entero
+								setRutaFchRecep(getRutaFchRecep() + datos.substr(0, pos));
+								setFicheroConfigurado(1); // Ruta configurada con éxito
+
+								/*
+								 * Si la ruta y el autor están en una trama, intenta buscar también el autor.
+								 * Si el autor no cabe en la trama junto a la ruta, se almacena el contenido que sí
+								 * cabe hasta que se encuentre un delimitador de campo (fin de línea)
+								 */
+								datos = datos.substr(pos + 1, dynamic_cast<TramaDatos *>(tramaAux)->getL());
+								pos = datos.find(CONSTANTES::CRLN);
+								if (pos == std::__cxx11::string::npos) {
+									setAutorFchRecep(getAutorFchRecep() + datos);
+									break;
+								}
+							} else { // NO está entero, se concatena con lo existente
+								setRutaFchRecep(getRutaFchRecep() + datos);
+								break;
+							}
+						case 1: // Campo de autor
+							if (pos != std::__cxx11::string::npos) { // Comprueba que el campo de autor esté entero
+								setAutorFchRecep(getAutorFchRecep() + datos.substr(0, pos));
+								setFicheroConfigurado(2); // Autor configurado con éxito
+
+								printf("%s %s\n", MSJ_INICIO_REC_FICHERO, getAutorFchRecep().c_str());
+							} else { // NO está entero, se concatena con lo existente
+								setAutorFchRecep(getAutorFchRecep() + datos);
+							}
+					}
 				} else if (getRecepFichero() &&
 						   ficheroEstaConfigurado()) { // Se está recibiendo el cuerpo de un fichero
 					fFichero.write(tramaAux->toString().c_str(), sizeof(tramaAux->toString().c_str()));
@@ -137,6 +164,7 @@ void LectorPuertoCOM::leerTrama(/* Caracter de trama*/char car) {
 			// Reinicia las banderas de trama
 			setIdxTrama(1);
 			setEsTrama(false);
+
 			delete tramaAux;
 			delete[] datosRecibidos; // Libera la cadena auxiliar de lectura
 			break;
@@ -151,6 +179,10 @@ char LectorPuertoCOM::hayContenido() {
 	HANDLE com = mPuertoCOM->getHandle();
 	// Comprueba que el manejador del puerto COM esté abierto
 	return static_cast<char>(manPrtoCOMAbierto() ? RecibirCaracter(com) : 0);
+}
+
+bool LectorPuertoCOM::ficheroEstaConfigurado() {
+	return getFicheroConfigurado() == 2;
 }
 
 int LectorPuertoCOM::getIdxTrama() {
@@ -185,11 +217,13 @@ void LectorPuertoCOM::setEsTrama(/* Nuevo valor de la bandera*/bool esTrama) {
 	this->esTrama = esTrama;
 }
 
-void LectorPuertoCOM::setAutorFchRecep(/* Nuevo valor del autor*/const string &autorFchRecep) {
+void LectorPuertoCOM::setAutorFchRecep(/* Nuevo valor del autor*/
+		const string &autorFchRecep) {
 	this->autorFchRecep = autorFchRecep;
 }
 
-void LectorPuertoCOM::setRutaFchRecep(/* Nuevo valor de la ruta*/const string &rutaFchRecep) {
+void LectorPuertoCOM::setRutaFchRecep(/* Nuevo valor de la ruta*/
+		const string &rutaFchRecep) {
 	this->rutaFchRecep = rutaFchRecep;
 }
 
@@ -200,13 +234,10 @@ void LectorPuertoCOM::setRecepFichero(/* Nuevo valor de la bandera*/bool recepFi
 	}
 }
 
-void LectorPuertoCOM::setFicheroConfigurado(/* Nuevo valor de la bandera*/int ficheroConfigurado) {
+void LectorPuertoCOM::setFicheroConfigurado(/* Nuevo valor de la bandera*/
+		int ficheroConfigurado) {
 	this->ficheroConfigurado = ficheroConfigurado;
 	if (getRecepFichero() && ficheroEstaConfigurado()) {
 		if (!fFichero.is_open())fFichero.open(getRutaFchRecep(), ios::out);
 	}
-}
-
-bool LectorPuertoCOM::ficheroEstaConfigurado() {
-	return getFicheroConfigurado() == 2;
 }
