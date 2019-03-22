@@ -1,6 +1,7 @@
 #include <fstream>
 #include "EscritorPuertoCOM.h"
 
+
 const int EscritorPuertoCOM::BUFFER_MAX_CAR = 700;
 const int EscritorPuertoCOM::MSJ_NUM_CRLF = 1;
 const char EscritorPuertoCOM::MSJ_SEL_TC[] = "Trama de control a enviar:\n1: Trama ENQ.\n2: Trama EOT.\n3: Trama ACK.\n4: Trama NACK.";
@@ -169,46 +170,79 @@ void EscritorPuertoCOM::enviarTramaControl() {
 void EscritorPuertoCOM::enviarFichero() {
 	HANDLE com = ManejadorPuertoCOM::recuperarInstancia()->getHandle();
 	fstream fFichero;
+    std::string titulo;
+    std::string autor;
+    char *cuerpoMensaje;
+    TramaDatos tramaDatos = TramaDatos();
 
-	fFichero.open(RUTA_DEF_FICHERO_ENVIO, ios::in);
+    fFichero.open(RUTA_DEF_FICHERO_ENVIO, ios::in);            // Abrimos el fichero a enviar
+
 	if (fFichero.is_open()) {
-		printf("%s %s\n", MSJ_INICIO_ENV_FICHERO, "Autor"); // TODO extraer el autor
-		EnviarCaracter(com, CHAR_INICIO_FICHERO);
 
-		// INSTRUMENTACIÓN DE PRUEBA ->
+        getline(fFichero, titulo);                                // ----- Nombre de fichero en titulo
+        EnviarCadena(com, titulo.c_str(), titulo.size());        // Enviar nombre de fichero
 
-		string ruta = "F.tx";
-		string autor = "t\ngp";
-		string cuerpo = "z\nHOLA";
+        getline(fFichero, autor);                                // ----- Nombre de autor en autor
+        EnviarCadena(com, autor.c_str(), autor.size());        // Enviar nombre de autor
 
-		EnviarCaracter(com, 22);
-		EnviarCaracter(com, 'T');
-		EnviarCaracter(com, 2);
-		EnviarCaracter(com, '0');
-		EnviarCaracter(com, 4);
-		EnviarCadena(com, ruta.c_str(), sizeof(ruta.c_str()));
-		EnviarCaracter(com, 'F' ^ '.' ^ 't' ^ 'x');
+        printf("%s %s\n", MSJ_INICIO_ENV_FICHERO, autor.c_str()); // Enviar autor de fichero
 
-		EnviarCaracter(com, 22);
-		EnviarCaracter(com, 'T');
-		EnviarCaracter(com, 2);
-		EnviarCaracter(com, '0');
-		EnviarCaracter(com, 4);
-		EnviarCadena(com, autor.c_str(), sizeof(autor.c_str()));
-		EnviarCaracter(com, 't' ^ '\n' ^ 'g' ^ 'p');
+        EnviarCaracter(com, CHAR_INICIO_FICHERO);        // Envío de '#' (inicio de fichero)
 
-		EnviarCaracter(com, 22);
-		EnviarCaracter(com, 'T');
-		EnviarCaracter(com, 2);
-		EnviarCaracter(com, '0');
-		EnviarCaracter(com, 6);
-		EnviarCadena(com, cuerpo.c_str(), sizeof(cuerpo.c_str()));
-		EnviarCaracter(com, 'z' ^ '\n' ^ 10);
+        while (!fFichero.eof()) {
+            fFichero.read(cuerpoMensaje, 254);
+            cuerpoMensaje[fFichero.gcount()] = '\0';
+            if (fFichero.gcount() > 0) {
+                // Construcción de la trama de datos
+                tramaDatos.setDatos(cuerpoMensaje);
+                tramaDatos.setL(fFichero.gcount());
+                tramaDatos.calcularBCE();
+                // Enviar trama de datos
+                enviarTramaDatos(tramaDatos);
+                // Lectura de datos no exclusiva
+                LectorPuertoCOM(ManejadorPuertoCOM::recuperarInstancia()).lectura();
+            }
+        }
 
-		// <- INSTRUMENTACIÓN DE PRUEBA
+        // TODO - Enviar tamaño de fichero
 
-		EnviarCaracter(com, CHAR_FIN_FICHERO);
-		printf("%s\n", MSJ_FIN_ENV_FICHERO);
+        EnviarCaracter(com, CHAR_FIN_FICHERO);    // Enviamos '@' (fin de fichero)
+        printf("%s\n", MSJ_FIN_ENV_FICHERO);
+
+        fFichero.close();                        // Cerramos el fichero
+
+        /*// INSTRUMENTACIÓN DE PRUEBA ->
+
+        string ruta = "F.tx";
+        string autor = "t\ngp";
+        string cuerpo = "z\nHOLA";
+
+        EnviarCaracter(com, 22);
+        EnviarCaracter(com, 'T');
+        EnviarCaracter(com, 2);
+        EnviarCaracter(com, '0');
+        EnviarCaracter(com, 4);
+        EnviarCadena(com, ruta.c_str(), sizeof(ruta.c_str()));
+        EnviarCaracter(com, 'F' ^ '.' ^ 't' ^ 'x');
+
+        EnviarCaracter(com, 22);
+        EnviarCaracter(com, 'T');
+        EnviarCaracter(com, 2);
+        EnviarCaracter(com, '0');
+        EnviarCaracter(com, 4);
+        EnviarCadena(com, autor.c_str(), sizeof(autor.c_str()));
+        EnviarCaracter(com, 't' ^ '\n' ^ 'g' ^ 'p');
+
+        EnviarCaracter(com, 22);
+        EnviarCaracter(com, 'T');
+        EnviarCaracter(com, 2);
+        EnviarCaracter(com, '0');
+        EnviarCaracter(com, 6);
+        EnviarCadena(com, cuerpo.c_str(), sizeof(cuerpo.c_str()));
+        EnviarCaracter(com, 'z' ^ '\n' ^ 10);
+
+        // <- INSTRUMENTACIÓN DE PRUEBA*/
+
 	} else {
 		printf("%s \n\tRuta relativa: %s", MSJ_ERR_FICHERO_ENVIO_NO_ENCONTRADO, RUTA_DEF_FICHERO_ENVIO);
 	}
