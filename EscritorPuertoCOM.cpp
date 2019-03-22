@@ -2,7 +2,7 @@
 #include "EscritorPuertoCOM.h"
 
 const int EscritorPuertoCOM::BUFFER_MAX_CAR = 700;
-const int EscritorPuertoCOM::MSJ_NUM_CRLF = 2;
+const int EscritorPuertoCOM::MSJ_NUM_CRLF = 1;
 const char EscritorPuertoCOM::MSJ_SEL_TC[] = "Trama de control a enviar:\n1: Trama ENQ.\n2: Trama EOT.\n3: Trama ACK.\n4: Trama NACK.";
 const char EscritorPuertoCOM::MSJ_ERROR_SEL_TC[] = "Tipo de trama incorrecta";
 const unsigned char EscritorPuertoCOM::TC_DEF_DIRECCION = 'T';
@@ -174,6 +174,39 @@ void EscritorPuertoCOM::enviarFichero() {
 	if (fFichero.is_open()) {
 		printf("%s %s\n", MSJ_INICIO_ENV_FICHERO, "Autor"); // TODO extraer el autor
 		EnviarCaracter(com, CHAR_INICIO_FICHERO);
+
+		// INSTRUMENTACIÓN DE PRUEBA ->
+
+		string ruta = "F.tx";
+		string autor = "t\ngp";
+		string cuerpo = "z\nHOLA";
+
+		EnviarCaracter(com, 22);
+		EnviarCaracter(com, 'T');
+		EnviarCaracter(com, 2);
+		EnviarCaracter(com, '0');
+		EnviarCaracter(com, 4);
+		EnviarCadena(com, ruta.c_str(), sizeof(ruta.c_str()));
+		EnviarCaracter(com, 'F' ^ '.' ^ 't' ^ 'x');
+
+		EnviarCaracter(com, 22);
+		EnviarCaracter(com, 'T');
+		EnviarCaracter(com, 2);
+		EnviarCaracter(com, '0');
+		EnviarCaracter(com, 4);
+		EnviarCadena(com, autor.c_str(), sizeof(autor.c_str()));
+		EnviarCaracter(com, 't' ^ '\n' ^ 'g' ^ 'p');
+
+		EnviarCaracter(com, 22);
+		EnviarCaracter(com, 'T');
+		EnviarCaracter(com, 2);
+		EnviarCaracter(com, '0');
+		EnviarCaracter(com, 6);
+		EnviarCadena(com, cuerpo.c_str(), sizeof(cuerpo.c_str()));
+		EnviarCaracter(com, 'z' ^ '\n' ^ 10);
+
+		// <- INSTRUMENTACIÓN DE PRUEBA
+
 		EnviarCaracter(com, CHAR_FIN_FICHERO);
 		printf("%s\n", MSJ_FIN_ENV_FICHERO);
 	} else {

@@ -52,18 +52,6 @@ private:
 	 * Ruta por defecto del fichero fuente enviado por el puerto COM
 	 */
 	static const char RUTA_DEF_FICHERO_ENVIO[];
-
-public:
-	/**
-	 * Caracter indicador del inicio del envío de un fichero
-	 */
-	static const char CHAR_INICIO_FICHERO = '#';
-	/**
-	 * Caracter indicador del fin del envío de un fichero
-	 */
-	static const char CHAR_FIN_FICHERO = '@';
-
-private:
 	/**
 	 * Máximo número base de caracteres en el buffer
 	 */
@@ -80,6 +68,16 @@ private:
 	 * Mensaje para indicar opción inválida en la elección de tipo de trama de control
 	 */
 	static const char MSJ_ERROR_SEL_TC[];
+
+public:
+	/**
+	 * Caracter indicador del inicio del envío de un fichero
+	 */
+	static const char CHAR_INICIO_FICHERO = '#';
+	/**
+	 * Caracter indicador del fin del envío de un fichero
+	 */
+	static const char CHAR_FIN_FICHERO = '@';
 
 private:
 	/**
