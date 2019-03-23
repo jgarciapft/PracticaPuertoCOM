@@ -174,7 +174,7 @@ void EscritorPuertoCOM::enviarFichero() {
     std::string autor;
     char *cuerpoMensaje;
     int pesoFichero = 0;
-    TramaDatos tramaDatos = TramaDatos();
+    TramaDatos tramaDatos;
 
     fFichero.open(RUTA_DEF_FICHERO_ENVIO, ios::in);            // Abrimos el fichero a enviar
 
@@ -197,8 +197,7 @@ void EscritorPuertoCOM::enviarFichero() {
                 // Actualización del peso del fichero
                 pesoFichero = pesoFichero + (int) fFichero.gcount();
                 // Construcción de la trama de datos
-                tramaDatos.setDatos(cuerpoMensaje);
-                tramaDatos.setL((unsigned char) fFichero.gcount());
+                tramaDatos = TramaDatos(22, 'T', 02, '0', (unsigned char) fFichero.gcount(), cuerpoMensaje);
                 tramaDatos.calcularBCE();
                 // Envio de la trama de datos
                 enviarTramaDatos(tramaDatos);
