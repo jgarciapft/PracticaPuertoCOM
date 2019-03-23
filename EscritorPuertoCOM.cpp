@@ -181,10 +181,10 @@ void EscritorPuertoCOM::enviarFichero() {
 	if (fFichero.is_open()) {
 
         getline(fFichero, titulo);                                // ----- Nombre de fichero en titulo
-        EnviarCadena(com, titulo.c_str(), titulo.size());        // Enviar nombre de fichero
+        EnviarCadena(com, titulo.c_str(), (int) titulo.size());        // Enviar nombre de fichero
 
         getline(fFichero, autor);                                // ----- Nombre de autor en autor
-        EnviarCadena(com, autor.c_str(), autor.size());        // Enviar nombre de autor
+        EnviarCadena(com, autor.c_str(), (int) autor.size());        // Enviar nombre de autor
 
         printf("%s %s\n", MSJ_INICIO_ENV_FICHERO, autor.c_str()); // Enviar autor de fichero
 
@@ -198,7 +198,7 @@ void EscritorPuertoCOM::enviarFichero() {
                 pesoFichero = pesoFichero + (int) fFichero.gcount();
                 // Construcción de la trama de datos
                 tramaDatos.setDatos(cuerpoMensaje);
-                tramaDatos.setL(fFichero.gcount());
+                tramaDatos.setL((unsigned char) fFichero.gcount());
                 tramaDatos.calcularBCE();
                 // Enviar trama de datos
                 enviarTramaDatos(tramaDatos);
