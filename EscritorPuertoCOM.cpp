@@ -173,6 +173,7 @@ void EscritorPuertoCOM::enviarFichero() {
     std::string titulo;
     std::string autor;
     char *cuerpoMensaje;
+    int pesoFichero = 0;
     TramaDatos tramaDatos = TramaDatos();
 
     fFichero.open(RUTA_DEF_FICHERO_ENVIO, ios::in);            // Abrimos el fichero a enviar
@@ -193,6 +194,8 @@ void EscritorPuertoCOM::enviarFichero() {
             fFichero.read(cuerpoMensaje, 254);
             cuerpoMensaje[fFichero.gcount()] = '\0';
             if (fFichero.gcount() > 0) {
+                // Actualización del peso del fichero
+                pesoFichero = pesoFichero + (int) fFichero.gcount();
                 // Construcción de la trama de datos
                 tramaDatos.setDatos(cuerpoMensaje);
                 tramaDatos.setL(fFichero.gcount());
@@ -205,6 +208,7 @@ void EscritorPuertoCOM::enviarFichero() {
         }
 
         // TODO - Enviar tamaño de fichero
+        // Se encuentra en la variable pesoFichero
 
         EnviarCaracter(com, CHAR_FIN_FICHERO);    // Enviamos '@' (fin de fichero)
         printf("%s\n", MSJ_FIN_ENV_FICHERO);
