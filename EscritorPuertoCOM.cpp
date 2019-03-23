@@ -211,7 +211,7 @@ void EscritorPuertoCOM::enviarFichero() {
 
 		printf("%s\n", MSJ_FIN_ENV_FICHERO);
 
-		fFichero.close(); // Cerramos el fichero
+		fFichero.close(); // Cierra el fichero
 	} else {
 		printf("%s \n\tRuta relativa: %s", MSJ_ERR_FICHERO_ENVIO_NO_ENCONTRADO, RUTA_DEF_FICHERO_ENVIO);
 	}
