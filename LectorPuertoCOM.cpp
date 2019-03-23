@@ -5,24 +5,15 @@ const char LectorPuertoCOM::MSJ_ERROR_BCE_INVALIDO_FCH[] = "Error en la recepcio
 const char LectorPuertoCOM::MSJ_INICIO_REC_FICHERO[] = "Recibiendo fichero por";
 const char LectorPuertoCOM::MSJ_FIN_REC_FICHERO[] = "Fichero recibido";
 
+LectorPuertoCOM *LectorPuertoCOM::instancia = nullptr;
+
 LectorPuertoCOM::LectorPuertoCOM() {
-	mPuertoCOM = nullptr;
+	this->mPuertoCOM = ManejadorPuertoCOM::recuperarInstancia();
 
 	idxTrama = 1;
 	esTrama = false;
 	recepFichero = false;
 	ficheroConfigurado = 0;
-	tramaAux = nullptr;
-}
-
-LectorPuertoCOM::LectorPuertoCOM(ManejadorPuertoCOM *mPuertoCOM) {
-	this->mPuertoCOM = mPuertoCOM;
-
-	idxTrama = 1;
-	esTrama = false;
-	recepFichero = false;
-	ficheroConfigurado = 0;
-	tramaAux = nullptr;
 }
 
 void LectorPuertoCOM::lectura() {
@@ -147,13 +138,17 @@ void LectorPuertoCOM::leerTrama(/* Caracter de trama*/char car) {
 								setFicheroConfigurado(2); // Autor configurado con éxito
 
 								printf("%s %s\n", MSJ_INICIO_REC_FICHERO, getAutorFchRecep().c_str());
+
+								// Reinicio de los campos de la cabecera
+								setRutaFchRecep("");
+								setAutorFchRecep("");
 							} else { // NO está entero, se concatena con lo existente
 								setAutorFchRecep(getAutorFchRecep() + datos);
 							}
 					}
 				} else if (getRecepFichero() &&
 						   ficheroEstaConfigurado()) { // Se está recibiendo el cuerpo de un fichero
-					fFichero.write(tramaAux->toString().c_str(), sizeof(tramaAux->toString().c_str()));
+					fFichero.write(tramaAux->toString().c_str(), tramaAux->toString().length());
 				} else { // Se ha recibido otra trama de datos
 					printf("%s", tramaAux->toString().c_str());
 				}
@@ -183,6 +178,13 @@ char LectorPuertoCOM::hayContenido() {
 
 bool LectorPuertoCOM::ficheroEstaConfigurado() {
 	return getFicheroConfigurado() == 2;
+}
+
+LectorPuertoCOM *LectorPuertoCOM::recuperarInstancia() {
+	if (instancia == nullptr)
+		instancia = new LectorPuertoCOM();
+
+	return instancia;
 }
 
 int LectorPuertoCOM::getIdxTrama() {

@@ -28,12 +28,12 @@ int main() {
 	/** MANEJO DE LAS OPERACIONES DEL PUERTO COM */
 
 	// Manejador de lectura del puerto COM
-	LectorPuertoCOM lectorPuertoCOM = LectorPuertoCOM(ManejadorPuertoCOM::recuperarInstancia());
+	LectorPuertoCOM *lectorPuertoCOM = LectorPuertoCOM::recuperarInstancia();
 	// Manejador de escritura del puerto COM
 	EscritorPuertoCOM escritorPuertoCOM = EscritorPuertoCOM(ManejadorPuertoCOM::recuperarInstancia());
 
 	while (!escritorPuertoCOM.getFinCaracter()) { // Mientras el usuario no pulse la tecla ESCAPE
-		lectorPuertoCOM.lectura(); // Lectura del puerto COM
+		lectorPuertoCOM->lectura(); // Lectura del puerto COM
 		if (kbhit()) // Si se ha pulsado una tecla invoca al manejador de escritura del puerto COM
 			escritorPuertoCOM.escritura();
 	}

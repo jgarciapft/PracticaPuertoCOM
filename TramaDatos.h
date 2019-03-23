@@ -20,7 +20,7 @@ private:
 	/**
 	 * Mensaje contenido en la trama
 	 */
-	char *datos;
+	const char *datos;
 	/**
 	 * Bloque de control de errores
 	 */
@@ -31,7 +31,7 @@ public:
 	TramaDatos();
 
 	TramaDatos(unsigned char S, unsigned char D, unsigned char C, unsigned char NT, unsigned char L,
-			   char *datos);
+			   const char *datos);
 
 	/**
 	 * Calcula el BCE para el mensaje contenido en la trama

@@ -7,7 +7,7 @@ TramaDatos::TramaDatos() {
 }
 
 TramaDatos::TramaDatos(unsigned char S, unsigned char D, unsigned char C, unsigned char NT, unsigned char L,
-					   char *datos) : Trama(S, D, C, NT) {
+					   const char *datos) : Trama(S, D, C, NT) {
 	this->L = L;
 	this->datos = datos;
 	this->BCE = 0;

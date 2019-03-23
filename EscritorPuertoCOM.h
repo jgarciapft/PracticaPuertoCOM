@@ -68,6 +68,11 @@ private:
      * Mensaje para indicar opción inválida en la elección de tipo de trama de control
      */
     static const char MSJ_ERROR_SEL_TC[];
+    /**
+     * Máxima longitud del campo de datos de una trama de datos
+     */
+    static const int TD_MAX_LON_DATOS;
+
 
 public:
     /**
@@ -115,8 +120,10 @@ private:
 
     /**
      * Formatea el mensaje y divide el buffer de escritura en tramas para después enviarlas por el puerto COM
+     *
+     * @param buffer Buffer de caracteres con delimitador 0 del que formar las tramas
      */
-    void enviarBufferTramas();
+    void enviarBufferTramas(const char *buffer);
 
     /**
      * Envía una trama de datos por el puerto COM

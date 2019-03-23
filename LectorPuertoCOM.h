@@ -34,6 +34,10 @@ private:
 
 private:
 	/**
+	 * Instancia Singleton de la clase
+	 */
+	static LectorPuertoCOM *instancia;
+	/**
 	 * Manejador del puerto COM del que leer
 	 */
 	ManejadorPuertoCOM *mPuertoCOM;
@@ -67,11 +71,12 @@ private:
 	 * de 2 quiere decir que se ha leído también el autor.
 	 */
 	int ficheroConfigurado;
-
 	/**
 	 * Auxiliar sobre la que construir una trama
 	 */
 	Trama *tramaAux;
+
+	LectorPuertoCOM();
 
 	/**
 	 * Maneja el procesamiento de un caracter
@@ -136,14 +141,16 @@ private:
 	void setFicheroConfigurado(/* Nuevo valor de la bandera*/int ficheroConfigurado);
 
 public:
-	LectorPuertoCOM();
-
-	explicit LectorPuertoCOM(ManejadorPuertoCOM *mPuertoCOM);
 
 	/**
 	 * Maneja la función de lectura del puerto COM. Maneja la lectura de un caracter y la lectura de una trama
 	 */
 	void lectura();
+
+	/**
+	 * @return Instancia Singleton de la clase
+	 */
+	static LectorPuertoCOM *recuperarInstancia();
 
 	/**
 	 * Método accesor del atributo 'idxTrama'

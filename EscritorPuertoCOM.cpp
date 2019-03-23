@@ -11,6 +11,7 @@ const unsigned char EscritorPuertoCOM::TC_DEF_NT = '0';
 const unsigned char EscritorPuertoCOM::TD_DEF_DIRECCION = 'T';
 const unsigned char EscritorPuertoCOM::TD_DEF_CONTROL = 2;
 const unsigned char EscritorPuertoCOM::TD_DEF_NT = '0';
+const int EscritorPuertoCOM::TD_MAX_LON_DATOS = 254;
 const char EscritorPuertoCOM::MSJ_ERR_FICHERO_ENVIO_NO_ENCONTRADO[] = "Error al abrir el fichero de envio";
 const char EscritorPuertoCOM::MSJ_INICIO_ENV_FICHERO[] = "Enviando fichero por";
 const char EscritorPuertoCOM::MSJ_FIN_ENV_FICHERO[] = "Fichero enviado";
@@ -92,7 +93,7 @@ void EscritorPuertoCOM::enviarMensaje() {
 	/** ENVÍO DE MENSAJE */
 
 	if (manPrtoCOMAbierto()) // Comprueba que el puerto COM esté operativo
-		enviarBufferTramas();
+		enviarBufferTramas(buffer);
 	printf("%c", CONSTANTES::CRLN); // Salta a la siguiente línea para seguir escribiendo
 
 	/** REINICIO DE BANDERAS */
@@ -100,29 +101,25 @@ void EscritorPuertoCOM::enviarMensaje() {
 	setIdxBuffer(0); // Reinicia el índice del buffer de escritura
 }
 
-void EscritorPuertoCOM::enviarBufferTramas() {
+void EscritorPuertoCOM::enviarBufferTramas(const char *buffer) {
 	int idx, auxLen;
-	TramaDatos tramaDatos;
 
 	// Divide el mensaje en las tramas necesarias mediante referencias desplazadas al puntero buffer
-	for (idx = 0; idx < strlen(buffer); idx += 254) {
+	for (idx = 0; idx < strlen(buffer); idx += TD_MAX_LON_DATOS) {
 		auxLen = static_cast<int>(strlen(
 				buffer + idx)); // Auxiliar para comprobar la longitud real de la cadena de la sección buffer + idx
 
-		tramaDatos = TramaDatos(CONSTANTES::SINCRONISMO, TD_DEF_DIRECCION, TD_DEF_CONTROL, TD_DEF_NT,
-								static_cast<unsigned char>(auxLen > 254 ? 254 : auxLen), buffer + idx);
-
-		tramaDatos.calcularBCE(); // Calcula el BCE la trama antes de enviarla
-		enviarTramaDatos(tramaDatos);
-
-		// Lectura de datos no exclusiva
-		LectorPuertoCOM(ManejadorPuertoCOM::recuperarInstancia()).lectura();
+		enviarTramaDatos(TramaDatos(CONSTANTES::SINCRONISMO, TD_DEF_DIRECCION, TD_DEF_CONTROL, TD_DEF_NT,
+									static_cast<unsigned char>(auxLen > TD_MAX_LON_DATOS ? TD_MAX_LON_DATOS : auxLen),
+									buffer + idx));
 	}
 }
 
 void EscritorPuertoCOM::enviarTramaDatos(TramaDatos tramaDatos) {
 	HANDLE com = ManejadorPuertoCOM::recuperarInstancia()->getHandle();
 
+	// Calcula el BCE de la trama antes de enviarla
+	tramaDatos.calcularBCE();
 	// Envía el contenido de la trama por partes
 	EnviarCaracter(com, tramaDatos.getS());
 	EnviarCaracter(com, tramaDatos.getD());
@@ -131,6 +128,9 @@ void EscritorPuertoCOM::enviarTramaDatos(TramaDatos tramaDatos) {
 	EnviarCaracter(com, tramaDatos.getL());
 	EnviarCadena(com, tramaDatos.getDatos(), tramaDatos.getL());
 	EnviarCaracter(com, tramaDatos.getBCE());
+
+	// Lectura de datos no exclusiva
+	LectorPuertoCOM::recuperarInstancia()->lectura();
 }
 
 void EscritorPuertoCOM::enviarTramaControl() {
@@ -170,85 +170,54 @@ void EscritorPuertoCOM::enviarTramaControl() {
 void EscritorPuertoCOM::enviarFichero() {
 	HANDLE com = ManejadorPuertoCOM::recuperarInstancia()->getHandle();
 	fstream fFichero;
-    std::string titulo;
-    std::string autor;
-    char *cuerpoMensaje;
-    int pesoFichero = 0;
-    TramaDatos tramaDatos;
+	string cabecera;
+	string autor;
+	char *cuerpoMensaje = new char[TD_MAX_LON_DATOS + 1];
+	char *msjNumBytes = new char[TD_MAX_LON_DATOS + 1];
+	int pesoFichero = 0;
 
-    fFichero.open(RUTA_DEF_FICHERO_ENVIO, ios::in);            // Abrimos el fichero a enviar
-
+	fFichero.open(RUTA_DEF_FICHERO_ENVIO, ios::in); // Abrimos el fichero a enviar
 	if (fFichero.is_open()) {
+		EnviarCaracter(com, CHAR_INICIO_FICHERO); // Envío de '#' (inicio de fichero)
 
-        getline(fFichero, titulo);                                          // ----- Nombre de fichero en titulo
-        EnviarCadena(com, titulo.c_str(), sizeof(titulo.c_str()));          // Enviar nombre de fichero
+		// LEE LA CABECERA DEL FICHERO
+		getline(fFichero, cabecera); // Lee la ruta
+		cabecera.append("\n");
+		getline(fFichero, autor); // Lee el autor
+		autor.append("\n");
+		cabecera.append(autor); // Crea una sola cadena con la cabecera
+		// ENVÍA LA CABECERA
+		enviarBufferTramas(cabecera.c_str());
+		printf("%s %s\n", MSJ_INICIO_ENV_FICHERO, autor.c_str());
+		// PROCESA EL CONTENIDO DEL FICHERO
+		while (!fFichero.eof()) {
+			fFichero.read(cuerpoMensaje, TD_MAX_LON_DATOS);
+			cuerpoMensaje[fFichero.gcount()] = CONSTANTES::DELIM_CAD;
 
-        getline(fFichero, autor);                                           // ----- Nombre de autor en autor
-        EnviarCadena(com, autor.c_str(), sizeof(autor.c_str()));            // Enviar nombre de autor
+			if (fFichero.gcount() > 0) {
+				// Envio de la trama de datos
+				enviarTramaDatos(TramaDatos(CONSTANTES::SINCRONISMO, TD_DEF_DIRECCION, TD_DEF_CONTROL, TD_DEF_NT,
+											static_cast<unsigned char>(fFichero.gcount()), cuerpoMensaje));
+				// Actualización del peso del fichero
+				pesoFichero += static_cast<int>(fFichero.gcount());
+			}
+		}
 
-        printf("%s %s\n", MSJ_INICIO_ENV_FICHERO, autor.c_str());           // Enviar autor de fichero
+		EnviarCaracter(com, CHAR_FIN_FICHERO); // Enviamos '@' (fin de fichero)
+		// Envía el número de bytes procesados
+		sprintf(msjNumBytes, "%s %d %s\n", "El fichero tiene un peso de", pesoFichero, "bytes");
+		enviarTramaDatos(TramaDatos(CONSTANTES::SINCRONISMO, TD_DEF_DIRECCION, TD_DEF_CONTROL, TD_DEF_NT,
+									static_cast<unsigned char>(strlen(msjNumBytes)), msjNumBytes));
 
-        EnviarCaracter(com, CHAR_INICIO_FICHERO);                           // Envío de '#' (inicio de fichero)
+		printf("%s\n", MSJ_FIN_ENV_FICHERO);
 
-        while (!fFichero.eof()) {
-            fFichero.read(cuerpoMensaje, 254);
-            cuerpoMensaje[fFichero.gcount()] = '\0';
-            if (fFichero.gcount() > 0) {
-                // Actualización del peso del fichero
-                pesoFichero = pesoFichero + (int) fFichero.gcount();
-                // Construcción de la trama de datos
-                tramaDatos = TramaDatos(22, 'T', 02, '0', (unsigned char) fFichero.gcount(), cuerpoMensaje);
-                tramaDatos.calcularBCE();
-                // Envio de la trama de datos
-                enviarTramaDatos(tramaDatos);
-                // Lectura de datos no exclusiva
-                LectorPuertoCOM(ManejadorPuertoCOM::recuperarInstancia()).lectura();
-            }
-        }
-
-        // TODO - Enviar tamaño de fichero
-        // Se encuentra en la variable pesoFichero
-
-        EnviarCaracter(com, CHAR_FIN_FICHERO);    // Enviamos '@' (fin de fichero)
-        printf("%s\n", MSJ_FIN_ENV_FICHERO);
-
-        fFichero.close();                        // Cerramos el fichero
-
-        /*// INSTRUMENTACIÓN DE PRUEBA ->
-
-        string ruta = "F.tx";
-        string autor = "t\ngp";
-        string cuerpo = "z\nHOLA";
-
-        EnviarCaracter(com, 22);
-        EnviarCaracter(com, 'T');
-        EnviarCaracter(com, 2);
-        EnviarCaracter(com, '0');
-        EnviarCaracter(com, 4);
-        EnviarCadena(com, ruta.c_str(), sizeof(ruta.c_str()));
-        EnviarCaracter(com, 'F' ^ '.' ^ 't' ^ 'x');
-
-        EnviarCaracter(com, 22);
-        EnviarCaracter(com, 'T');
-        EnviarCaracter(com, 2);
-        EnviarCaracter(com, '0');
-        EnviarCaracter(com, 4);
-        EnviarCadena(com, autor.c_str(), sizeof(autor.c_str()));
-        EnviarCaracter(com, 't' ^ '\n' ^ 'g' ^ 'p');
-
-        EnviarCaracter(com, 22);
-        EnviarCaracter(com, 'T');
-        EnviarCaracter(com, 2);
-        EnviarCaracter(com, '0');
-        EnviarCaracter(com, 6);
-        EnviarCadena(com, cuerpo.c_str(), sizeof(cuerpo.c_str()));
-        EnviarCaracter(com, 'z' ^ '\n' ^ 10);
-
-        // <- INSTRUMENTACIÓN DE PRUEBA*/
-
+		fFichero.close(); // Cerramos el fichero
 	} else {
 		printf("%s \n\tRuta relativa: %s", MSJ_ERR_FICHERO_ENVIO_NO_ENCONTRADO, RUTA_DEF_FICHERO_ENVIO);
 	}
+
+	delete[] msjNumBytes; // Libera la memoria asociada al mensaje del peso del fichero enviado
+	delete[] cuerpoMensaje; // Libera la memoria asociada a la cadena del cuerpo del texto del fichero
 }
 
 bool EscritorPuertoCOM::manPrtoCOMAbierto() {
