@@ -180,15 +180,15 @@ void EscritorPuertoCOM::enviarFichero() {
 
 	if (fFichero.is_open()) {
 
-        getline(fFichero, titulo);                                // ----- Nombre de fichero en titulo
-        EnviarCadena(com, titulo.c_str(), (int) titulo.size());        // Enviar nombre de fichero
+        getline(fFichero, titulo);                                          // ----- Nombre de fichero en titulo
+        EnviarCadena(com, titulo.c_str(), sizeof(titulo.c_str()));          // Enviar nombre de fichero
 
-        getline(fFichero, autor);                                // ----- Nombre de autor en autor
-        EnviarCadena(com, autor.c_str(), (int) autor.size());        // Enviar nombre de autor
+        getline(fFichero, autor);                                           // ----- Nombre de autor en autor
+        EnviarCadena(com, autor.c_str(), sizeof(autor.c_str()));            // Enviar nombre de autor
 
-        printf("%s %s\n", MSJ_INICIO_ENV_FICHERO, autor.c_str()); // Enviar autor de fichero
+        printf("%s %s\n", MSJ_INICIO_ENV_FICHERO, autor.c_str());           // Enviar autor de fichero
 
-        EnviarCaracter(com, CHAR_INICIO_FICHERO);        // Envío de '#' (inicio de fichero)
+        EnviarCaracter(com, CHAR_INICIO_FICHERO);                           // Envío de '#' (inicio de fichero)
 
         while (!fFichero.eof()) {
             fFichero.read(cuerpoMensaje, 254);
@@ -200,7 +200,7 @@ void EscritorPuertoCOM::enviarFichero() {
                 tramaDatos.setDatos(cuerpoMensaje);
                 tramaDatos.setL((unsigned char) fFichero.gcount());
                 tramaDatos.calcularBCE();
-                // Enviar trama de datos
+                // Envio de la trama de datos
                 enviarTramaDatos(tramaDatos);
                 // Lectura de datos no exclusiva
                 LectorPuertoCOM(ManejadorPuertoCOM::recuperarInstancia()).lectura();
