@@ -50,6 +50,10 @@ private:
 	 */
 	int idxTrama;
 	/**
+	 * Auxiliar sobre la que construir una trama
+	 */
+	Trama *tramaAux;
+	/**
 	 * Autor del fichero de recepción
 	 */
 	string autorFchRecep;
@@ -71,10 +75,6 @@ private:
 	 * de 2 quiere decir que se ha leído también el autor.
 	 */
 	int ficheroConfigurado;
-	/**
-	 * Auxiliar sobre la que construir una trama
-	 */
-	Trama *tramaAux;
 
 	LectorPuertoCOM();
 
@@ -87,8 +87,19 @@ private:
 
 	/**
 	 * Maneja el procesamiento de una trama
+	 *
+	 * @param car /Caracter de trama
 	 */
-	void leerTrama(/* Caracter de trama*/char car);
+	void leerTrama(char car);
+
+	/**
+	 * Procesa la trama de datos recibida para buscar campos de la cabecera empleados para configurar el fichero
+	 * de recepción: ruta relativa del fichero de recepción y autor del envío. Los campos pueden incluirse en una trama,
+	 * separados cada uno en una trama, o en varias si no caben. CUIDADO: Toda infromación en una trama de
+	 * datos que contiene campos de cabecera debe incluir únicamente información sobre la cabecera, si incluye parte del
+	 * cuerpo del mensaje será ignorado
+	 */
+	void procesarCabeceraFchRecep();
 
 	/**
 	 * @return si el manejador del puerto COM está inicializado
@@ -109,36 +120,48 @@ private:
 
 	/**
 	 * Método modificador del atributo 'idxTrama'
+	 *
+	 * @param idxTrama Nuevo valor del índice
 	 */
-	void setIdxTrama(/* Nuevo valor del índice */int idxTrama);
+	void setIdxTrama(int idxTrama);
 
 	/**
 	 * Método modificador del atributo 'esTrama'
+	 *
+	 * @param esTrama Nuevo valor de la bandera
 	 */
-	void setEsTrama(/* Nuevo valor de la bandera*/bool esTrama);
+	void setEsTrama(bool esTrama);
 
 	/**
 	 * Método modificador del atributo 'recepFichero'.
 	 * Cierra el flujo asociado al fichero de recepción si la bandera es FALSO
+	 *
+	 * @param recepFichero Nuevo valor de la bandera
 	 */
-	void setRecepFichero(/* Nuevo valor de la bandera*/bool recepFichero);
+	void setRecepFichero(bool recepFichero);
 
 	/**
 	 * Método modificador del atributo 'autorFichero'
+	 *
+	 * @param autorFchRecep Nuevo valor del autor
 	 */
-	void setAutorFchRecep(/* Nuevo valor del autor*/const string &autorFchRecep);
+	void setAutorFchRecep(const string &autorFchRecep);
 
 	/**
 	 * Método modificador del atributo 'rutaFchRecep'
+	 *
+	 * @param Nuevo valor de la ruta
 	 */
-	void setRutaFchRecep(/* Nuevo valor de la ruta*/const string &rutaFchRecep);
+	void setRutaFchRecep(const string &rutaFchRecep);
 
 	/**
 	 * Método modificador del atributo 'ficheroConfigurado'.
 	 * Abre el flujo asociado al fichero de recepción si se está recibiendd un fichero y la bandera es VERDADERO,
 	 * entonces coge el valor del atributo 'rutaFchRecep' como ruta
+	 *
+	 * @param Nuevo valor de la bandera
 	 */
-	void setFicheroConfigurado(/* Nuevo valor de la bandera*/int ficheroConfigurado);
+	void setFicheroConfigurado(int ficheroConfigurado);
 
 public:
 

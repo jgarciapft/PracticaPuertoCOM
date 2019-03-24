@@ -169,31 +169,39 @@ void EscritorPuertoCOM::enviarTramaControl() {
 
 void EscritorPuertoCOM::enviarFichero() {
 	HANDLE com = ManejadorPuertoCOM::recuperarInstancia()->getHandle();
-	fstream fFichero;
-	string cabecera;
-	string autor;
-	char *cuerpoMensaje = new char[TD_MAX_LON_DATOS + 1];
-	char *msjNumBytes = new char[TD_MAX_LON_DATOS + 1];
-	int pesoFichero = 0;
+	fstream fFichero; // Flujo asociado al fichero de envío del que leer el contenido a enviar
+	string cabecera; // Cabecera completa del fichero. Ruta del fichero destino y autor
+	string autor; // Autor del fichero
+	char *cuerpoMensaje = new char[TD_MAX_LON_DATOS +
+								   1]; // Auxiliar para ir almacenando cada porción del cuerpo del mensaje
+	char *msjNumBytes = new char[TD_MAX_LON_DATOS + 1]; // Mensaje sobre el peso del fichero enviado
+	int pesoFichero = 0; // Peso del fichero enviado. 1 char -> 1 Byte
 
 	fFichero.open(RUTA_DEF_FICHERO_ENVIO, ios::in); // Abrimos el fichero a enviar
 	if (fFichero.is_open()) {
-		EnviarCaracter(com, CHAR_INICIO_FICHERO); // Envío de '#' (inicio de fichero)
+		EnviarCaracter(com, CHAR_INICIO_FICHERO); // Envío de inicio de fichero
 
-		// LEE LA CABECERA DEL FICHERO
+		/* LEE LA CABECERA DEL FICHERO */
+
 		getline(fFichero, cabecera); // Lee la ruta
 		cabecera.append("\n");
 		getline(fFichero, autor); // Lee el autor
 		autor.append("\n");
 		cabecera.append(autor); // Crea una sola cadena con la cabecera
-		// ENVÍA LA CABECERA
+
+		/* ENVÍA LA CABECERA */
+
 		enviarBufferTramas(cabecera.c_str());
 		printf("%s %s\n", MSJ_INICIO_ENV_FICHERO, autor.c_str());
-		// PROCESA EL CONTENIDO DEL FICHERO
-		while (!fFichero.eof()) {
-			fFichero.read(cuerpoMensaje, TD_MAX_LON_DATOS);
-			cuerpoMensaje[fFichero.gcount()] = CONSTANTES::DELIM_CAD;
 
+		/* PROCESA EL CONTENIDO DEL FICHERO */
+
+		while (!fFichero.eof()) {
+			fFichero.read(cuerpoMensaje,
+						  TD_MAX_LON_DATOS); // Lee una porción del tamaño de una trama de datos o hasta el EOF
+			cuerpoMensaje[fFichero.gcount()] = CONSTANTES::DELIM_CAD; // Añade delimitador de cadena por seguridad
+
+			// Comprueba que haya contenido a enviar
 			if (fFichero.gcount() > 0) {
 				// Envio de la trama de datos
 				enviarTramaDatos(TramaDatos(CONSTANTES::SINCRONISMO, TD_DEF_DIRECCION, TD_DEF_CONTROL, TD_DEF_NT,
@@ -203,14 +211,13 @@ void EscritorPuertoCOM::enviarFichero() {
 			}
 		}
 
-		EnviarCaracter(com, CHAR_FIN_FICHERO); // Enviamos '@' (fin de fichero)
+		EnviarCaracter(com, CHAR_FIN_FICHERO); // Envía fin de fichero
 		// Envía el número de bytes procesados
 		sprintf(msjNumBytes, "%s %d %s\n", "El fichero tiene un peso de", pesoFichero, "bytes");
 		enviarTramaDatos(TramaDatos(CONSTANTES::SINCRONISMO, TD_DEF_DIRECCION, TD_DEF_CONTROL, TD_DEF_NT,
 									static_cast<unsigned char>(strlen(msjNumBytes)), msjNumBytes));
-
+		// Mensaje de final de envío de fichero
 		printf("%s\n", MSJ_FIN_ENV_FICHERO);
-
 		fFichero.close(); // Cierra el fichero
 	} else {
 		printf("%s \n\tRuta relativa: %s", MSJ_ERR_FICHERO_ENVIO_NO_ENCONTRADO, RUTA_DEF_FICHERO_ENVIO);
@@ -234,11 +241,11 @@ bool EscritorPuertoCOM::getFinCaracter() {
 	return finCaracter;
 }
 
-void EscritorPuertoCOM::setIdxBuffer(/* Nuevo valor del índice */int idxBuffer) {
+void EscritorPuertoCOM::setIdxBuffer(int idxBuffer) {
 	this->idxBuffer = idxBuffer;
 }
 
-void EscritorPuertoCOM::setFinCaracter(/* Nuevo valor de la bandera */bool finCaracter) {
+void EscritorPuertoCOM::setFinCaracter(bool finCaracter) {
 	this->finCaracter = finCaracter;
 }
 

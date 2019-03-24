@@ -36,11 +36,11 @@ const char *TramaDatos::getDatos() {
 	return datos;
 }
 
-void TramaDatos::setL(/* Nuevo valor de la longitud */unsigned char L) {
+void TramaDatos::setL(unsigned char L) {
 	this->L = L;
 }
 
-void TramaDatos::setBCE(/* Nuevo valor del BCE */unsigned char BCE) {
+void TramaDatos::setBCE(unsigned char BCE) {
 	this->BCE = BCE;
 }
 

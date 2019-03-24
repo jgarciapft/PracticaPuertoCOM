@@ -27,19 +27,19 @@ unsigned char Trama::getNT() {
 	return NT;
 }
 
-void Trama::setS(/* Nuevo valor del caracter de sincronismo */unsigned char S) {
+void Trama::setS(unsigned char S) {
 	this->S = S;
 }
 
-void Trama::setD(/* Nuevo valor del caracter de dirección */unsigned char D) {
+void Trama::setD(unsigned char D) {
 	this->D = D;
 }
 
-void Trama::setC(/* Nuevo valor del caracter de control */unsigned char C) {
+void Trama::setC(unsigned char C) {
 	this->C = C;
 }
 
-void Trama::setNT(/* Nuevo valor del número de trama */unsigned char NT) {
+void Trama::setNT(unsigned char NT) {
 	this->NT = NT;
 }
 

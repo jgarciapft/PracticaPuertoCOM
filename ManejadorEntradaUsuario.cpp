@@ -2,11 +2,8 @@
 
 ManejadorEntradaUsuario::ManejadorEntradaUsuario() = default;
 
-int ManejadorEntradaUsuario::preguntarRespEntRang(/* Mensaje que mostrar al usuario */
-		const char pregunta[], /* Mensaje de error */
-		const char msjError[], /* Límite inferior del rango numérico permitido (inclusive) */
-		int limInf, /* Limite superior del rango numérico permitido <(inclusive) */int limSup) {
-
+int
+ManejadorEntradaUsuario::preguntarRespEntRang(const char pregunta[], const char msjError[], int limInf, int limSup) {
 	bool selCorrecta = false; // Bandera de selección correcta del usuario
 	char cadAux[10]; // Cadena auxiliar en la que leer la entrada de usuario
 	int entUs; // Selección numérica del usuario convertida a entero

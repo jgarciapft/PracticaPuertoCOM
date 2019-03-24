@@ -26,6 +26,13 @@ private:
 	 */
 	unsigned char BCE;
 
+	/**
+	 * Método modificador del atributo 'BCE'
+	 *
+	 * @param BCE Nuevo BCE
+	 */
+	void setBCE(unsigned char BCE);
+
 public:
 
 	TramaDatos();
@@ -54,29 +61,31 @@ public:
 	const char *getDatos();
 
 	/**
-	* Método modificador del atributo 'L'
-	*/
+	 * Método modificador del atributo 'L'
+ 	 *
+ 	 * @param L Nuevo valor de la longitud
+	 */
 	void setL(unsigned char L);
 
 	/**
-	 * Método modificador del atributo 'BCE'
-	 */
-	void setBCE(unsigned char BCE);
-
-	/**
 	 * Método modificador del atributo 'datos'
+	 *
+	 * @param datos Nuevo mensaje
 	 */
 	void setDatos(char *datos);
 
 	/**
 	 * Método modificador global
+	 *
+	 * @param S Nuevo valor del caracter de sincronismo
+	 * @param D Nuevo valor del caracter de dirección
+	 * @param C Nuevo valor del caracter de control
+	 * @param NT Nuevo valor del número de trama
+	 * @param L Nuevo valor de la longitud
+	 * @param datos Nuevo mensaje
 	 */
 	void
-	setAttr(/* Nuevo valor del caracter de sincronismo */unsigned char S,/* Nuevo valor del caracter de dirección */
-														 unsigned char D,/* Nuevo valor del caracter de control */
-														 unsigned char C, /* Nuevo valor del número de trama */
-														 unsigned char NT,/* Nuevo valor de la longitud */
-														 unsigned char L, /* Nuevo mensaje */char *datos);
+	setAttr(unsigned char S, unsigned char D, unsigned char C, unsigned char NT, unsigned char L, char *datos);
 
 	/**
 	 * Devuelve la representación en cadena de la trama de datos

@@ -57,19 +57,19 @@ void CargadorManejadorPuertoCOM::setNombrePuerto(LPCSTR nombrePuerto) {
 	this->nombrePuerto = nombrePuerto;
 }
 
-void CargadorManejadorPuertoCOM::setVelocidad(/* Nueva tasa de baudios */DWORD velocidad) {
+void CargadorManejadorPuertoCOM::setVelocidad(DWORD velocidad) {
 	this->velocidad = velocidad;
 }
 
 void
-CargadorManejadorPuertoCOM::setNumBitsXByte(/* Nuevo número de bits por byte enviado o recibido */BYTE numBitsXByte) {
+CargadorManejadorPuertoCOM::setNumBitsXByte(BYTE numBitsXByte) {
 	this->numBitsXByte = numBitsXByte;
 }
 
-void CargadorManejadorPuertoCOM::setParidad(/* Nuevo modo de paridad */BYTE paridad) {
+void CargadorManejadorPuertoCOM::setParidad(BYTE paridad) {
 	this->paridad = paridad;
 }
 
-void CargadorManejadorPuertoCOM::setBitsParada(/* Nuevo número de bits de parada */BYTE bitsParada) {
+void CargadorManejadorPuertoCOM::setBitsParada(BYTE bitsParada) {
 	this->bitsParada = bitsParada;
 }

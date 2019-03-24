@@ -17,11 +17,13 @@ public:
 
 	/**
 	 * Obtiene una respuesta numérica del usuario a una pregunta
+	 *
+	 * @param pregunta Mensaje que mostrar al usuario
+	 * @param msjError Mensaje de error
+	 * @param limInf Límite inferior del rango numérico permitido (inclusive)
+	 * @param limSup Limite superior del rango numérico permitido (inclusive)
 	 */
-	static int preguntarRespEntRang(/* Mensaje que mostrar al usuario */
-			const char pregunta[], /* Mensaje de error */
-			const char msjError[], /* Límite inferior del rango numérico permitido (inclusive) */
-			int limInf, /* Limite superior del rango numérico permitido (inclusive) */int limSup);
+	static int preguntarRespEntRang(const char pregunta[], const char msjError[], int limInf, int limSup);
 };
 
 #endif

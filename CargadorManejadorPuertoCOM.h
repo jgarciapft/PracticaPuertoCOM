@@ -64,6 +64,11 @@ public:
 	bool inicializarManejador();
 
 	/**
+	 * Método accesor del atributo 'nombrePuerto'
+	 */
+	LPCSTR getNombrePuerto();
+
+	/**
 	 * Método accesor del atributo 'velocidad'
 	 */
 	DWORD getVelocidad();
@@ -84,34 +89,39 @@ public:
 	BYTE getBitsParada();
 
 	/**
-	 * Método modificador del atributo 'velocidad'
+	 * Método modificador del atributo 'nombrePuerto'
+	 *
+	 * @param nombrePuerto Nuevo nombre del puerto
 	 */
-	void setVelocidad(/* Nueva tasa de baudios */DWORD velocidad);
+	void setNombrePuerto(LPCSTR nombrePuerto);
+
+	/**
+	 * Método modificador del atributo 'velocidad'
+	 *
+	 * @param velocidad Nueva tasa de baudios
+	 */
+	void setVelocidad(DWORD velocidad);
 
 	/**
 	 * Método modificador del atributo 'numBitsXByte'
+	 *
+	 * @param numBitsXByte Nuevo número de bits por byte enviado o recibido
 	 */
-	void setNumBitsXByte(/* Nuevo número de bits por byte enviado o recibido */BYTE numBitsXByte);
+	void setNumBitsXByte(BYTE numBitsXByte);
 
 	/**
 	 * Método modificador del atributo 'paridad'
+	 *
+	 * @param paridad Nuevo modo de paridad
 	 */
-	void setParidad(/* Nuevo modo de paridad */BYTE paridad);
+	void setParidad(BYTE paridad);
 
 	/**
 	 * Método modificador del atributo 'bitsParada'
+	 *
+	 * @param Nuevo número de bits de parada
 	 */
-	void setBitsParada(/* Nuevo número de bits de parada */BYTE bitsParada);
-
-	/**
-	 * Método accesor del atributo 'nombrePuerto'
-	 */
-	LPCSTR getNombrePuerto();
-
-	/**
-	 * Método modificador del atributo 'nombrePuerto'
-	 */
-	void setNombrePuerto(LPCSTR nombrePuerto);
+	void setBitsParada(BYTE bitsParada);
 };
 
 #endif

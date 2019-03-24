@@ -73,7 +73,6 @@ private:
      */
     static const int TD_MAX_LON_DATOS;
 
-
 public:
     /**
      * Caracter indicador del inicio del envío de un fichero
@@ -151,13 +150,17 @@ private:
 
     /**
      * Método modificador del atributo 'finCaracter'
+     *
+     * @param finCaracter Nuevo valor de la bandera
      */
-    void setFinCaracter(/* Nuevo valor de la bandera */bool finCaracter);
+    void setFinCaracter(bool finCaracter);
 
     /**
      * Método modificador del atributo 'idxBuffer'
+     *
+     * @param idxBuffer Nuevo valor del índice
      */
-    void setIdxBuffer(/* Nuevo valor del índice */int idxBuffer);
+    void setIdxBuffer(int idxBuffer);
 
 public:
 

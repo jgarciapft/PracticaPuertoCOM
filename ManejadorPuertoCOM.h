@@ -36,25 +36,32 @@ private:
 
 	/**
 	 * Método modificador del atributo 'estadoAbierto'
+	 *
+	 * @param estadoAbierto Nuevo valor de la bandera de estado
 	 */
-	void setEstadoAbierto(/* Nuevo valor de la bandera de estado */boolean estadoAbierto);
+	void setEstadoAbierto(boolean estadoAbierto);
 
 public:
 	/**
-	 * Intenta abrir el manejador en el puerto COM deseado. Devuelve 'VERDADERO' si el manejador fue correctamente inicializado, 'FALSO' en otro caso
+	 * Intenta abrir el manejador en el puerto COM deseado. Devuelve 'VERDADERO' si el manejador fue correctamente
+	 * inicializado, 'FALSO' en otro caso
+	 *
+	 * @param nombrePuerto Constante que indica el puerto COM a elegir
+	 * @param velocidad Tasa de baudios
+	 * @param numBitsXByte Número de bits en cada byte enviado o recibido. Valor entre 4 y 8, ambos inclusive
+	 * @param paridad Bit de paridad.
+     *   0 = sin paridad
+     *   1=impar
+     *   2=par
+     *   3=marca
+     *   4=espacio
+     * @param bitsParada Bits de stop.
+     *   0 = 1 bit
+     *   1 = 1.5 bits
+     *   2 = 2 bits
 	 */
 	bool
-	abrirManejador(/* Constante que indica el puerto COM a elegir */LPCSTR nombrePuerto, /* Tasa de baudios */
-																	DWORD velocidad, /* Número de bits en cada byte enviado o recibido. Valor entre 4 y 8, ambos inclusive */
-																	BYTE numBitsXByte, /* Bit de paridad.
-        0 = sin paridad
-        1=impar
-        2=par
-        3=marca
-        4=espacio */BYTE paridad, /* Bits de stop.
-        0 = 1 bit
-        1 = 1.5 bits
-        2 = 2 bits */BYTE bitsParada);
+	abrirManejador(LPCSTR nombrePuerto, DWORD velocidad, BYTE numBitsXByte, BYTE paridad, BYTE bitsParada);
 
 	/**
 	 * Cierra el manejador del puerto COM

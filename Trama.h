@@ -76,32 +76,42 @@ public:
 
 	/**
 	 * Método modificador del atributo 'S'
+	 *
+	 * @param S Nuevo valor del caracter de sincronismo
 	 */
-	void setS(/* Nuevo valor del caracter de sincronismo */unsigned char S);
+	void setS(unsigned char S);
 
 	/**
 	 * Método modificador del atributo 'D'
+	 *
+	 * @param D Nuevo valor del caracter de dirección
 	 */
-	void setD(/* Nuevo valor del caracter de dirección */unsigned char D);
+	void setD(unsigned char D);
 
 	/**
 	 * Método modificador del atributo 'C'
+	 *
+	 * @param C Nuevo valor del caracter de control
 	 */
-	void setC(/* Nuevo valor del caracter de control */unsigned char C);
+	void setC(unsigned char C);
 
 	/**
 	 * Método modificador del atributo 'NT'
+	 *
+	 * @param NT Nuevo valor del número de trama
 	 */
-	void setNT(/* Nuevo valor del número de trama */unsigned char NT);
+	void setNT(unsigned char NT);
 
 	/**
 	 * Método modificador combinado de todos los atributos de la clase
+	 *
+	 * @param S Nuevo valor del caracter de sincronismo
+	 * @param D Nuevo valor del caracter de dirección
+	 * @param C Nuevo valor del caracter de control
+	 * @param NT Nuevo valor del número de trama
 	 */
 	virtual void
-	setAttr(/* Nuevo valor del caracter de sincronismo */unsigned char S,/* Nuevo valor del caracter de dirección */
-														 unsigned char D,/* Nuevo valor del caracter de control */
-														 unsigned char C, /* Nuevo valor del número de trama */
-														 unsigned char NT);
+	setAttr(unsigned char S, unsigned char D, unsigned char C, unsigned char NT);
 
 	/**
 	 * Devuelve la representación en cadena de la trama
