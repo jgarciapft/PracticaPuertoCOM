@@ -220,7 +220,7 @@ void EscritorPuertoCOM::enviarFichero() {
 		printf("%s\n", MSJ_FIN_ENV_FICHERO);
 		fFichero.close(); // Cierra el fichero
 	} else {
-		printf("%s \n\tRuta relativa: %s", MSJ_ERR_FICHERO_ENVIO_NO_ENCONTRADO, RUTA_DEF_FICHERO_ENVIO);
+		printf("%s \n\tRuta relativa: %s\n", MSJ_ERR_FICHERO_ENVIO_NO_ENCONTRADO, RUTA_DEF_FICHERO_ENVIO);
 	}
 
 	delete[] msjNumBytes; // Libera la memoria asociada al mensaje del peso del fichero enviado
