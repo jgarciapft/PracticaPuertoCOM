@@ -2,7 +2,6 @@
 #define TRAMA_H
 
 #include <string>
-#include "Principal.h"
 
 /**
  * Clase que modela una trama genérica. Contiene:

@@ -1,4 +1,5 @@
 #include "Trama.h"
+#include "Principal.h"
 
 const std::string Trama::CONST_CONTROL_TRAMA[] = {"ENQ", "EOT", "ACK", "NACK", "DESCONOCIDO"};
 

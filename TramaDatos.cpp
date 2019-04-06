@@ -1,4 +1,5 @@
 #include "TramaDatos.h"
+#include "Principal.h"
 
 TramaDatos::TramaDatos() {
 	datos = nullptr;
