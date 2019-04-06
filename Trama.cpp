@@ -3,7 +3,19 @@
 
 const std::string Trama::CONST_CONTROL_TRAMA[] = {"ENQ", "EOT", "ACK", "NACK", "STX", "DESCONOCIDO"};
 
-Trama::Trama() = default;
+Trama::Trama() {
+	this->S = 0;
+	this->D = 0;
+	this->C = 0;
+	this->NT = 0;
+}
+
+Trama::Trama(Trama *trama) {
+	S = trama->getS();
+	D = trama->getD();
+	C = trama->getC();
+	NT = trama->getNT();
+}
 
 Trama::Trama(unsigned char S, unsigned char D, unsigned char C, unsigned char NT) {
 	this->S = S;
@@ -12,19 +24,23 @@ Trama::Trama(unsigned char S, unsigned char D, unsigned char C, unsigned char NT
 	this->NT = NT;
 }
 
-unsigned char Trama::getS() {
+Trama* Trama::copia() {
+	return new Trama(this);
+}
+
+unsigned char Trama::getS() const {
 	return S;
 }
 
-unsigned char Trama::getD() {
+unsigned char Trama::getD() const {
 	return D;
 }
 
-unsigned char Trama::getC() {
+unsigned char Trama::getC() const {
 	return C;
 }
 
-unsigned char Trama::getNT() {
+unsigned char Trama::getNT() const {
 	return NT;
 }
 
@@ -61,7 +77,7 @@ std::string Trama::protoc_toString() {
 	const string tipoTrama = constTipoTrama(getC());
 	char *cad = static_cast<char *>(malloc(sizeof(D) + sizeof(NT) + tipoTrama.size() + 2));
 
-	sprintf(cad, "%c\t%s\t%d", D, tipoTrama.c_str(), NT);
+	sprintf(cad, "%c\t%s\t%c", D, tipoTrama.c_str(), NT);
 
 	const basic_string<char> &basicString = std::string(cad);
 	delete cad;

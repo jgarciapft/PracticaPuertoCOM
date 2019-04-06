@@ -16,15 +16,17 @@ LectorPuertoCOM::LectorPuertoCOM() {
 	ficheroConfigurado = 0;
 }
 
-void LectorPuertoCOM::lectura() {
+Trama *LectorPuertoCOM::lectura() {
 	char car = hayContenido(); // Comprueba si hay car. Si lo hay lo lee
 
-	if (car) procesarCar(car);
+	if (car) return procesarCar(car);
+
+	return nullptr;
 }
 
-void LectorPuertoCOM::procesarCar(char car) { // Detecta caracter sincronismo. Es trama
+Trama *LectorPuertoCOM::procesarCar(char car) { // Detecta caracter sincronismo. Es trama
 	if (car == CONSTANTES::SINCRONISMO || getEsTrama()) {
-		leerTrama(car);
+		return leerTrama(car);
 	} else {
 		switch (car) {
 			case EscritorPuertoCOM::CHAR_INICIO_FICHERO: // Se va a leer un fichero
@@ -38,10 +40,11 @@ void LectorPuertoCOM::procesarCar(char car) { // Detecta caracter sincronismo. E
 			default:
 				printf("%s\n\tcar : %c\n", "ERROR : no es una trama", car);
 		}
+		return nullptr;
 	}
 }
 
-void LectorPuertoCOM::leerTrama(char car) {
+Trama *LectorPuertoCOM::leerTrama(char car) {
 	HANDLE com = mPuertoCOM->getHandle();
 
 	int longitud;
@@ -53,26 +56,19 @@ void LectorPuertoCOM::leerTrama(char car) {
 			setEsTrama(true);
 
 			tramaAux->setS(car);
-			setIdxTrama(getIdxTrama() + 1);
 			break;
 		case 2: // Campo de Dirección
 			tramaAux->setD(car);
-			setIdxTrama(getIdxTrama() + 1);
 			break;
 		case 3: // Campo de Control
 			tramaAux->setC(car);
-			setIdxTrama(getIdxTrama() + 1);
 			break;
 		case 4: // Campo de Número de Trama
 			tramaAux->setNT(car);
 
-			if (tramaAux->getC() != 2) {
+			if (tramaAux->getC() != Trama::STX) {
 				// Procesar Trama Control (imprime el tipo de trama de control recibida)
 				printf("%s [%s]\n", "Recibido", tramaAux->toString().c_str());
-				// Reinicio de las banderas de trama
-				setIdxTrama(1);
-				setEsTrama(false);
-				delete tramaAux; // Destruye la trama base genérica tratada
 			} else {
 				// Temporales para copiar los datos de la trama genérica en trama de datos
 				unsigned char getS = tramaAux->getS();
@@ -82,13 +78,12 @@ void LectorPuertoCOM::leerTrama(char car) {
 				delete tramaAux; // Libera la memoria asociada a la trama de datos genérica, ahora inútil
 
 				// Copia de la trama genérica en una trama de datos
-				tramaAux = new TramaDatos(getS, getD, getC, getNT, 0,
-										  nullptr);
-				setIdxTrama(getIdxTrama() + 1);
+				tramaAux = new TramaDatos(getS, getD, getC, getNT, 0, nullptr);
 			}
 			break;
 		case 5: // Longitud
 			dynamic_cast<TramaDatos *>(tramaAux)->setL(static_cast<unsigned char>(car));
+			setIdxTrama(getIdxTrama() + 1); // Compensa el paso inmediato del caso 5 al 6
 		case 6: // Datos
 			longitud = dynamic_cast<TramaDatos *>(tramaAux)->getL(); // Auxiliar con la longitud recibida
 			datosRecibidos = new char[longitud + 1]; // Cadena auxiliar para recibir los datos (+1 para fin de cadena)
@@ -97,8 +92,6 @@ void LectorPuertoCOM::leerTrama(char car) {
 			RecibirCadena(com, datosRecibidos, longitud);
 			datosRecibidos[longitud] = CONSTANTES::DELIM_CAD; // Formatea el fin de cadena por seguridad
 			dynamic_cast<TramaDatos *>(tramaAux)->setDatos(datosRecibidos); // Almacena el mensaje en la trama de datos
-
-			setIdxTrama(getIdxTrama() + 2);
 			break;
 		case 7:
 			dynamic_cast<TramaDatos *>(tramaAux)->calcularBCE(); // Calculamos y almacenamos el BCE de nuestra trama
@@ -119,13 +112,23 @@ void LectorPuertoCOM::leerTrama(char car) {
 				if (getRecepFichero()) printf("%s\n", MSJ_ERROR_BCE_INVALIDO_FCH);
 				else printf("%s\n", MSJ_ERROR_BCE_INVALIDO);
 			}
-			// Reinicia las banderas de trama
-			setIdxTrama(1);
-			setEsTrama(false);
 
-			delete tramaAux;
 			delete[] datosRecibidos; // Libera la cadena auxiliar de lectura
-			break;
+	}
+
+	// Gestion de las banderas y qué retornar. Solo retorna si se ha recibido una trama entera
+	if ((getIdxTrama() == 4 && tramaAux->getC() != Trama::STX) || getIdxTrama() == 7) {
+		Trama *copiaTrama = tramaAux->copia();
+
+		// Reinicia las banderas de trama
+		setIdxTrama(1);
+		setEsTrama(false);
+		delete tramaAux;
+
+		return copiaTrama;
+	} else {
+		setIdxTrama(getIdxTrama() + 1); // Incrementa el índice de trama
+		return nullptr;
 	}
 }
 

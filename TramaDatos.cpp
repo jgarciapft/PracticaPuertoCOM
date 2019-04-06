@@ -7,11 +7,21 @@ TramaDatos::TramaDatos() {
 	BCE = 0;
 }
 
+TramaDatos::TramaDatos(Trama *trama) : Trama(trama) {
+	datos = dynamic_cast<TramaDatos *>(trama)->getDatos();
+	L = dynamic_cast<TramaDatos *>(trama)->getL();
+	BCE = dynamic_cast<TramaDatos *>(trama)->getBCE();
+}
+
 TramaDatos::TramaDatos(unsigned char S, unsigned char D, unsigned char C, unsigned char NT, unsigned char L,
 					   const char *datos) : Trama(S, D, C, NT) {
 	this->L = L;
 	this->datos = datos;
 	this->BCE = 0;
+}
+
+Trama *TramaDatos::copia() {
+	return new TramaDatos(this);
 }
 
 void TramaDatos::calcularBCE() {

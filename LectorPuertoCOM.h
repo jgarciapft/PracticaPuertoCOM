@@ -83,14 +83,14 @@ private:
 	 *
 	 * @param car Caracter recibido
 	 */
-	void procesarCar(/* Caracter a procesar*/char car);
+	Trama *procesarCar(/* Caracter a procesar*/char car);
 
 	/**
 	 * Maneja el procesamiento de una trama
 	 *
 	 * @param car /Caracter de trama
 	 */
-	void leerTrama(char car);
+	Trama* leerTrama(char car);
 
 	/**
 	 * Procesa la trama de datos recibida para buscar campos de la cabecera empleados para configurar el fichero
@@ -168,7 +168,7 @@ public:
 	/**
 	 * Maneja la función de lectura del puerto COM. Maneja la lectura de un caracter y la lectura de una trama
 	 */
-	void lectura();
+	Trama *lectura();
 
 	/**
 	 * @return Instancia Singleton de la clase

@@ -47,8 +47,12 @@ public:
 
 	TramaDatos();
 
+	explicit TramaDatos(Trama *trama);
+
 	TramaDatos(unsigned char S, unsigned char D, unsigned char C, unsigned char NT, unsigned char L,
 			   const char *datos);
+
+	Trama *copia() override;
 
 	/**
 	 * Calcula el BCE para el mensaje contenido en la trama

@@ -86,27 +86,34 @@ public:
 
 	Trama();
 
+	explicit Trama(Trama *trama);
+
 	Trama(unsigned char S, unsigned char D, unsigned char C, unsigned char NT);
+
+	/**
+	 * Copia de la instacia actual
+	 */
+	virtual Trama *copia();
 
 	/**
 	 * Método accesor del atributo 'S'
 	 */
-	unsigned char getS();
+	unsigned char getS() const;
 
 	/**
 	 * Método accesor del atributo 'D'
 	 */
-	unsigned char getD();
+	unsigned char getD() const;
 
 	/**
 	 * Método accesor del atributo 'C'
 	 */
-	unsigned char getC();
+	unsigned char getC() const;
 
 	/**
 	 * Método accesor del atributo 'NT'
 	 */
-	unsigned char getNT();
+	unsigned char getNT() const;
 
 	/**
 	 * Método modificador del atributo 'S'

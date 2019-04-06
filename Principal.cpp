@@ -33,7 +33,11 @@ int main() {
 	EscritorPuertoCOM escritorPuertoCOM = EscritorPuertoCOM(ManejadorPuertoCOM::recuperarInstancia());
 
 	while (!escritorPuertoCOM.getFinCaracter()) { // Mientras el usuario no pulse la tecla ESCAPE
-		lectorPuertoCOM->lectura(); // Lectura del puerto COM
+		Trama *const pTrama = lectorPuertoCOM->lectura(); // Lectura del puerto COM
+		if (pTrama != nullptr) {
+			cout << pTrama->protoc_toString() << endl;
+			delete pTrama; // HAY QUE DELETEAR
+		}
 		if (kbhit()) // Si se ha pulsado una tecla invoca al manejador de escritura del puerto COM
 			escritorPuertoCOM.escritura();
 	}
