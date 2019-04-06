@@ -2,6 +2,7 @@
 #define TRAMA_H
 
 #include <string>
+#include "Principal.h"
 
 /**
  * Clase que modela una trama genérica. Contiene:
@@ -28,7 +29,7 @@ public:
 	 * Colección de códigos ASCII de tipos de trama
 	 */
 	enum COD_CONTROL_TRAMA {
-		ENQ = 5, EOT = 4, ACK = 6, NACK = 21
+		STX = 2, ENQ = 5, EOT = 4, ACK = 6, NACK = 21
 	};
 
 private:
@@ -50,6 +51,40 @@ private:
 	unsigned char NT;
 
 public:
+
+	/**
+	 * @return Trama de control para la operación de selección
+	 */
+	static Trama llamadaSeleccion();
+
+	/**
+	 * @return Trama de control para la operación de sondeo
+	 */
+	static Trama llamadaSondeo();
+
+	/**
+	 * TODO Añadir modo del protocolo
+	 *
+	 * @param nt Valor del campo de trama de la trama a confirmar
+	 * @return Trama de control de confirmación de trama
+	 */
+	static Trama confirmacionTramaN(unsigned char nt);
+
+	/**
+	 * TODO Añadir modo del protocolo
+	 *
+	 * @param nt Valor del campo de trama de la trama a rechazar
+	 * @return Trama de control de rechazo de trama
+	 */
+	static Trama rechazoTramaN(unsigned char nt);
+
+	/**
+	 * TODO Añadir modo del protocolo
+	 *
+	 * @return Trama de control de liberación
+	 */
+	static Trama liberacion	();
+
 	Trama();
 
 	Trama(unsigned char S, unsigned char D, unsigned char C, unsigned char NT);

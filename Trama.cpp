@@ -72,3 +72,23 @@ std::string Trama::toString() {
 
 	return "Trama " + tipoTrama;
 }
+
+Trama Trama::llamadaSeleccion() {
+	return Trama(CONSTANTES::SINCRONISMO, 'R', ENQ, '0');
+}
+
+Trama Trama::llamadaSondeo() {
+	return Trama(CONSTANTES::SINCRONISMO, 'T', ENQ, '0');
+}
+
+Trama Trama::confirmacionTramaN(unsigned char nt) {
+	return Trama(CONSTANTES::SINCRONISMO, 'R', ACK, '0');
+}
+
+Trama Trama::rechazoTramaN(unsigned char nt) {
+	return Trama(CONSTANTES::SINCRONISMO, 'R', NACK, '0');
+}
+
+Trama Trama::liberacion() {
+	return Trama(CONSTANTES::SINCRONISMO, 'R', EOT, '0');
+}

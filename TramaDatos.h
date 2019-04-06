@@ -35,6 +35,16 @@ private:
 
 public:
 
+	/**
+	 * TODO Añadir modo de protocolo
+	 *
+	 * @param nt Número de trama
+	 * @param lon Longitud de los datos
+	 * @param datos Datos a enviar
+	 * @return Trama de datos formateada para trabajar con el protocolo Maestro-Esclavo
+	 */
+	static TramaDatos envioDatosN(unsigned char nt, unsigned char lon, const char *datos);
+
 	TramaDatos();
 
 	TramaDatos(unsigned char S, unsigned char D, unsigned char C, unsigned char NT, unsigned char L,

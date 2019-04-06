@@ -61,3 +61,10 @@ void TramaDatos::setAttr(unsigned char S, unsigned char D, unsigned char C, unsi
 std::string TramaDatos::toString() {
 	return std::string(datos, getL());
 }
+
+TramaDatos TramaDatos::envioDatosN(unsigned char nt, unsigned char lon, const char *datos) {
+	TramaDatos tramaDatos = TramaDatos(CONSTANTES::SINCRONISMO, 'R', STX, nt, lon, datos);
+	tramaDatos.calcularBCE();
+
+	return tramaDatos;
+}
