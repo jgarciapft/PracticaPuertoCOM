@@ -148,9 +148,20 @@ public:
 	setAttr(unsigned char S, unsigned char D, unsigned char C, unsigned char NT);
 
 	/**
-	 * Devuelve la representación en cadena de la trama
+	 * @return Representación en cadena de la trama
 	 */
 	virtual std::string toString();
+
+	/**
+	 * @return Representación en formato especial para ser mostrado en el resumen de la comunicación de protocolo
+	 */
+	virtual std::string protoc_toString();
+
+	/**
+	 * @param controlCar Valor del campo de control
+	 * @return Cadena que reprensenta un valor del campo de contol
+	 */
+	std::string constTipoTrama(unsigned char controlCar);
 };
 
 #endif

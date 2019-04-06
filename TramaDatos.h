@@ -101,6 +101,10 @@ public:
 	 * Devuelve la representación en cadena de la trama de datos
 	 */
 	std::string toString() override;
+
+	std::string protoc_toString(unsigned char BCECalculado);
+
+	std::string protoc_toString() override;
 };
 
 #endif

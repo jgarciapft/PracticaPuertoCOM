@@ -52,9 +52,27 @@ void Trama::setAttr(unsigned char S, unsigned char D, unsigned char C, unsigned 
 }
 
 std::string Trama::toString() {
+	return "Trama " + constTipoTrama(getC());
+}
+
+std::string Trama::protoc_toString() {
+	const unsigned char D = getD();
+	const unsigned char NT = getNT();
+	const string tipoTrama = constTipoTrama(getC());
+	char *cad = static_cast<char *>(malloc(sizeof(D) + sizeof(NT) + tipoTrama.size() + 2));
+
+	sprintf(cad, "%c\t%s\t%d", D, tipoTrama.c_str(), NT);
+
+	const basic_string<char> &basicString = std::string(cad);
+	delete cad;
+
+	return basicString;
+}
+
+string Trama::constTipoTrama(unsigned char controlCar) {
 	std::string tipoTrama;
 
-	switch (getC()) {
+	switch (controlCar) {
 		case ENQ:
 			tipoTrama = CONST_CONTROL_TRAMA[0];
 			break;
@@ -67,11 +85,13 @@ std::string Trama::toString() {
 		case NACK:
 			tipoTrama = CONST_CONTROL_TRAMA[3];
 			break;
+		case STX:
+			tipoTrama = CONST_CONTROL_TRAMA[4];
+			break;
 		default:
 			tipoTrama = CONST_CONTROL_TRAMA[5];
 	}
-
-	return "Trama " + tipoTrama;
+	return tipoTrama;
 }
 
 Trama Trama::llamadaSeleccion() {

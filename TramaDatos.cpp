@@ -63,6 +63,31 @@ std::string TramaDatos::toString() {
 	return std::string(datos, getL());
 }
 
+std::string TramaDatos::protoc_toString(unsigned char BCECalculado) {
+	const string &base = protoc_toString();
+	char *cad = static_cast<char *>(malloc(base.size() + sizeof(BCECalculado) + 1));
+
+	sprintf(cad, "%s\t%d", base.c_str(), BCECalculado);
+
+	const basic_string<char> &basicString = std::string(cad);
+	delete cad;
+
+	return basicString;
+}
+
+std::string TramaDatos::protoc_toString() {
+	const string &base = Trama::protoc_toString();
+	const unsigned char BCE = getBCE();
+	char *cad = static_cast<char *>(malloc(base.size() + sizeof(BCE) + 1));
+
+	sprintf(cad, "%s\t%d", base.c_str(), BCE);
+
+	const basic_string<char> &basicString = std::string(cad);
+	delete cad;
+
+	return basicString;
+}
+
 TramaDatos TramaDatos::envioDatosN(unsigned char nt, unsigned char lon, const char *datos) {
 	TramaDatos tramaDatos = TramaDatos(CONSTANTES::SINCRONISMO, 'R', STX, nt, lon, datos);
 	tramaDatos.calcularBCE();
