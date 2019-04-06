@@ -17,7 +17,7 @@
 
 class Trama {
 
-private:
+protected:
 	/**
 	 * Colección de constantes alfabéticas de tipos de control de tramas
 	 */
@@ -82,7 +82,7 @@ public:
 	 *
 	 * @return Trama de control de liberación
 	 */
-	static Trama liberacion	();
+	static Trama liberacion();
 
 	Trama();
 

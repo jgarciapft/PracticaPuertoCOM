@@ -1,7 +1,7 @@
 #include "Trama.h"
 #include "Principal.h"
 
-const std::string Trama::CONST_CONTROL_TRAMA[] = {"ENQ", "EOT", "ACK", "NACK", "DESCONOCIDO"};
+const std::string Trama::CONST_CONTROL_TRAMA[] = {"ENQ", "EOT", "ACK", "NACK", "STX", "DESCONOCIDO"};
 
 Trama::Trama() = default;
 
@@ -68,7 +68,7 @@ std::string Trama::toString() {
 			tipoTrama = CONST_CONTROL_TRAMA[3];
 			break;
 		default:
-			tipoTrama = CONST_CONTROL_TRAMA[4];
+			tipoTrama = CONST_CONTROL_TRAMA[5];
 	}
 
 	return "Trama " + tipoTrama;
