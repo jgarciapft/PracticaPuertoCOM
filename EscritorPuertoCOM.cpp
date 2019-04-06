@@ -2,7 +2,7 @@
 #include <algorithm>
 #include "EscritorPuertoCOM.h"
 
-
+EscritorPuertoCOM *EscritorPuertoCOM::instancia = nullptr;
 const int EscritorPuertoCOM::BUFFER_MAX_CAR = 700;
 const int EscritorPuertoCOM::MSJ_NUM_CRLF = 1;
 const char EscritorPuertoCOM::MSJ_SEL_TC[] = "Trama de control a enviar:\n1: Trama ENQ.\n2: Trama EOT.\n3: Trama ACK.\n4: Trama NACK.";
@@ -21,16 +21,7 @@ const char EscritorPuertoCOM::CHAR_INICIO_FICHERO;
 const char EscritorPuertoCOM::CHAR_FIN_FICHERO;
 
 EscritorPuertoCOM::EscritorPuertoCOM() {
-	mPuertoCOM = nullptr;
-
-	// Reserva el espacio necesario para el buffer de escritura
-	buffer = new char[BUFFER_MAX_CAR + MSJ_NUM_CRLF + 1];
-	idxBuffer = 0;
-	finCaracter = false;
-}
-
-EscritorPuertoCOM::EscritorPuertoCOM(ManejadorPuertoCOM *mPuertoCOM) {
-	this->mPuertoCOM = mPuertoCOM;
+	mPuertoCOM = ManejadorPuertoCOM::recuperarInstancia();
 
 	// Reserva el espacio necesario para el buffer de escritura
 	buffer = new char[BUFFER_MAX_CAR + MSJ_NUM_CRLF + 1];
@@ -285,4 +276,11 @@ void EscritorPuertoCOM::setFinCaracter(bool finCaracter) {
 EscritorPuertoCOM::~EscritorPuertoCOM() {
 	// Libera el buffer de escritura
 	delete[] buffer;
+}
+
+EscritorPuertoCOM *EscritorPuertoCOM::recuperarInstancia() {
+	if (instancia == nullptr)
+		instancia = new EscritorPuertoCOM();
+
+	return instancia;
 }

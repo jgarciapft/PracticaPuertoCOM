@@ -23,4 +23,4 @@ add_executable(PracticaPuertoCOM
         Trama.cpp
         Trama.h
         TramaDatos.h
-        TramaDatos.cpp)
+        TramaDatos.cpp Protocolo.cpp Protocolo.h ProtocoloEstandar.cpp ProtocoloEstandar.h)

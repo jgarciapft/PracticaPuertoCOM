@@ -1,4 +1,6 @@
 #include "Principal.h"
+#include "Protocolo.h"
+#include "ProtocoloEstandar.h"
 
 const LPCSTR CONSTANTES::COM[] = {"COM1", "COM2", "COM3", "COM4"};
 const char CONSTANTES::MSJ_SEL_COM[] = "Seleccionar el puerto a utilizar:\n1. COM1\n2. COM2\n3. COM3\n4. COM4";
@@ -30,21 +32,10 @@ int main() {
 	// Manejador de lectura del puerto COM
 	LectorPuertoCOM *lectorPuertoCOM = LectorPuertoCOM::recuperarInstancia();
 	// Manejador de escritura del puerto COM
-	EscritorPuertoCOM escritorPuertoCOM = EscritorPuertoCOM(ManejadorPuertoCOM::recuperarInstancia());
+	EscritorPuertoCOM *escritorPuertoCOM = EscritorPuertoCOM::recuperarInstancia();
 
-	while (!escritorPuertoCOM.getFinCaracter()) { // Mientras el usuario no pulse la tecla ESCAPE
-		Trama *const pTrama = lectorPuertoCOM->lectura(); // Lectura del puerto COM
-		if (pTrama != nullptr) {
-			cout << pTrama->protoc_toString() << endl;
-			delete pTrama; // HAY QUE LIBERAR MEMORIA
-		}
-		if (kbhit()) { // Si se ha pulsado una tecla invoca al manejador de escritura del puerto COM
-			escritorPuertoCOM.escritura();
-			for (auto trama : escritorPuertoCOM.getBufferTramas())
-				cout << trama->protoc_toString() << endl;
-			escritorPuertoCOM.liberarBufferTramas(); // HAY QUE LIBERAR MEMORIA
-		}
-	}
+	Protocolo *protocolo = new ProtocoloEstandar(lectorPuertoCOM, escritorPuertoCOM);
+	protocolo->iniciar();
 
 	/** CIERRE DEL PUERTO COM */
 

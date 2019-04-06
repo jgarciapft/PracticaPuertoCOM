@@ -8,7 +8,7 @@ const char LectorPuertoCOM::MSJ_FIN_REC_FICHERO[] = "Fichero recibido";
 LectorPuertoCOM *LectorPuertoCOM::instancia = nullptr;
 
 LectorPuertoCOM::LectorPuertoCOM() {
-	this->mPuertoCOM = ManejadorPuertoCOM::recuperarInstancia();
+	mPuertoCOM = ManejadorPuertoCOM::recuperarInstancia();
 
 	idxTrama = 1;
 	esTrama = false;

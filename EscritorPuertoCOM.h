@@ -85,6 +85,10 @@ public:
 
 private:
 	/**
+	 * Instancia Singleton de la clase
+	 */
+	static EscritorPuertoCOM *instancia;
+	/**
 	 * Manejador del puerto COM
 	 */
 	ManejadorPuertoCOM *mPuertoCOM;
@@ -177,8 +181,6 @@ public:
 
 	EscritorPuertoCOM();
 
-	explicit EscritorPuertoCOM(ManejadorPuertoCOM *mPuertoCOM);
-
 	~EscritorPuertoCOM();
 
 	/**
@@ -197,6 +199,11 @@ public:
 	 * @return Buffer de tramas enviadas
 	 */
 	vector<Trama *> getBufferTramas();
+
+	/**
+	 * @return Instancia Singleton de la clase
+	 */
+	static EscritorPuertoCOM *recuperarInstancia();
 
 	/**
 	 * Método accesor del atributo 'finCaracter'
