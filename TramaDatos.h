@@ -2,6 +2,7 @@
 #define TRAMADATOS_H
 
 #include "Trama.h"
+#include "CONSTANTES.h"
 
 /**
  * Clase que modela una trama de datos. Deriva de la clase Trama

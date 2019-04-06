@@ -2,9 +2,10 @@
 #define LECTORPUERTOCOM_H
 
 #include <fstream>
+#include "CONSTANTES.h"
 #include "ManejadorPuertoCOM.h"
 #include "Trama.h"
-#include "Principal.h"
+#include "TramaDatos.h"
 
 /**
  * Manejador responsable de la lectura sobre el puertoCOM
@@ -75,6 +76,10 @@ private:
 	 * de 2 quiere decir que se ha leído también el autor.
 	 */
 	int ficheroConfigurado;
+	/**
+	 * Protocolo bajo el que está siendo utilizado
+	 */
+	CONSTANTES::PROTOCOLOS protocoloActual;
 
 	LectorPuertoCOM();
 
@@ -208,6 +213,16 @@ public:
 	 * Método accesor del atributo 'ficheroConfigurado'
 	 */
 	int getFicheroConfigurado();
+
+	/**
+	 * @return Protocolo bajo el que está siendo utilizado
+	 */
+	CONSTANTES::PROTOCOLOS getProtocoloActual();
+
+	/**
+	 * @param protocoloActual Nuevo protocolo de uso
+	 */
+	void setProtocoloActual(CONSTANTES::PROTOCOLOS protocoloActual);
 };
 
 #endif

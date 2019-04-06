@@ -2,8 +2,8 @@
 #ifndef PRACTICAPUERTOCOM_PROTOCOLO_H
 #define PRACTICAPUERTOCOM_PROTOCOLO_H
 
-
 #include "LectorPuertoCOM.h"
+#include "EscritorPuertoCOM.h"
 
 class Protocolo {
 
@@ -30,8 +30,11 @@ private:
 
 	/**
 	 * Instrucciones finales antes de cerrar el protocolo
+	 *
+	 * @param finAplicacion Si se desea terminar la aplicación
+	 * @return Si se desea terminar la aplicación
 	 */
-	virtual void liberacion() = 0;
+	virtual bool liberacion(bool finAplicacion) = 0;
 
 public:
 	/**

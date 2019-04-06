@@ -2,10 +2,14 @@
 #define ESCRITORPUERTOCOM_H
 
 #include <vector>
+#include <fstream>
+#include <algorithm>
 #include "ManejadorPuertoCOM.h"
-#include "ManejadorEntradaUsuario.h"
-#include "Principal.h"
+#include "CONSTANTES.h"
 #include "TramaDatos.h"
+#include "Trama.h"
+#include "ManejadorEntradaUsuario.h"
+#include "LectorPuertoCOM.h"
 
 /**
  * Manejador responsable de la escritura sobre el puerto COM
@@ -72,16 +76,6 @@ private:
 	 * Máxima longitud del campo de datos de una trama de datos
 	 */
 	static const int TD_MAX_LON_DATOS;
-
-public:
-	/**
-	 * Caracter indicador del inicio del envío de un fichero
-	 */
-	static const char CHAR_INICIO_FICHERO = '#';
-	/**
-	 * Caracter indicador del fin del envío de un fichero
-	 */
-	static const char CHAR_FIN_FICHERO = '@';
 
 private:
 	/**

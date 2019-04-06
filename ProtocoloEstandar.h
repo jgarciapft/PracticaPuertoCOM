@@ -2,7 +2,6 @@
 #ifndef PRACTICAPUERTOCOM_PROTOCOLOESTANDAR_H
 #define PRACTICAPUERTOCOM_PROTOCOLOESTANDAR_H
 
-
 #include "Protocolo.h"
 
 class ProtocoloEstandar : public Protocolo{
@@ -12,7 +11,7 @@ private:
 
 	void transmision() override;
 
-	void liberacion() override;
+	bool liberacion(bool finAplicacion) override;
 
 public:
 	ProtocoloEstandar(LectorPuertoCOM *lectorPuertoCom, EscritorPuertoCOM *escritorPuertoCom);

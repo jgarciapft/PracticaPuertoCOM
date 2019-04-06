@@ -21,9 +21,10 @@ void ProtocoloEstandar::transmision() {
 			getEscritorPuertoCOM()->liberarBufferTramas(); // HAY QUE LIBERAR MEMORIA
 		}
 	}
-	liberacion();
+	liberacion(true);
 }
 
-void ProtocoloEstandar::liberacion() {
+bool ProtocoloEstandar::liberacion(bool finAplicacion) {
 	cout << "LIBERANDO PROTOCOLO ESTANDAR";
+	return finAplicacion;
 }

@@ -2,7 +2,6 @@
 #define CARGADORMANEJADORPUERTOCOM_H
 
 #include "ManejadorPuertoCOM.h"
-#include "ManejadorEntradaUsuario.h"
 
 /**
  * Clase encargada de definir los parámetros de inicialización del manejador del puerto COM y de realizar la acción de inicializar el mismo

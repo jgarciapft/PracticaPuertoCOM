@@ -31,11 +31,11 @@ Trama *LectorPuertoCOM::procesarCar(char car) { // Detecta caracter sincronismo.
 		pTrama = leerTrama(car);
 	} else {
 		switch (car) {
-			case EscritorPuertoCOM::CHAR_INICIO_FICHERO: // Se va a leer un fichero
+			case CONSTANTES::CHAR_INICIO_FICHERO: // Se va a leer un fichero
 				setRecepFichero(true);
 				setFicheroConfigurado(0);
 				break;
-			case EscritorPuertoCOM::CHAR_FIN_FICHERO: // Se ha terminado de leer el fichero
+			case CONSTANTES::CHAR_FIN_FICHERO: // Se ha terminado de leer el fichero
 				printf("%s\n", MSJ_FIN_REC_FICHERO);
 				setRecepFichero(false); // Reinicia la bandera de procesamiento de fichero
 				break;
@@ -68,7 +68,7 @@ Trama *LectorPuertoCOM::leerTrama(char car) {
 		case 4: // Campo de Número de Trama
 			tramaAux->setNT(car);
 
-			if (tramaAux->getC() != Trama::STX) {
+			if (tramaAux->getC() != CONSTANTES::STX) {
 				// Procesar Trama Control (imprime el tipo de trama de control recibida)
 				printf("%s [%s]\n", "Recibido", tramaAux->toString().c_str());
 			} else {
@@ -119,7 +119,7 @@ Trama *LectorPuertoCOM::leerTrama(char car) {
 	}
 
 	// Gestion de las banderas y qué retornar. Solo retorna si se ha recibido una trama entera
-	if ((getIdxTrama() == 4 && tramaAux->getC() != Trama::STX) || getIdxTrama() == 7) {
+	if ((getIdxTrama() == 4 && tramaAux->getC() != CONSTANTES::STX) || getIdxTrama() == 7) {
 		Trama *copiaTrama = tramaAux->copia();
 
 		// Reinicia las banderas de trama
@@ -245,4 +245,12 @@ void LectorPuertoCOM::setFicheroConfigurado(int ficheroConfigurado) {
 	this->ficheroConfigurado = ficheroConfigurado;
 	if (getRecepFichero() && ficheroEstaConfigurado())
 		if (!fFichero.is_open()) fFichero.open(getRutaFchRecep(), ios::out);
+}
+
+CONSTANTES::PROTOCOLOS LectorPuertoCOM::getProtocoloActual() {
+	return protocoloActual;
+}
+
+void LectorPuertoCOM::setProtocoloActual(CONSTANTES::PROTOCOLOS protocoloActual) {
+	this->protocoloActual = protocoloActual;
 }

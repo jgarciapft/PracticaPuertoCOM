@@ -1,5 +1,3 @@
-#include <fstream>
-#include <algorithm>
 #include "EscritorPuertoCOM.h"
 
 EscritorPuertoCOM *EscritorPuertoCOM::instancia = nullptr;
@@ -17,8 +15,6 @@ const char EscritorPuertoCOM::MSJ_ERR_FICHERO_ENVIO_NO_ENCONTRADO[] = "Error al 
 const char EscritorPuertoCOM::MSJ_INICIO_ENV_FICHERO[] = "Enviando fichero por";
 const char EscritorPuertoCOM::MSJ_FIN_ENV_FICHERO[] = "Fichero enviado";
 const char EscritorPuertoCOM::RUTA_DEF_FICHERO_ENVIO[] = "Fenvio.txt";
-const char EscritorPuertoCOM::CHAR_INICIO_FICHERO;
-const char EscritorPuertoCOM::CHAR_FIN_FICHERO;
 
 EscritorPuertoCOM::EscritorPuertoCOM() {
 	mPuertoCOM = ManejadorPuertoCOM::recuperarInstancia();
@@ -147,16 +143,16 @@ void EscritorPuertoCOM::enviarTramaControl() {
 														  1,
 														  4)) {
 		case 1:
-			C = Trama::ENQ;
+			C = CONSTANTES::ENQ;
 			break;
 		case 2:
-			C = Trama::EOT;
+			C = CONSTANTES::EOT;
 			break;
 		case 3:
-			C = Trama::ACK;
+			C = CONSTANTES::ACK;
 			break;
 		case 4:
-			C = Trama::NACK;
+			C = CONSTANTES::NACK;
 	}
 
 	tramaAux->setAttr(CONSTANTES::SINCRONISMO, TC_DEF_DIRECCION, C, TC_DEF_NT);
@@ -185,7 +181,7 @@ void EscritorPuertoCOM::enviarFichero() {
 
 	fFichero.open(RUTA_DEF_FICHERO_ENVIO, ios::in); // Abrimos el fichero a enviar
 	if (fFichero.is_open()) {
-		EnviarCaracter(com, CHAR_INICIO_FICHERO); // Envío de inicio de fichero
+		EnviarCaracter(com, CONSTANTES::CHAR_INICIO_FICHERO); // Envío de inicio de fichero
 
 		/* LEE LA CABECERA DEL FICHERO */
 
@@ -220,7 +216,7 @@ void EscritorPuertoCOM::enviarFichero() {
 			LectorPuertoCOM::recuperarInstancia()->lectura();
 		}
 
-		EnviarCaracter(com, CHAR_FIN_FICHERO); // Envía fin de fichero
+		EnviarCaracter(com, CONSTANTES::CHAR_FIN_FICHERO); // Envía fin de fichero
 		// Envía el número de bytes procesados
 		sprintf(msjNumBytes, "%s %d %s\n", "El fichero tiene un peso de", pesoFichero, "bytes");
 		enviarTramaDatos(new TramaDatos(CONSTANTES::SINCRONISMO, TD_DEF_DIRECCION, TD_DEF_CONTROL, TD_DEF_NT,

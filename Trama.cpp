@@ -1,5 +1,4 @@
 #include "Trama.h"
-#include "Principal.h"
 
 const std::string Trama::CONST_CONTROL_TRAMA[] = {"ENQ", "EOT", "ACK", "NACK", "STX", "DESCONOCIDO"};
 
@@ -74,34 +73,34 @@ std::string Trama::toString() {
 std::string Trama::protoc_toString() {
 	const unsigned char D = getD();
 	const unsigned char NT = getNT();
-	const string tipoTrama = constTipoTrama(getC());
+	const std::string tipoTrama = constTipoTrama(getC());
 	char *cad = static_cast<char *>(malloc(sizeof(D) + sizeof(NT) + tipoTrama.size() + 2));
 
 	sprintf(cad, "%c\t%s\t%c", D, tipoTrama.c_str(), NT);
 
-	const basic_string<char> &basicString = std::string(cad);
+	const std::basic_string<char> &basicString = std::string(cad);
 	delete cad;
 
 	return basicString;
 }
 
-string Trama::constTipoTrama(unsigned char controlCar) {
+std::string Trama::constTipoTrama(unsigned char controlCar) {
 	std::string tipoTrama;
 
 	switch (controlCar) {
-		case ENQ:
+		case CONSTANTES::ENQ:
 			tipoTrama = CONST_CONTROL_TRAMA[0];
 			break;
-		case EOT:
+		case CONSTANTES::EOT:
 			tipoTrama = CONST_CONTROL_TRAMA[1];
 			break;
-		case ACK:
+		case CONSTANTES::ACK:
 			tipoTrama = CONST_CONTROL_TRAMA[2];
 			break;
-		case NACK:
+		case CONSTANTES::NACK:
 			tipoTrama = CONST_CONTROL_TRAMA[3];
 			break;
-		case STX:
+		case CONSTANTES::STX:
 			tipoTrama = CONST_CONTROL_TRAMA[4];
 			break;
 		default:
@@ -111,21 +110,21 @@ string Trama::constTipoTrama(unsigned char controlCar) {
 }
 
 Trama Trama::llamadaSeleccion() {
-	return Trama(CONSTANTES::SINCRONISMO, 'R', ENQ, '0');
+	return Trama(CONSTANTES::SINCRONISMO, 'R', CONSTANTES::ENQ, '0');
 }
 
 Trama Trama::llamadaSondeo() {
-	return Trama(CONSTANTES::SINCRONISMO, 'T', ENQ, '0');
+	return Trama(CONSTANTES::SINCRONISMO, 'T', CONSTANTES::ENQ, '0');
 }
 
 Trama Trama::confirmacionTramaN(unsigned char d, unsigned char nt) {
-	return Trama(CONSTANTES::SINCRONISMO, d, ACK, '0');
+	return Trama(CONSTANTES::SINCRONISMO, d, CONSTANTES::ACK, '0');
 }
 
 Trama Trama::rechazoTramaN(unsigned char d, unsigned char nt) {
-	return Trama(CONSTANTES::SINCRONISMO, d, NACK, '0');
+	return Trama(CONSTANTES::SINCRONISMO, d, CONSTANTES::NACK, '0');
 }
 
 Trama Trama::liberacion(unsigned char d) {
-	return Trama(CONSTANTES::SINCRONISMO, d, EOT, '0');
+	return Trama(CONSTANTES::SINCRONISMO, d, CONSTANTES::EOT, '0');
 }

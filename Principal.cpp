@@ -1,29 +1,27 @@
 #include "Principal.h"
-#include "Protocolo.h"
-#include "ProtocoloEstandar.h"
 
-const LPCSTR CONSTANTES::COM[] = {"COM1", "COM2", "COM3", "COM4"};
-const char CONSTANTES::MSJ_SEL_COM[] = "Seleccionar el puerto a utilizar:\n1. COM1\n2. COM2\n3. COM3\n4. COM4";
-const char CONSTANTES::MSJ_ERROR_SEL_COM[] = "Puerto COM incorrecto";
-const DWORD CONSTANTES::VELOCIDAD_DEF = 9600;
-const BYTE CONSTANTES::NUM_BITS_X_BYTE_DEF = 8;
-const BYTE CONSTANTES::PARIDAD_DEF = 0;
-const BYTE CONSTANTES::BITS_STOP_DEF = 0;
+const LPCSTR Principal::COM[] = {"COM1", "COM2", "COM3", "COM4"};
+const char Principal::MSJ_SEL_COM[] = "Seleccionar el puerto a utilizar:\n1. COM1\n2. COM2\n3. COM3\n4. COM4";
+const char Principal::MSJ_ERROR_SEL_COM[] = "Puerto COM incorrecto";
+const DWORD Principal::VELOCIDAD_DEF = 9600;
+const BYTE Principal::NUM_BITS_X_BYTE_DEF = 8;
+const BYTE Principal::PARIDAD_DEF = 0;
+const BYTE Principal::BITS_STOP_DEF = 0;
 
 int main() {
 
 	/** INICIALIZACIÓN DEL PUERTO COM */
 
 	CargadorManejadorPuertoCOM cargadorPCOM = CargadorManejadorPuertoCOM();
-	cargadorPCOM.setNombrePuerto(CONSTANTES::COM[ManejadorEntradaUsuario::preguntarRespEntRang(CONSTANTES::MSJ_SEL_COM,
-																							   CONSTANTES::MSJ_ERROR_SEL_COM,
-																							   1,
-																							   sizeof(CONSTANTES::COM) /
-																							   sizeof(LPCSTR)) - 1]);
-	cargadorPCOM.setVelocidad(CONSTANTES::VELOCIDAD_DEF);
-	cargadorPCOM.setNumBitsXByte(CONSTANTES::NUM_BITS_X_BYTE_DEF);
-	cargadorPCOM.setParidad(CONSTANTES::PARIDAD_DEF);
-	cargadorPCOM.setBitsParada(CONSTANTES::BITS_STOP_DEF);
+	cargadorPCOM.setNombrePuerto(Principal::COM[ManejadorEntradaUsuario::preguntarRespEntRang(Principal::MSJ_SEL_COM,
+																							  Principal::MSJ_ERROR_SEL_COM,
+																							  1,
+																							  sizeof(Principal::COM) /
+																							  sizeof(LPCSTR)) - 1]);
+	cargadorPCOM.setVelocidad(Principal::VELOCIDAD_DEF);
+	cargadorPCOM.setNumBitsXByte(Principal::NUM_BITS_X_BYTE_DEF);
+	cargadorPCOM.setParidad(Principal::PARIDAD_DEF);
+	cargadorPCOM.setBitsParada(Principal::BITS_STOP_DEF);
 
 	cargadorPCOM.inicializarManejador(); // Intenta inicializar el puerto COM con los parámetros elegidos
 
