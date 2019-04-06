@@ -36,14 +36,13 @@ private:
 public:
 
 	/**
-	 * TODO Añadir modo de protocolo
-	 *
+	 * @param d Dirección de la trama
 	 * @param nt Número de trama
 	 * @param lon Longitud de los datos
 	 * @param datos Datos a enviar
 	 * @return Trama de datos formateada para trabajar con el protocolo Maestro-Esclavo
 	 */
-	static TramaDatos envioDatosN(unsigned char nt, unsigned char lon, const char *datos);
+	static TramaDatos envioDatosN(unsigned char d, unsigned char nt, unsigned char lon, const char *datos);
 
 	TramaDatos();
 
@@ -52,6 +51,9 @@ public:
 	TramaDatos(unsigned char S, unsigned char D, unsigned char C, unsigned char NT, unsigned char L,
 			   const char *datos);
 
+	/**
+	 * @return Puntero a una copia de la instacia actual
+	 */
 	Trama *copia() override;
 
 	/**
@@ -102,12 +104,20 @@ public:
 	setAttr(unsigned char S, unsigned char D, unsigned char C, unsigned char NT, unsigned char L, char *datos);
 
 	/**
-	 * Devuelve la representación en cadena de la trama de datos
+	 * @return Representación en cadena de la trama
 	 */
 	std::string toString() override;
 
+	/**
+	 * @param BCECalculado BCE calculado externamente
+	 * @return Representación en formato especial para ser mostrado en el resumen de la comunicación de protocolo,
+	 * mostrando el BCE calculado externamente
+	 */
 	std::string protoc_toString(unsigned char BCECalculado);
 
+	/**
+	 * @return Representación en formato especial para ser mostrado en el resumen de la comunicación de protocolo
+	 */
 	std::string protoc_toString() override;
 };
 

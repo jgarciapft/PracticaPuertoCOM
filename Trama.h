@@ -62,27 +62,24 @@ public:
 	static Trama llamadaSondeo();
 
 	/**
-	 * TODO Añadir modo del protocolo
-	 *
+	 * @param d Dirección de la trama
 	 * @param nt Valor del campo de trama de la trama a confirmar
 	 * @return Trama de control de confirmación de trama
 	 */
-	static Trama confirmacionTramaN(unsigned char nt);
+	static Trama confirmacionTramaN(unsigned char d, unsigned char nt);
 
 	/**
-	 * TODO Añadir modo del protocolo
-	 *
+	 * @param d Dirección de la trama
 	 * @param nt Valor del campo de trama de la trama a rechazar
 	 * @return Trama de control de rechazo de trama
 	 */
-	static Trama rechazoTramaN(unsigned char nt);
+	static Trama rechazoTramaN(unsigned char d, unsigned char nt);
 
 	/**
-	 * TODO Añadir modo del protocolo
-	 *
+	 * @param d Dirección de la trama
 	 * @return Trama de control de liberación
 	 */
-	static Trama liberacion();
+	static Trama liberacion(unsigned char d);
 
 	Trama();
 
@@ -91,7 +88,7 @@ public:
 	Trama(unsigned char S, unsigned char D, unsigned char C, unsigned char NT);
 
 	/**
-	 * Copia de la instacia actual
+	 * @return Puntero a una copia de la instacia actual
 	 */
 	virtual Trama *copia();
 

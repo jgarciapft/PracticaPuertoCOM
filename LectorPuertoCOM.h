@@ -82,6 +82,7 @@ private:
 	 * Maneja el procesamiento de un caracter
 	 *
 	 * @param car Caracter recibido
+	 * @return Trama leída, o nulo si no se ha procesado ninguna trama completa
 	 */
 	Trama *procesarCar(/* Caracter a procesar*/char car);
 
@@ -89,6 +90,7 @@ private:
 	 * Maneja el procesamiento de una trama
 	 *
 	 * @param car /Caracter de trama
+	 * @return Trama leída, o nulo si no se ha procesado ninguna trama completa
 	 */
 	Trama* leerTrama(char car);
 
@@ -167,6 +169,8 @@ public:
 
 	/**
 	 * Maneja la función de lectura del puerto COM. Maneja la lectura de un caracter y la lectura de una trama
+	 *
+	 * @return Trama leída, o nulo si no se ha procesado ninguna trama completa
 	 */
 	Trama *lectura();
 

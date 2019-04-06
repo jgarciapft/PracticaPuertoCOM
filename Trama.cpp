@@ -24,7 +24,7 @@ Trama::Trama(unsigned char S, unsigned char D, unsigned char C, unsigned char NT
 	this->NT = NT;
 }
 
-Trama* Trama::copia() {
+Trama *Trama::copia() {
 	return new Trama(this);
 }
 
@@ -118,14 +118,14 @@ Trama Trama::llamadaSondeo() {
 	return Trama(CONSTANTES::SINCRONISMO, 'T', ENQ, '0');
 }
 
-Trama Trama::confirmacionTramaN(unsigned char nt) {
-	return Trama(CONSTANTES::SINCRONISMO, 'R', ACK, '0');
+Trama Trama::confirmacionTramaN(unsigned char d, unsigned char nt) {
+	return Trama(CONSTANTES::SINCRONISMO, d, ACK, '0');
 }
 
-Trama Trama::rechazoTramaN(unsigned char nt) {
-	return Trama(CONSTANTES::SINCRONISMO, 'R', NACK, '0');
+Trama Trama::rechazoTramaN(unsigned char d, unsigned char nt) {
+	return Trama(CONSTANTES::SINCRONISMO, d, NACK, '0');
 }
 
-Trama Trama::liberacion() {
-	return Trama(CONSTANTES::SINCRONISMO, 'R', EOT, '0');
+Trama Trama::liberacion(unsigned char d) {
+	return Trama(CONSTANTES::SINCRONISMO, d, EOT, '0');
 }

@@ -98,8 +98,8 @@ std::string TramaDatos::protoc_toString() {
 	return basicString;
 }
 
-TramaDatos TramaDatos::envioDatosN(unsigned char nt, unsigned char lon, const char *datos) {
-	TramaDatos tramaDatos = TramaDatos(CONSTANTES::SINCRONISMO, 'R', STX, nt, lon, datos);
+TramaDatos TramaDatos::envioDatosN(unsigned char d, unsigned char nt, unsigned char lon, const char *datos) {
+	TramaDatos tramaDatos = TramaDatos(CONSTANTES::SINCRONISMO, d, STX, nt, lon, datos);
 	tramaDatos.calcularBCE();
 
 	return tramaDatos;

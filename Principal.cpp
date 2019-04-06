@@ -36,10 +36,14 @@ int main() {
 		Trama *const pTrama = lectorPuertoCOM->lectura(); // Lectura del puerto COM
 		if (pTrama != nullptr) {
 			cout << pTrama->protoc_toString() << endl;
-			delete pTrama; // HAY QUE DELETEAR
+			delete pTrama; // HAY QUE LIBERAR MEMORIA
 		}
-		if (kbhit()) // Si se ha pulsado una tecla invoca al manejador de escritura del puerto COM
+		if (kbhit()) { // Si se ha pulsado una tecla invoca al manejador de escritura del puerto COM
 			escritorPuertoCOM.escritura();
+			for (auto trama : escritorPuertoCOM.getBufferTramas())
+				cout << trama->protoc_toString() << endl;
+			escritorPuertoCOM.liberarBufferTramas(); // HAY QUE LIBERAR MEMORIA
+		}
 	}
 
 	/** CIERRE DEL PUERTO COM */

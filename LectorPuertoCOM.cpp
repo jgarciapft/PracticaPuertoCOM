@@ -25,8 +25,10 @@ Trama *LectorPuertoCOM::lectura() {
 }
 
 Trama *LectorPuertoCOM::procesarCar(char car) { // Detecta caracter sincronismo. Es trama
+	Trama *pTrama = nullptr;
+
 	if (car == CONSTANTES::SINCRONISMO || getEsTrama()) {
-		return leerTrama(car);
+		pTrama = leerTrama(car);
 	} else {
 		switch (car) {
 			case EscritorPuertoCOM::CHAR_INICIO_FICHERO: // Se va a leer un fichero
@@ -40,8 +42,8 @@ Trama *LectorPuertoCOM::procesarCar(char car) { // Detecta caracter sincronismo.
 			default:
 				printf("%s\n\tcar : %c\n", "ERROR : no es una trama", car);
 		}
-		return nullptr;
 	}
+	return pTrama;
 }
 
 Trama *LectorPuertoCOM::leerTrama(char car) {
