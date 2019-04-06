@@ -89,7 +89,7 @@ private:
 	 * @param car Caracter recibido
 	 * @return Trama leída, o nulo si no se ha procesado ninguna trama completa
 	 */
-	Trama *procesarCar(/* Caracter a procesar*/char car);
+	Trama *procesarCar(char car);
 
 	/**
 	 * Maneja el procesamiento de una trama

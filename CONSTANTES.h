@@ -2,7 +2,12 @@
 #ifndef PRACTICAPUERTOCOM_CONSTANTES_H
 #define PRACTICAPUERTOCOM_CONSTANTES_H
 
-
+/**
+ * Almacén de constantes públicas
+ *
+ * @author Juan Pablo García Plaza Pérez @ 2ºGIIIS/GrupoA
+ * @author José Ángel Concha Carrasco @ 2ºGIIIS/GrupoA
+ */
 class CONSTANTES {
 
 public:

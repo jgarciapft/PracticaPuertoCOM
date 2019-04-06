@@ -13,3 +13,5 @@ LectorPuertoCOM *Protocolo::getLectorPuertoCOM() {
 EscritorPuertoCOM *Protocolo::getEscritorPuertoCOM() {
 	return escritorPuertoCom;
 }
+
+Protocolo::~Protocolo() {}

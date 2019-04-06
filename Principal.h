@@ -4,8 +4,7 @@
 #include "EscritorPuertoCOM.h"
 #include "LectorPuertoCOM.h"
 #include "CargadorManejadorPuertoCOM.h"
-#include "Protocolo.h"
-#include "ProtocoloEstandar.h"
+#include "ManejadorProtocolo.h"
 
 /**
  * Punto de entrada al programa. Controla el flujo de ejecución y contiene la colección de constantes comunes al programa

@@ -31,9 +31,8 @@ int main() {
 	LectorPuertoCOM *lectorPuertoCOM = LectorPuertoCOM::recuperarInstancia();
 	// Manejador de escritura del puerto COM
 	EscritorPuertoCOM *escritorPuertoCOM = EscritorPuertoCOM::recuperarInstancia();
-
-	Protocolo *protocolo = new ProtocoloEstandar(lectorPuertoCOM, escritorPuertoCOM);
-	protocolo->iniciar();
+	// Manejador del control de los protocolos de aplicación. Maneja el resto del flujo del programa
+	ManejadorProtocolo(lectorPuertoCOM, escritorPuertoCOM).ejecutar();
 
 	/** CIERRE DEL PUERTO COM */
 

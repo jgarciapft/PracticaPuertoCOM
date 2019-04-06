@@ -4,15 +4,15 @@
 ProtocoloEstandar::ProtocoloEstandar(LectorPuertoCOM *lectorPuertoCom, EscritorPuertoCOM *escritorPuertoCom)
 		: Protocolo(lectorPuertoCom, escritorPuertoCom) {}
 
-void ProtocoloEstandar::iniciar() {
-	establecimiento();
+bool ProtocoloEstandar::iniciar() {
+	return establecimiento();
 }
 
-void ProtocoloEstandar::establecimiento() {
-	transmision();
+bool ProtocoloEstandar::establecimiento() {
+	return transmision();
 }
 
-void ProtocoloEstandar::transmision() {
+bool ProtocoloEstandar::transmision() {
 	while (!getEscritorPuertoCOM()->getFinCaracter()) { // Mientras el usuario no pulse la tecla ESCAPE
 		Trama *const pTrama = getLectorPuertoCOM()->lectura(); // Lectura del puerto COM
 		if (pTrama != nullptr) delete pTrama; // HAY QUE LIBERAR MEMORIA
@@ -21,10 +21,10 @@ void ProtocoloEstandar::transmision() {
 			getEscritorPuertoCOM()->liberarBufferTramas(); // HAY QUE LIBERAR MEMORIA
 		}
 	}
-	liberacion(true);
+	return liberacion();
 }
 
-bool ProtocoloEstandar::liberacion(bool finAplicacion) {
-	cout << "LIBERANDO PROTOCOLO ESTANDAR";
-	return finAplicacion;
+bool ProtocoloEstandar::liberacion() {
+	cout << endl << "LIBERANDO PROTOCOLO ESTANDAR" << endl;
+	return true; // TODO Identificar la salida
 }

@@ -5,6 +5,14 @@
 #include "LectorPuertoCOM.h"
 #include "EscritorPuertoCOM.h"
 
+/**
+ * Clase base que modela el comportamiento de un protocolo. Sirve de interfaz sobre la quye construir un protocolo
+ * de aplicación específico. Establece el funcionamiento del protocolo en 3 fases: establecimiento, transmisión y
+ * liberación
+ *
+ * @author Juan Pablo García Plaza Pérez @ 2ºGIIIS/GrupoA
+ * @author José Ángel Concha Carrasco @ 2ºGIIIS/GrupoA
+ */
 class Protocolo {
 
 private:
@@ -19,22 +27,25 @@ private:
 
 private:
 	/**
-	 * Establece la primera fase de comunicación del protocolo
+	 * Establece la primera fase de comunicación del protocolo y pasa a la fase de transimisión
+	 *
+	 * @return Si se desea terminar la aplicación
 	 */
-	virtual void establecimiento() = 0;
+	virtual bool establecimiento() = 0;
 
 	/**
-	 * Fase de transimisión de datos
+	 * Fase de transimisión de datos y pasa a la fase de liberación
+	 *
+	 * @return Si se desea terminar la aplicación
 	 */
-	virtual void transmision() = 0;
+	virtual bool transmision() = 0;
 
 	/**
 	 * Instrucciones finales antes de cerrar el protocolo
 	 *
-	 * @param finAplicacion Si se desea terminar la aplicación
 	 * @return Si se desea terminar la aplicación
 	 */
-	virtual bool liberacion(bool finAplicacion) = 0;
+	virtual bool liberacion() = 0;
 
 public:
 	/**
@@ -45,12 +56,22 @@ public:
 
 	/**
 	 * Inicia el protocolo y lo maneja de inicio a fin
+	 *
+	 * @return Si se desea terminar la aplicación
 	 */
-	virtual void iniciar() = 0;
+	virtual bool iniciar() = 0;
+
+	virtual ~Protocolo();
 
 protected:
+	/**
+	 * @return Lector que maneje la lectura de datos
+	 */
 	LectorPuertoCOM *getLectorPuertoCOM();
 
+	/**
+	 * @return Escritor que maneje la escritura de datos
+	 */
 	EscritorPuertoCOM *getEscritorPuertoCOM();
 };
 
