@@ -1,8 +1,6 @@
 #ifndef PRINCIPAL_H
 #define PRINCIPAL_H
 
-#include "EscritorPuertoCOM.h"
-#include "LectorPuertoCOM.h"
 #include "CargadorManejadorPuertoCOM.h"
 #include "ManejadorProtocolo.h"
 

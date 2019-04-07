@@ -1,8 +1,9 @@
 
 #include "ManejadorProtocolo.h"
 
-ManejadorProtocolo::ManejadorProtocolo(LectorPuertoCOM *lectorPuertoCOM, EscritorPuertoCOM *EscritorPuertoCOM) {
-	protocoloEstandar = new ProtocoloEstandar(lectorPuertoCOM, EscritorPuertoCOM);
+ManejadorProtocolo::ManejadorProtocolo() {
+	protocoloEstandar = new ProtocoloEstandar(LectorPuertoCOM::recuperarInstancia(),
+											  EscritorPuertoCOM::recuperarInstancia());
 //	protocoloMaestroEsclavo = new ProtocoloEstandar(lectorPuertoCOM, EscritorPuertoCOM); TODO Instanciar
 
 	protocoloActual = const_cast<Protocolo *>(protocoloEstandar);
@@ -17,8 +18,7 @@ ManejadorProtocolo::~ManejadorProtocolo() {
 
 void ManejadorProtocolo::ejecutar() {
 	while (!getProtocoloActual()->iniciar())
-		setProtocoloActual(const_cast<Protocolo *>(getProtocoloActual() == protocoloEstandar ? protocoloMaestroEsclavo
-																							 : protocoloEstandar));
+		cambiarProtocoloActual();
 	cout << "FIN APLICACION";
 }
 
@@ -26,6 +26,7 @@ Protocolo *ManejadorProtocolo::getProtocoloActual() {
 	return protocoloActual;
 }
 
-void ManejadorProtocolo::setProtocoloActual(Protocolo *protocoloActual) {
-	this->protocoloActual = protocoloActual;
+void ManejadorProtocolo::cambiarProtocoloActual() {
+	this->protocoloActual = const_cast<Protocolo *>(getProtocoloActual() == protocoloEstandar ? protocoloMaestroEsclavo
+																							  : protocoloEstandar);
 }

@@ -1,4 +1,5 @@
 #include "EscritorPuertoCOM.h"
+#include "EscritorPuertoCOM_P_ME.h"
 
 EscritorPuertoCOM *EscritorPuertoCOM::instancia = nullptr;
 const int EscritorPuertoCOM::BUFFER_MAX_CAR = 700;
@@ -90,7 +91,6 @@ void EscritorPuertoCOM::enviarMensaje() {
 }
 
 void EscritorPuertoCOM::enviarBufferTramas(const char *bufferMsj) {
-	vector<Trama *> buffAux; // Nuevo buffer de tramas enviadas
 	int idx, auxLen;
 
 	// Divide el mensaje en las tramas necesarias mediante referencias desplazadas al puntero buffer
@@ -104,14 +104,11 @@ void EscritorPuertoCOM::enviarBufferTramas(const char *bufferMsj) {
 																		   ? TD_MAX_LON_DATOS
 																		   : auxLen),
 												bufferMsj + idx);
-		buffAux.push_back(tramaDatos); // Añade al buffer la nueva trama creada
 		enviarTramaDatos(tramaDatos); // Envía la nueva trama creada
 
 		// Lectura de datos no exclusiva
 		LectorPuertoCOM::recuperarInstancia()->lectura();
 	}
-
-	setBufferTramas(buffAux); // Reasigna al buffer la trama de control enviada
 }
 
 void EscritorPuertoCOM::enviarTramaDatos(TramaDatos *tramaDatos) {
@@ -134,7 +131,6 @@ void EscritorPuertoCOM::enviarTramaDatos(TramaDatos *tramaDatos) {
 void EscritorPuertoCOM::enviarTramaControl() {
 	HANDLE com = mPuertoCOM->getHandle();
 	Trama *tramaAux = new Trama(); // Trama a consturir
-	vector<Trama *> buffAux; // Nuevo buffer de tramas enviadas
 	unsigned char C = 0; // Caracter para determinar el campo de control de la trama
 
 	// Pregunta al usuario el tipo de trama a enviar
@@ -156,7 +152,6 @@ void EscritorPuertoCOM::enviarTramaControl() {
 	}
 
 	tramaAux->setAttr(CONSTANTES::SINCRONISMO, TC_DEF_DIRECCION, C, TC_DEF_NT);
-	buffAux.push_back(tramaAux);
 
 	// Envía la trama formada
 	if (manPrtoCOMAbierto()) { // Comprueba que el puerto COM esté operativo
@@ -164,8 +159,6 @@ void EscritorPuertoCOM::enviarTramaControl() {
 		EnviarCaracter(com, tramaAux->getD());
 		EnviarCaracter(com, tramaAux->getC());
 		EnviarCaracter(com, tramaAux->getNT());
-
-		setBufferTramas(buffAux); // Reasigna al buffer la trama de control enviada
 	}
 }
 
@@ -238,27 +231,12 @@ bool EscritorPuertoCOM::manPrtoCOMAbierto() {
 
 bool EscritorPuertoCOM::bufferLleno() { return getIdxBuffer() >= BUFFER_MAX_CAR; }
 
-vector<Trama *> EscritorPuertoCOM::getBufferTramas() {
-	return bufferTramas;
-}
-
-void EscritorPuertoCOM::liberarBufferTramas() {
-	auto inicio = std::stable_partition(bufferTramas.begin(), bufferTramas.end(),
-										[](Trama *trama) { return true; });
-	std::for_each(inicio, bufferTramas.end(), [](Trama *trama) { delete trama; });
-	bufferTramas.erase(inicio, bufferTramas.end());
-}
-
 int EscritorPuertoCOM::getIdxBuffer() {
 	return idxBuffer;
 }
 
 bool EscritorPuertoCOM::getFinCaracter() {
 	return finCaracter;
-}
-
-void EscritorPuertoCOM::setBufferTramas(vector<Trama *> bufferTramas) {
-	this->bufferTramas = bufferTramas;
 }
 
 void EscritorPuertoCOM::setIdxBuffer(int idxBuffer) {

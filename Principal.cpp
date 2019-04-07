@@ -27,12 +27,8 @@ int main() {
 
 	/** MANEJO DE LAS OPERACIONES DEL PUERTO COM */
 
-	// Manejador de lectura del puerto COM
-	LectorPuertoCOM *lectorPuertoCOM = LectorPuertoCOM::recuperarInstancia();
-	// Manejador de escritura del puerto COM
-	EscritorPuertoCOM *escritorPuertoCOM = EscritorPuertoCOM::recuperarInstancia();
 	// Manejador del control de los protocolos de aplicación. Maneja el resto del flujo del programa
-	ManejadorProtocolo(lectorPuertoCOM, escritorPuertoCOM).ejecutar();
+	ManejadorProtocolo().ejecutar();
 
 	/** CIERRE DEL PUERTO COM */
 

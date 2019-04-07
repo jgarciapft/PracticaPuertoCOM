@@ -34,18 +34,12 @@ private:
 	Protocolo *getProtocoloActual();
 
 	/**
-	 * Método modificador del atributo 'protocoloActual'
-	 *
-	 * @param protocoloActual Nuevo protocolo en uso
+	 * Alterna entre protocolos
 	 */
-	void setProtocoloActual(Protocolo *protocoloActual);
+	void cambiarProtocoloActual();
 
 public:
-	/**
-	 * @param lectorPuertoCOM Lector que maneje la lectura de datos
-	 * @param EscritorPuertoCOM Escritor que maneje la escritura de datos
-	 */
-	ManejadorProtocolo(LectorPuertoCOM *lectorPuertoCOM, EscritorPuertoCOM *EscritorPuertoCOM);
+	ManejadorProtocolo();
 
 	~ManejadorProtocolo();
 

@@ -87,10 +87,6 @@ private:
 	 */
 	ManejadorPuertoCOM *mPuertoCOM;
 	/**
-	 * Buffer de tramas enviadas
-	 */
-	vector<Trama *> bufferTramas;
-	/**
 	 * Índice de posición libre del buffer de escritura
 	 */
 	int idxBuffer;
@@ -151,13 +147,6 @@ private:
 	void leerCarEcho(char car);
 
 	/**
-	 * Método modificador del atributo 'bufferTramas'
-	 *
-	 * @param bufferTramas Nuevo buffer de tramas
-	 */
-	void setBufferTramas(vector<Trama *> bufferTramas);
-
-	/**
 	 * Método modificador del atributo 'finCaracter'
 	 *
 	 * @param finCaracter Nuevo valor de la bandera
@@ -182,17 +171,6 @@ public:
 	 * borrado de caracter y escritura de caracter
 	 */
 	void escritura();
-
-	/**
-	 * Libera la memoria asociada a las tramas del buffer. Debe ser llamado antes de volver a asignar el buffer para
-	 * evitar fugas de memoria
-	 */
-	void liberarBufferTramas();
-
-	/**
-	 * @return Buffer de tramas enviadas
-	 */
-	vector<Trama *> getBufferTramas();
 
 	/**
 	 * @return Instancia Singleton de la clase
