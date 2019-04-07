@@ -81,8 +81,7 @@ void EscritorPuertoCOM::enviarMensaje() {
 
 	/** ENVÍO DE MENSAJE */
 
-	if (manPrtoCOMAbierto()) // Comprueba que el puerto COM esté operativo
-		enviarBufferTramas(buffer);
+	enviarBufferTramas(buffer);
 	printf("%c", CONSTANTES::CRLN); // Salta a la siguiente línea para seguir escribiendo
 
 	/** REINICIO DE BANDERAS */
@@ -98,39 +97,38 @@ void EscritorPuertoCOM::enviarBufferTramas(const char *bufferMsj) {
 		auxLen = static_cast<int>(strlen(
 				bufferMsj + idx)); // Auxiliar para comprobar la longitud real de la cadena de la sección buffer + idx
 
-		TramaDatos *tramaDatos = new TramaDatos(CONSTANTES::SINCRONISMO, TD_DEF_DIRECCION, TD_DEF_CONTROL,
-												TD_DEF_NT,
-												static_cast<unsigned char>(auxLen > TD_MAX_LON_DATOS
-																		   ? TD_MAX_LON_DATOS
-																		   : auxLen),
-												bufferMsj + idx);
-		enviarTramaDatos(tramaDatos); // Envía la nueva trama creada
+		// Envía la nueva trama creada
+		enviarTramaDatos(TramaDatos(CONSTANTES::SINCRONISMO, TD_DEF_DIRECCION, TD_DEF_CONTROL,
+									TD_DEF_NT,
+									static_cast<unsigned char>(auxLen > TD_MAX_LON_DATOS ? TD_MAX_LON_DATOS
+																						 : auxLen),
+									bufferMsj + idx));
 
 		// Lectura de datos no exclusiva
 		LectorPuertoCOM::recuperarInstancia()->lectura();
 	}
 }
 
-void EscritorPuertoCOM::enviarTramaDatos(TramaDatos *tramaDatos) {
+void EscritorPuertoCOM::enviarTramaDatos(TramaDatos tramaDatos) {
 	HANDLE com = ManejadorPuertoCOM::recuperarInstancia()->getHandle();
 
 	// Calcula el BCE de la trama antes de enviarla
-	tramaDatos->calcularBCE();
+	tramaDatos.calcularBCE();
 	// Envía el contenido de la trama por partes
 	if (manPrtoCOMAbierto()) { // Comprueba que el puerto COM esté operativo
-		EnviarCaracter(com, tramaDatos->getS());
-		EnviarCaracter(com, tramaDatos->getD());
-		EnviarCaracter(com, tramaDatos->getC());
-		EnviarCaracter(com, tramaDatos->getNT());
-		EnviarCaracter(com, tramaDatos->getL());
-		EnviarCadena(com, tramaDatos->getDatos(), tramaDatos->getL());
-		EnviarCaracter(com, tramaDatos->getBCE());
+		EnviarCaracter(com, tramaDatos.getS());
+		EnviarCaracter(com, tramaDatos.getD());
+		EnviarCaracter(com, tramaDatos.getC());
+		EnviarCaracter(com, tramaDatos.getNT());
+		EnviarCaracter(com, tramaDatos.getL());
+		EnviarCadena(com, tramaDatos.getDatos(), tramaDatos.getL());
+		EnviarCaracter(com, tramaDatos.getBCE());
 	}
 }
 
 void EscritorPuertoCOM::enviarTramaControl() {
 	HANDLE com = mPuertoCOM->getHandle();
-	Trama *tramaAux = new Trama(); // Trama a consturir
+	Trama tramaAux = Trama(); // Trama a consturir
 	unsigned char C = 0; // Caracter para determinar el campo de control de la trama
 
 	// Pregunta al usuario el tipo de trama a enviar
@@ -151,14 +149,14 @@ void EscritorPuertoCOM::enviarTramaControl() {
 			C = CONSTANTES::NACK;
 	}
 
-	tramaAux->setAttr(CONSTANTES::SINCRONISMO, TC_DEF_DIRECCION, C, TC_DEF_NT);
+	tramaAux.setAttr(CONSTANTES::SINCRONISMO, TC_DEF_DIRECCION, C, TC_DEF_NT);
 
 	// Envía la trama formada
 	if (manPrtoCOMAbierto()) { // Comprueba que el puerto COM esté operativo
-		EnviarCaracter(com, tramaAux->getS());
-		EnviarCaracter(com, tramaAux->getD());
-		EnviarCaracter(com, tramaAux->getC());
-		EnviarCaracter(com, tramaAux->getNT());
+		EnviarCaracter(com, tramaAux.getS());
+		EnviarCaracter(com, tramaAux.getD());
+		EnviarCaracter(com, tramaAux.getC());
+		EnviarCaracter(com, tramaAux.getNT());
 	}
 }
 
@@ -199,8 +197,8 @@ void EscritorPuertoCOM::enviarFichero() {
 			// Comprueba que haya contenido a enviar
 			if (fFichero.gcount() > 0) {
 				// Envio de la trama de datos
-				enviarTramaDatos(new TramaDatos(CONSTANTES::SINCRONISMO, TD_DEF_DIRECCION, TD_DEF_CONTROL, TD_DEF_NT,
-												static_cast<unsigned char>(fFichero.gcount()), cuerpoMensaje));
+				enviarTramaDatos(TramaDatos(CONSTANTES::SINCRONISMO, TD_DEF_DIRECCION, TD_DEF_CONTROL, TD_DEF_NT,
+											static_cast<unsigned char>(fFichero.gcount()), cuerpoMensaje));
 				// Actualización del peso del fichero
 				pesoFichero += static_cast<int>(fFichero.gcount());
 			}
@@ -212,8 +210,8 @@ void EscritorPuertoCOM::enviarFichero() {
 		EnviarCaracter(com, CONSTANTES::CHAR_FIN_FICHERO); // Envía fin de fichero
 		// Envía el número de bytes procesados
 		sprintf(msjNumBytes, "%s %d %s\n", "El fichero tiene un peso de", pesoFichero, "bytes");
-		enviarTramaDatos(new TramaDatos(CONSTANTES::SINCRONISMO, TD_DEF_DIRECCION, TD_DEF_CONTROL, TD_DEF_NT,
-										static_cast<unsigned char>(strlen(msjNumBytes)), msjNumBytes));
+		enviarTramaDatos(TramaDatos(CONSTANTES::SINCRONISMO, TD_DEF_DIRECCION, TD_DEF_CONTROL, TD_DEF_NT,
+									static_cast<unsigned char>(strlen(msjNumBytes)), msjNumBytes));
 		// Mensaje de final de envío de fichero
 		printf("%s\n", MSJ_FIN_ENV_FICHERO);
 		fFichero.close(); // Cierra el fichero

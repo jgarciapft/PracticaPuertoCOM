@@ -127,7 +127,7 @@ private:
 	 *
 	 * @param tramaDatos Trama de datos a enviar
 	 */
-	void enviarTramaDatos(TramaDatos *tramaDatos);
+	void enviarTramaDatos(TramaDatos tramaDatos);
 
 	/**
 	 * Formatea y envía una trama de control por el pueto COM según el manejador establecido

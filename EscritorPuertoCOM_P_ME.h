@@ -5,7 +5,7 @@
 #include <vector>
 #include <algorithm>
 #include "ManejadorPuertoCOM.h"
-#include "Trama.h"
+#include "TramaDatos.h"
 
 /**
  * Clase que implementa el envío de fichero pensando en su uso en el protocolo maestro-esclavo.
@@ -45,6 +45,20 @@ public:
 	 * @param mPuertoCOM Manejador del puerto COM
 	 */
 	EscritorPuertoCOM_P_ME(ManejadorPuertoCOM *mPuertoCOM);
+
+	/**
+	 * Envía una trama de control por el puerto COM
+	 *
+	 * @param tramaDatos Trama de control a enviar
+	 */
+	void enviarTramaControl(Trama tramaControl);
+
+	/**
+	 * Envía una trama de datos por el puerto COM
+	 *
+	 * @param tramaDatos Trama de datos a enviar
+	 */
+	void enviarTramaDatos(TramaDatos tramaDatos);
 
 	/**
 	* @return Buffer de tramas enviadas
