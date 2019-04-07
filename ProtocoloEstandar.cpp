@@ -5,6 +5,7 @@ ProtocoloEstandar::ProtocoloEstandar(LectorPuertoCOM *lectorPuertoCom, EscritorP
 		: Protocolo(lectorPuertoCom, escritorPuertoCom) {}
 
 bool ProtocoloEstandar::iniciar() {
+	getLectorPuertoCOM()->setProtocoloActual(CONSTANTES::ESTANDAR);
 	return establecimiento();
 }
 

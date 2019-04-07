@@ -3,6 +3,7 @@
 #define PRACTICAPUERTOCOM_MANEJADORPROTOCOLO_H
 
 #include "Protocolo.h"
+#include "ProtocoloEstandar.h"
 
 /**
  * Manejador del flujo de programa relacionado con el cambio de protocolos a elección
@@ -46,7 +47,7 @@ public:
 	 */
 	ManejadorProtocolo(LectorPuertoCOM *lectorPuertoCOM, EscritorPuertoCOM *EscritorPuertoCOM);
 
-	virtual ~ManejadorProtocolo();
+	~ManejadorProtocolo();
 
 	/**
 	 * Maneja el cambio de protocolos y el resto del flujo de la aplicación
