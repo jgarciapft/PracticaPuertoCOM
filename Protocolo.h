@@ -64,6 +64,10 @@ public:
 	virtual ~Protocolo();
 
 protected:
+	string repTrama(char dir, Trama *trama);
+
+	string repTrama(char dir, Trama *trama, unsigned char BCECalculado);
+
 	/**
 	 * @return Lector que maneje la lectura de datos
 	 */
