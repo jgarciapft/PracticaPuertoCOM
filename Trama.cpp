@@ -74,8 +74,10 @@ std::string Trama::protoc_toString() {
 	const unsigned char D = getD();
 	const unsigned char NT = getNT();
 	const std::string tipoTrama = constTipoTrama(getC());
+	// Cadena auxiliar para formatear el mensaje. +2 por las dos tabulaciones
 	char *cad = static_cast<char *>(malloc(sizeof(D) + sizeof(NT) + tipoTrama.size() + 2));
 
+	// Formatea la cadena a devolver
 	sprintf(cad, "%c\t%s\t%c", D, tipoTrama.c_str(), NT);
 
 	const std::basic_string<char> &basicString = std::string(cad);
