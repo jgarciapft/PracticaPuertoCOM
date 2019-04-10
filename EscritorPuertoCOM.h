@@ -1,11 +1,15 @@
 #ifndef ESCRITORPUERTOCOM_H
 #define ESCRITORPUERTOCOM_H
 
-
+#include <vector>
+#include <fstream>
+#include <algorithm>
 #include "ManejadorPuertoCOM.h"
-#include "ManejadorEntradaUsuario.h"
-#include "Principal.h"
+#include "CONSTANTES.h"
 #include "TramaDatos.h"
+#include "Trama.h"
+#include "ManejadorEntradaUsuario.h"
+#include "LectorPuertoCOM.h"
 
 /**
  * Manejador responsable de la escritura sobre el puerto COM
@@ -73,33 +77,27 @@ private:
      */
     static const int TD_MAX_LON_DATOS;
 
-public:
-    /**
-     * Caracter indicador del inicio del envío de un fichero
-     */
-    static const char CHAR_INICIO_FICHERO = '#';
-    /**
-     * Caracter indicador del fin del envío de un fichero
-     */
-    static const char CHAR_FIN_FICHERO = '@';
-
 private:
-    /**
-     * Manejador del puerto COM
-     */
-    ManejadorPuertoCOM *mPuertoCOM;
-    /**
-     * Índice de posición libre del buffer de escritura
-     */
-    int idxBuffer;
-    /**
-     * Bandera que indica si se ha leido el caracter de finalización del programa
-     */
-    bool finCaracter;
-    /**
-     * Buffer de escritura
-     */
-    char *buffer;
+	/**
+	 * Instancia Singleton de la clase
+	 */
+	static EscritorPuertoCOM *instancia;
+	/**
+	 * Manejador del puerto COM
+	 */
+	ManejadorPuertoCOM *mPuertoCOM;
+	/**
+	 * Índice de posición libre del buffer de escritura
+	 */
+	int idxBuffer;
+	/**
+	 * Bandera que indica si se ha leido el caracter de finalización del programa
+	 */
+	bool finCaracter;
+	/**
+	 * Buffer de escritura
+	 */
+	char *buffer;
 
     /**
      * Comprueba si el manejador del puerto COM está inicializado
@@ -166,19 +164,23 @@ public:
 
     EscritorPuertoCOM();
 
-    explicit EscritorPuertoCOM(ManejadorPuertoCOM *mPuertoCOM);
+	~EscritorPuertoCOM();
 
-    ~EscritorPuertoCOM();
+	/**
+	 * Maneja la funcin de escritura del puerto COM. Maneja los casos de elección de fin del programa, enviar mensaje,
+	 * borrado de caracter y escritura de caracter
+	 */
+	void escritura();
 
-    /**
-     * Maneja la función de escritura del puerto COM. Maneja los casos de elección de fin del programa, enviar mensaje, borrado de caracter y escritura de caracter
-     */
-    void escritura();
+	/**
+	 * @return Instancia Singleton de la clase
+	 */
+	static EscritorPuertoCOM *recuperarInstancia();
 
-    /**
-     * Método accesor del atributo 'finCaracter'
-     */
-    bool getFinCaracter();
+	/**
+	 * Método accesor del atributo 'finCaracter'
+	 */
+	bool getFinCaracter();
 
     /**
      * Método accesor del atributo 'idxBuffer'

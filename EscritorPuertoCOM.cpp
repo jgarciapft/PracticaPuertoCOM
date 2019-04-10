@@ -1,7 +1,6 @@
-#include <fstream>
 #include "EscritorPuertoCOM.h"
 
-
+EscritorPuertoCOM *EscritorPuertoCOM::instancia = nullptr;
 const int EscritorPuertoCOM::BUFFER_MAX_CAR = 700;
 const int EscritorPuertoCOM::MSJ_NUM_CRLF = 1;
 const char EscritorPuertoCOM::MSJ_SEL_TC[] = "Trama de control a enviar:\n1: Trama ENQ.\n2: Trama EOT.\n3: Trama ACK.\n4: Trama NACK.";
@@ -16,20 +15,9 @@ const char EscritorPuertoCOM::MSJ_ERR_FICHERO_ENVIO_NO_ENCONTRADO[] = "Error al 
 const char EscritorPuertoCOM::MSJ_INICIO_ENV_FICHERO[] = "Enviando fichero por";
 const char EscritorPuertoCOM::MSJ_FIN_ENV_FICHERO[] = "Fichero enviado";
 const char EscritorPuertoCOM::RUTA_DEF_FICHERO_ENVIO[] = "Fenvio.txt";
-const char EscritorPuertoCOM::CHAR_INICIO_FICHERO;
-const char EscritorPuertoCOM::CHAR_FIN_FICHERO;
 
 EscritorPuertoCOM::EscritorPuertoCOM() {
-	mPuertoCOM = nullptr;
-
-	// Reserva el espacio necesario para el buffer de escritura
-	buffer = new char[BUFFER_MAX_CAR + MSJ_NUM_CRLF + 1];
-	idxBuffer = 0;
-	finCaracter = false;
-}
-
-EscritorPuertoCOM::EscritorPuertoCOM(ManejadorPuertoCOM *mPuertoCOM) {
-	this->mPuertoCOM = mPuertoCOM;
+	mPuertoCOM = ManejadorPuertoCOM::recuperarInstancia();
 
 	// Reserva el espacio necesario para el buffer de escritura
 	buffer = new char[BUFFER_MAX_CAR + MSJ_NUM_CRLF + 1];
@@ -92,9 +80,8 @@ void EscritorPuertoCOM::enviarMensaje() {
 
 	/** ENVÍO DE MENSAJE */
 
-	if (manPrtoCOMAbierto()) // Comprueba que el puerto COM esté operativo
-		enviarBufferTramas(buffer);
-	printf("%c", CONSTANTES::CRLN); // Salta a la siguiente línea para seguir escribiendo
+	enviarBufferTramas(buffer);
+	printf("%c", CONSTANTES::CRLN); // Salta a la siguiente l?nea para seguir escribiendo
 
 	/** REINICIO DE BANDERAS */
 
@@ -109,9 +96,15 @@ void EscritorPuertoCOM::enviarBufferTramas(const char *buffer) {
 		auxLen = static_cast<int>(strlen(
 				buffer + idx)); // Auxiliar para comprobar la longitud real de la cadena de la sección buffer + idx
 
-		enviarTramaDatos(TramaDatos(CONSTANTES::SINCRONISMO, TD_DEF_DIRECCION, TD_DEF_CONTROL, TD_DEF_NT,
-									static_cast<unsigned char>(auxLen > TD_MAX_LON_DATOS ? TD_MAX_LON_DATOS : auxLen),
+		// Envía la nueva trama creada
+		enviarTramaDatos(TramaDatos(CONSTANTES::SINCRONISMO, TD_DEF_DIRECCION, TD_DEF_CONTROL,
+									TD_DEF_NT,
+									static_cast<unsigned char>(auxLen > TD_MAX_LON_DATOS ? TD_MAX_LON_DATOS
+																						 : auxLen),
 									buffer + idx));
+
+		// Lectura de datos no exclusiva
+		LectorPuertoCOM::recuperarInstancia()->lectura();
 	}
 }
 
@@ -121,22 +114,21 @@ void EscritorPuertoCOM::enviarTramaDatos(TramaDatos tramaDatos) {
 	// Calcula el BCE de la trama antes de enviarla
 	tramaDatos.calcularBCE();
 	// Envía el contenido de la trama por partes
-	EnviarCaracter(com, tramaDatos.getS());
-	EnviarCaracter(com, tramaDatos.getD());
-	EnviarCaracter(com, tramaDatos.getC());
-	EnviarCaracter(com, tramaDatos.getNT());
-	EnviarCaracter(com, tramaDatos.getL());
-	EnviarCadena(com, tramaDatos.getDatos(), tramaDatos.getL());
-	EnviarCaracter(com, tramaDatos.getBCE());
-
-	// Lectura de datos no exclusiva
-	LectorPuertoCOM::recuperarInstancia()->lectura();
+	if (manPrtoCOMAbierto()) { // Comprueba que el puerto COM está operativo
+		EnviarCaracter(com, tramaDatos.getS());
+		EnviarCaracter(com, tramaDatos.getD());
+		EnviarCaracter(com, tramaDatos.getC());
+		EnviarCaracter(com, tramaDatos.getNT());
+		EnviarCaracter(com, tramaDatos.getL());
+		EnviarCadena(com, tramaDatos.getDatos(), tramaDatos.getL());
+		EnviarCaracter(com, tramaDatos.getBCE());
+	}
 }
 
 void EscritorPuertoCOM::enviarTramaControl() {
 	HANDLE com = mPuertoCOM->getHandle();
-	Trama tramaAux = Trama(); // Trama a cosnturir
-	unsigned char C; // Caracter para determinar el campo de control de la trama
+	Trama tramaAux = Trama(); // Trama a consturir
+	unsigned char C = 0; // Caracter para determinar el campo de control de la trama
 
 	// Pregunta al usuario el tipo de trama a enviar
 	switch (ManejadorEntradaUsuario::preguntarRespEntRang(MSJ_SEL_TC,
@@ -144,16 +136,16 @@ void EscritorPuertoCOM::enviarTramaControl() {
 														  1,
 														  4)) {
 		case 1:
-			C = Trama::ENQ;
+			C = CONSTANTES::ENQ;
 			break;
 		case 2:
-			C = Trama::EOT;
+			C = CONSTANTES::EOT;
 			break;
 		case 3:
-			C = Trama::ACK;
+			C = CONSTANTES::ACK;
 			break;
 		case 4:
-			C = Trama::NACK;
+			C = CONSTANTES::NACK;
 	}
 
 	tramaAux.setAttr(CONSTANTES::SINCRONISMO, TC_DEF_DIRECCION, C, TC_DEF_NT);
@@ -179,7 +171,7 @@ void EscritorPuertoCOM::enviarFichero() {
 
 	fFichero.open(RUTA_DEF_FICHERO_ENVIO, ios::in); // Abrimos el fichero a enviar
 	if (fFichero.is_open()) {
-		EnviarCaracter(com, CHAR_INICIO_FICHERO); // Envío de inicio de fichero
+		EnviarCaracter(com, CONSTANTES::CHAR_INICIO_FICHERO); // Envío de inicio de fichero
 
 		/* LEE LA CABECERA DEL FICHERO */
 
@@ -209,9 +201,12 @@ void EscritorPuertoCOM::enviarFichero() {
 				// Actualización del peso del fichero
 				pesoFichero += static_cast<int>(fFichero.gcount());
 			}
+
+			// Lectura de datos no exclusiva
+			LectorPuertoCOM::recuperarInstancia()->lectura();
 		}
 
-		EnviarCaracter(com, CHAR_FIN_FICHERO); // Envía fin de fichero
+		EnviarCaracter(com, CONSTANTES::CHAR_FIN_FICHERO); // Envía fin de fichero
 		// Envía el número de bytes procesados
 		sprintf(msjNumBytes, "%s %d %s\n", "El fichero tiene un peso de", pesoFichero, "bytes");
 		enviarTramaDatos(TramaDatos(CONSTANTES::SINCRONISMO, TD_DEF_DIRECCION, TD_DEF_CONTROL, TD_DEF_NT,
@@ -252,4 +247,11 @@ void EscritorPuertoCOM::setFinCaracter(bool finCaracter) {
 EscritorPuertoCOM::~EscritorPuertoCOM() {
 	// Libera el buffer de escritura
 	delete[] buffer;
+}
+
+EscritorPuertoCOM *EscritorPuertoCOM::recuperarInstancia() {
+	if (instancia == nullptr)
+		instancia = new EscritorPuertoCOM();
+
+	return instancia;
 }

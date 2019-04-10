@@ -1,0 +1,4 @@
+#include "CONSTANTES.h"
+
+const char CONSTANTES::CHAR_INICIO_FICHERO;
+const char CONSTANTES::CHAR_FIN_FICHERO;

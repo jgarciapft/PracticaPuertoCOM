@@ -1,11 +1,7 @@
 #ifndef PRINCIPAL_H
 #define PRINCIPAL_H
 
-#include "ManejadorPuertoCOM.h"
-#include "ManejadorEntradaUsuario.h"
 #include "CargadorManejadorPuertoCOM.h"
-#include "LectorPuertoCOM.h"
-#include "EscritorPuertoCOM.h"
 
 /**
  * Punto de entrada al programa. Controla el flujo de ejecución y contiene la colección de constantes comunes al programa
@@ -14,25 +10,9 @@
  * @author José Ángel Concha Carrasco @ 2ºGIIIS/GrupoA
  */
 
-class CONSTANTES {
+class Principal {
 
 public:
-	/**
-	 * Tipo enumerado de códigos ASCII útiles para el programa
-	 */
-	enum COD_ASCII {
-		ESCAPE = 27,
-		SINCRONISMO = 22,
-		TECLA_FUNCION = '\0',
-		TECLA_F1 = 59,
-		TECLA_F2 = 60,
-		TECLA_F3 = 61,
-		TECLA_RETROCESO = '\b',
-		TECLA_RETORNO = 13,
-		CRLN = '\n',
-		DELIM_CAD = '\0'
-	};
-
 	/**
 	 * Colección de constantes de cadenas puerto COM
 	 */

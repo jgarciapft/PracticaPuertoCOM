@@ -6,11 +6,21 @@ TramaDatos::TramaDatos() {
 	BCE = 0;
 }
 
+TramaDatos::TramaDatos(Trama *trama) : Trama(trama) {
+	datos = dynamic_cast<TramaDatos *>(trama)->getDatos();
+	L = dynamic_cast<TramaDatos *>(trama)->getL();
+	BCE = dynamic_cast<TramaDatos *>(trama)->getBCE();
+}
+
 TramaDatos::TramaDatos(unsigned char S, unsigned char D, unsigned char C, unsigned char NT, unsigned char L,
 					   const char *datos) : Trama(S, D, C, NT) {
 	this->L = L;
 	this->datos = datos;
 	this->BCE = 0;
+}
+
+Trama *TramaDatos::copia() {
+	return new TramaDatos(this);
 }
 
 void TramaDatos::calcularBCE() {
@@ -60,4 +70,36 @@ void TramaDatos::setAttr(unsigned char S, unsigned char D, unsigned char C, unsi
 
 std::string TramaDatos::toString() {
 	return std::string(datos, getL());
+}
+
+std::string TramaDatos::protoc_toString(unsigned char BCECalculado) {
+	const std::string &base = protoc_toString();
+	char *cad = static_cast<char *>(malloc(base.size() + sizeof(BCECalculado) + 1));
+
+	sprintf(cad, "%s\t%d", base.c_str(), BCECalculado);
+
+	const std::basic_string<char> &basicString = std::string(cad);
+	delete cad;
+
+	return basicString;
+}
+
+std::string TramaDatos::protoc_toString() {
+	const std::string &base = Trama::protoc_toString();
+	const unsigned char BCE = getBCE();
+	char *cad = static_cast<char *>(malloc(base.size() + sizeof(BCE) + 1));
+
+	sprintf(cad, "%s\t%d", base.c_str(), BCE);
+
+	const std::basic_string<char> &basicString = std::string(cad);
+	delete cad;
+
+	return basicString;
+}
+
+TramaDatos TramaDatos::envioDatosN(unsigned char d, unsigned char nt, unsigned char lon, const char *datos) {
+	TramaDatos tramaDatos = TramaDatos(CONSTANTES::SINCRONISMO, d, CONSTANTES::STX, nt, lon, datos);
+	tramaDatos.calcularBCE();
+
+	return tramaDatos;
 }

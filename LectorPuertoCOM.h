@@ -2,9 +2,10 @@
 #define LECTORPUERTOCOM_H
 
 #include <fstream>
+#include "CONSTANTES.h"
 #include "ManejadorPuertoCOM.h"
 #include "Trama.h"
-#include "Principal.h"
+#include "TramaDatos.h"
 
 /**
  * Manejador responsable de la lectura sobre el puertoCOM
@@ -82,15 +83,17 @@ private:
 	 * Maneja el procesamiento de un caracter
 	 *
 	 * @param car Caracter recibido
+	 * @return Trama leída, o nulo si no se ha procesado ninguna trama completa
 	 */
-	void procesarCar(/* Caracter a procesar*/char car);
+	Trama *procesarCar(char car);
 
 	/**
 	 * Maneja el procesamiento de una trama
 	 *
 	 * @param car /Caracter de trama
+	 * @return Trama leída, o nulo si no se ha procesado ninguna trama completa
 	 */
-	void leerTrama(char car);
+	Trama* leerTrama(char car);
 
 	/**
 	 * Procesa la trama de datos recibida para buscar campos de la cabecera empleados para configurar el fichero
@@ -167,8 +170,10 @@ public:
 
 	/**
 	 * Maneja la función de lectura del puerto COM. Maneja la lectura de un caracter y la lectura de una trama
+	 *
+	 * @return Trama leída, o nulo si no se ha procesado ninguna trama completa
 	 */
-	void lectura();
+	Trama *lectura();
 
 	/**
 	 * @return Instancia Singleton de la clase

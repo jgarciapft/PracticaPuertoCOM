@@ -37,6 +37,6 @@ bool ManejadorPuertoCOM::getEstadoAbierto() {
 	return estadoAbierto;
 }
 
-void ManejadorPuertoCOM::setEstadoAbierto(/* Nuevo valor de la bandera de estado */boolean estadoAbierto) {
+void ManejadorPuertoCOM::setEstadoAbierto(boolean estadoAbierto) {
 	this->estadoAbierto = estadoAbierto;
 }
