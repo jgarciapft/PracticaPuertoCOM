@@ -1,6 +1,4 @@
 #include "Principal.h"
-#include "LectorPuertoCOM.h"
-#include "EscritorPuertoCOM.h"
 
 const LPCSTR Principal::COM[] = {"COM1", "COM2", "COM3", "COM4"};
 const char Principal::MSJ_SEL_COM[] = "Seleccionar el puerto a utilizar:\n1. COM1\n2. COM2\n3. COM3\n4. COM4";
@@ -44,4 +42,26 @@ int main() {
 	/** CIERRE DEL PUERTO COM */
 
 	ManejadorPuertoCOM::recuperarInstancia()->cerrarManejador();
+}
+
+string Principal::repTrama(char dir, Trama *trama) {
+	string protocToString = trama->protoc_toString();
+	char *cad = static_cast<char *>(malloc(sizeof(dir) + protocToString.length() + 1));
+
+	sprintf(cad, "%c\t%s", dir, protocToString.c_str());
+	const std::basic_string<char> &basicString = std::string(cad);
+	delete cad;
+
+	return basicString;
+}
+
+string Principal::repTrama(char dir, Trama *trama, unsigned char BCECalculado) {
+	string protocToString = dynamic_cast<TramaDatos *>(trama)->protoc_toString(BCECalculado);
+	char *cad = static_cast<char *>(malloc(sizeof(dir) + protocToString.length() + 1));
+
+	sprintf(cad, "%c\t%s", dir, protocToString.c_str());
+	const std::basic_string<char> &basicString = std::string(cad);
+	delete cad;
+
+	return basicString;
 }
