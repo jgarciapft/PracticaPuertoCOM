@@ -36,6 +36,7 @@ public:
 		TECLA_F1 = 59,
 		TECLA_F2 = 60,
 		TECLA_F3 = 61,
+		TECLA_F4 = 62,
 		TECLA_RETROCESO = '\b',
 		TECLA_RETORNO = 13,
 		CRLN = '\n',

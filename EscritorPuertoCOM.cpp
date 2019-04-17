@@ -42,6 +42,9 @@ void EscritorPuertoCOM::escritura() {
 					break;
 				case CONSTANTES::TECLA_F3: // Es F3
 					enviarFichero();
+					break;
+				case CONSTANTES::TECLA_F4:
+					configurarProtocMaestroEsclavo();
 			}
 			break;
 		case CONSTANTES::TECLA_RETROCESO: // RETROCESO
@@ -67,6 +70,42 @@ void EscritorPuertoCOM::leerCarEcho(char car) {
 
 		printf("%c", car); // 'echo' del caracter leído
 	}
+}
+
+void EscritorPuertoCOM::configurarProtocMaestroEsclavo() {
+	// Pregunta por la identidad de la estación actual
+	int identidadEstacion = ManejadorEntradaUsuario::preguntarRespEntRang(
+			"Seleccione la identidad de la estacion:\n\t1. Maestro\n\t2. Esclavo",
+			"Modo desconocido", 1, 2);
+	int selecOperacion;
+
+	// Si se ha elegido ser el maestro, se pide la operación a realizar
+	if (identidadEstacion == 1) {
+		selecOperacion = ManejadorEntradaUsuario::preguntarRespEntRang(
+				"Seleccione operacion:\n\t1. Seleccion\n\t2. Sondeo",
+				"Modo desconocido", 1, 2);
+		switch (selecOperacion) {
+			case 1:
+				maestro_seleccion();
+				break;
+			case 2:
+				maestro_sondeo();
+		}
+	} else {
+		esclavo_operacion();
+	}
+}
+
+void EscritorPuertoCOM::maestro_seleccion() {
+	printf("%s\n", "Maestro realizando Seleccion");
+}
+
+void EscritorPuertoCOM::maestro_sondeo() {
+	printf("%s\n", "Maestro realizando Sondeo");
+}
+
+void EscritorPuertoCOM::esclavo_operacion() {
+	printf("%s\n", "Esclavo realizando Operacion");
 }
 
 void EscritorPuertoCOM::enviarMensaje() {

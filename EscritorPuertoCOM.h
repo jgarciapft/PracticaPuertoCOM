@@ -99,6 +99,14 @@ private:
 	 */
 	char *buffer;
 
+	void configurarProtocMaestroEsclavo();
+
+	void maestro_seleccion();
+
+	void maestro_sondeo();
+
+	void esclavo_operacion();
+
     /**
      * Comprueba si el manejador del puerto COM está inicializado
      */
