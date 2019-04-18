@@ -69,9 +69,10 @@ public:
 
 	/**
 	 * @param d Dirección de la trama
+	 * @param nt Valor del campo de trama de la trama a rechazar
 	 * @return Trama de control de liberación
 	 */
-	static Trama liberacion(unsigned char d);
+	static Trama liberacion(unsigned char d, unsigned char nt);
 
 	Trama();
 

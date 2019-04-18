@@ -101,11 +101,17 @@ private:
 
 	void configurarProtocMaestroEsclavo();
 
+	Trama *esperarTramaRespuesta();
+
+	void esclavo_establecimiento();
+
 	void maestro_seleccion();
 
 	void maestro_sondeo();
 
-	void esclavo_operacion();
+	void esclavo_seleccion();
+
+	void esclavo_sondeo();
 
     /**
      * Comprueba si el manejador del puerto COM está inicializado
@@ -140,7 +146,12 @@ private:
     /**
      * Formatea y envía una trama de control por el pueto COM según el manejador establecido
      */
-    void enviarTramaControl();
+    void configuarTramaControl();
+
+    /**
+     * Envía una trama de control por el puerto COM
+     */
+	void enviarTramaControl(const Trama& tramaControl);
 
     /**
      * Maneja el evío de un fichero por el puerto COM según el manejador establecido

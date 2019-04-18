@@ -25,4 +25,6 @@ add_executable(PracticaPuertoCOM
         TramaDatos.h
         TramaDatos.cpp
         CONSTANTES.cpp
-        CONSTANTES.h)
+        CONSTANTES.h
+        NumeroCiclico.cpp
+        NumeroCiclico.h)

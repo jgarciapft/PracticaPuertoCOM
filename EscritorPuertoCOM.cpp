@@ -38,7 +38,7 @@ void EscritorPuertoCOM::escritura() {
 					enviarMensaje();
 					break;
 				case CONSTANTES::TECLA_F2: // Es F2
-					enviarTramaControl();
+					configuarTramaControl();
 					break;
 				case CONSTANTES::TECLA_F3: // Es F3
 					enviarFichero();
@@ -92,7 +92,34 @@ void EscritorPuertoCOM::configurarProtocMaestroEsclavo() {
 				maestro_sondeo();
 		}
 	} else {
-		esclavo_operacion();
+		esclavo_establecimiento();
+	}
+}
+
+Trama *EscritorPuertoCOM::esperarTramaRespuesta() {
+	Trama *pTrama;
+
+	do pTrama = LectorPuertoCOM::recuperarInstancia()->lectura();
+	while (pTrama == nullptr);
+
+	return pTrama;
+}
+
+void EscritorPuertoCOM::esclavo_establecimiento() {
+	Trama *pTrama;
+
+	printf("%s\n", "Esclavo realizando Establecimiento");
+
+	// Determinar el la operación que debe realizar el esclavo según la primera trama
+	pTrama = esperarTramaRespuesta();
+	// Confirma la operación y llama al procedimiento específico
+	enviarTramaControl(Trama::confirmacionTramaN(pTrama->getD(), pTrama->getNT()));
+	switch (pTrama->getD()) {
+		case CONSTANTES::SELECCION:
+			esclavo_seleccion();
+			break;
+		case CONSTANTES::SONDEO:
+			esclavo_sondeo();
 	}
 }
 
@@ -104,8 +131,12 @@ void EscritorPuertoCOM::maestro_sondeo() {
 	printf("%s\n", "Maestro realizando Sondeo");
 }
 
-void EscritorPuertoCOM::esclavo_operacion() {
-	printf("%s\n", "Esclavo realizando Operacion");
+void EscritorPuertoCOM::esclavo_seleccion() {
+	printf("%s\n", "Maestro realizando Seleccion");
+}
+
+void EscritorPuertoCOM::esclavo_sondeo() {
+	printf("%s\n", "Esclavo realizando Sondeo");
 }
 
 void EscritorPuertoCOM::enviarMensaje() {
@@ -164,16 +195,12 @@ void EscritorPuertoCOM::enviarTramaDatos(TramaDatos tramaDatos) {
 	}
 }
 
-void EscritorPuertoCOM::enviarTramaControl() {
-	HANDLE com = mPuertoCOM->getHandle();
+void EscritorPuertoCOM::configuarTramaControl() {
 	Trama tramaAux = Trama(); // Trama a consturir
 	unsigned char C = 0; // Caracter para determinar el campo de control de la trama
 
 	// Pregunta al usuario el tipo de trama a enviar
-	switch (ManejadorEntradaUsuario::preguntarRespEntRang(MSJ_SEL_TC,
-														  MSJ_ERROR_SEL_TC,
-														  1,
-														  4)) {
+	switch (ManejadorEntradaUsuario::preguntarRespEntRang(MSJ_SEL_TC, MSJ_ERROR_SEL_TC, 1, 4)) {
 		case 1:
 			C = CONSTANTES::ENQ;
 			break;
@@ -190,11 +217,17 @@ void EscritorPuertoCOM::enviarTramaControl() {
 	tramaAux.setAttr(CONSTANTES::SINCRONISMO, TC_DEF_DIRECCION, C, TC_DEF_NT);
 
 	// Envía la trama formada
+	enviarTramaControl(tramaAux);
+}
+
+void EscritorPuertoCOM::enviarTramaControl(const Trama &tramaControl) {
+	HANDLE com = mPuertoCOM->getHandle();
+
 	if (manPrtoCOMAbierto()) { // Comprueba que el puerto COM esté operativo
-		EnviarCaracter(com, tramaAux.getS());
-		EnviarCaracter(com, tramaAux.getD());
-		EnviarCaracter(com, tramaAux.getC());
-		EnviarCaracter(com, tramaAux.getNT());
+		EnviarCaracter(com, tramaControl.getS());
+		EnviarCaracter(com, tramaControl.getD());
+		EnviarCaracter(com, tramaControl.getC());
+		EnviarCaracter(com, tramaControl.getNT());
 	}
 }
 

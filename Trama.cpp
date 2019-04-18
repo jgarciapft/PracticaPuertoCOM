@@ -112,21 +112,21 @@ std::string Trama::constTipoTrama(unsigned char controlCar) {
 }
 
 Trama Trama::llamadaSeleccion() {
-	return Trama(CONSTANTES::SINCRONISMO, 'R', CONSTANTES::ENQ, '0');
+	return Trama(CONSTANTES::SINCRONISMO, CONSTANTES::SELECCION, CONSTANTES::ENQ, '0');
 }
 
 Trama Trama::llamadaSondeo() {
-	return Trama(CONSTANTES::SINCRONISMO, 'T', CONSTANTES::ENQ, '0');
+	return Trama(CONSTANTES::SINCRONISMO, CONSTANTES::SONDEO, CONSTANTES::ENQ, '0');
 }
 
 Trama Trama::confirmacionTramaN(unsigned char d, unsigned char nt) {
-	return Trama(CONSTANTES::SINCRONISMO, d, CONSTANTES::ACK, '0');
+	return Trama(CONSTANTES::SINCRONISMO, d, CONSTANTES::ACK, nt);
 }
 
 Trama Trama::rechazoTramaN(unsigned char d, unsigned char nt) {
-	return Trama(CONSTANTES::SINCRONISMO, d, CONSTANTES::NACK, '0');
+	return Trama(CONSTANTES::SINCRONISMO, d, CONSTANTES::NACK, nt);
 }
 
-Trama Trama::liberacion(unsigned char d) {
-	return Trama(CONSTANTES::SINCRONISMO, d, CONSTANTES::EOT, '0');
+Trama Trama::liberacion(unsigned char d, unsigned char nt) {
+	return Trama(CONSTANTES::SINCRONISMO, d, CONSTANTES::EOT, nt);
 }
