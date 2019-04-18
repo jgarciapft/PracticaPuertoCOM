@@ -44,6 +44,13 @@ public:
 	};
 
 	/**
+	 * Enumerado con los tipos de protocolos implementados
+	 */
+	enum PROTOCOLOS {
+		ESTANDAR, MAESTROESCLAVO
+	};
+
+	/**
 	 * Tipo enumerado para el campo de dirección de las tramas en el protocolo maestro-esclavo
 	 */
 	enum OP_PROTOC_ME {

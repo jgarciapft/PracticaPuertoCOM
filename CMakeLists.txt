@@ -14,8 +14,8 @@ add_executable(PracticaPuertoCOM
         EscritorPuertoCOM.h
         LectorPuertoCOM.cpp
         LectorPuertoCOM.h
-        ManejadorEntradaUsuario.cpp
-        ManejadorEntradaUsuario.h
+        ManejadorInfoUsuario.cpp
+        ManejadorInfoUsuario.h
         ManejadorPuertoCOM.cpp
         ManejadorPuertoCOM.h
         Principal.cpp

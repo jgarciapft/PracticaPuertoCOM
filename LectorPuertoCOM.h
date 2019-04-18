@@ -76,6 +76,10 @@ private:
 	 * de 2 quiere decir que se ha leído también el autor.
 	 */
 	int ficheroConfigurado;
+	/**
+	 * Bandera que indica qué protocolo domina la comunicación en un instante
+	 */
+	CONSTANTES::PROTOCOLOS protocoloActual;
 
 	LectorPuertoCOM();
 
@@ -93,7 +97,7 @@ private:
 	 * @param car /Caracter de trama
 	 * @return Trama leída, o nulo si no se ha procesado ninguna trama completa
 	 */
-	Trama* leerTrama(char car);
+	Trama *leerTrama(char car);
 
 	/**
 	 * Procesa la trama de datos recibida para buscar campos de la cabecera empleados para configurar el fichero
@@ -209,6 +213,16 @@ public:
 	 * Método accesor del atributo 'ficheroConfigurado'
 	 */
 	int getFicheroConfigurado();
+
+	/**
+	 * @return Protocolo actual
+	 */
+	CONSTANTES::PROTOCOLOS getProtocoloActual() const;
+
+	/**
+	 * @param protocoloActual Nuevo protocolo actual
+	 */
+	void setProtocoloActual(CONSTANTES::PROTOCOLOS protocoloActual);
 };
 
 #endif

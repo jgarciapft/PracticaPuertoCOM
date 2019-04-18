@@ -44,7 +44,9 @@ void EscritorPuertoCOM::escritura() {
 					enviarFichero();
 					break;
 				case CONSTANTES::TECLA_F4:
+					LectorPuertoCOM::recuperarInstancia()->setProtocoloActual(CONSTANTES::MAESTROESCLAVO);
 					configurarProtocMaestroEsclavo();
+					LectorPuertoCOM::recuperarInstancia()->setProtocoloActual(CONSTANTES::ESTANDAR);
 			}
 			break;
 		case CONSTANTES::TECLA_RETROCESO: // RETROCESO
@@ -74,14 +76,14 @@ void EscritorPuertoCOM::leerCarEcho(char car) {
 
 void EscritorPuertoCOM::configurarProtocMaestroEsclavo() {
 	// Pregunta por la identidad de la estación actual
-	int identidadEstacion = ManejadorEntradaUsuario::preguntarRespEntRang(
+	int identidadEstacion = ManejadorInfoUsuario::preguntarRespEntRang(
 			"Seleccione la identidad de la estacion:\n\t1. Maestro\n\t2. Esclavo",
 			"Modo desconocido", 1, 2);
 	int selecOperacion;
 
 	// Si se ha elegido ser el maestro, se pide la operación a realizar
 	if (identidadEstacion == 1) {
-		selecOperacion = ManejadorEntradaUsuario::preguntarRespEntRang(
+		selecOperacion = ManejadorInfoUsuario::preguntarRespEntRang(
 				"Seleccione operacion:\n\t1. Seleccion\n\t2. Sondeo",
 				"Modo desconocido", 1, 2);
 		switch (selecOperacion) {
@@ -201,7 +203,7 @@ void EscritorPuertoCOM::configuarTramaControl() {
 	unsigned char C = 0; // Caracter para determinar el campo de control de la trama
 
 	// Pregunta al usuario el tipo de trama a enviar
-	switch (ManejadorEntradaUsuario::preguntarRespEntRang(MSJ_SEL_TC, MSJ_ERROR_SEL_TC, 1, 4)) {
+	switch (ManejadorInfoUsuario::preguntarRespEntRang(MSJ_SEL_TC, MSJ_ERROR_SEL_TC, 1, 4)) {
 		case 1:
 			C = CONSTANTES::ENQ;
 			break;

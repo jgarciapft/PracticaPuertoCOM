@@ -6,10 +6,12 @@ NumeroCiclico::NumeroCiclico(int limiteInf, int limiteSup) : limiteInf(limiteInf
 }
 
 int NumeroCiclico::siguiente() {
-	if (numeroActual <= limiteSup) numeroActual++;
-	else numeroActual = limiteInf;
+	int sigNumero = numeroActual;
 
-	return numeroActual;
+	if (numeroActual < limiteSup) numeroActual++;
+	else reset();
+
+	return sigNumero;
 }
 
 void NumeroCiclico::reset() {
