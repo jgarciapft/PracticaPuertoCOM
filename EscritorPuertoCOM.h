@@ -101,17 +101,17 @@ private:
 
 	void configurarProtocMaestroEsclavo();
 
-	Trama *esperarTramaRespuesta();
-
-	void esclavo_establecimiento();
-
 	void maestro_seleccion();
 
 	void maestro_sondeo();
 
+	void esclavo_establecimiento();
+
 	void esclavo_seleccion();
 
 	void esclavo_sondeo();
+
+	Trama *esperarTramaRespuesta();
 
     /**
      * Comprueba si el manejador del puerto COM está inicializado

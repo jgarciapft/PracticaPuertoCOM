@@ -96,13 +96,13 @@ void EscritorPuertoCOM::configurarProtocMaestroEsclavo() {
 	}
 }
 
-Trama *EscritorPuertoCOM::esperarTramaRespuesta() {
-	Trama *pTrama;
+void EscritorPuertoCOM::maestro_seleccion() {
+	printf("%s\n", "Maestro realizando Seleccion");
+}
 
-	do pTrama = LectorPuertoCOM::recuperarInstancia()->lectura();
-	while (pTrama == nullptr);
-
-	return pTrama;
+void EscritorPuertoCOM::maestro_sondeo() {
+	enviarTramaControl(Trama::llamadaSondeo());
+	printf("%s\n", "Maestro realizando Sondeo");
 }
 
 void EscritorPuertoCOM::esclavo_establecimiento() {
@@ -123,20 +123,21 @@ void EscritorPuertoCOM::esclavo_establecimiento() {
 	}
 }
 
-void EscritorPuertoCOM::maestro_seleccion() {
-	printf("%s\n", "Maestro realizando Seleccion");
-}
-
-void EscritorPuertoCOM::maestro_sondeo() {
-	printf("%s\n", "Maestro realizando Sondeo");
-}
-
 void EscritorPuertoCOM::esclavo_seleccion() {
 	printf("%s\n", "Maestro realizando Seleccion");
 }
 
 void EscritorPuertoCOM::esclavo_sondeo() {
 	printf("%s\n", "Esclavo realizando Sondeo");
+}
+
+Trama *EscritorPuertoCOM::esperarTramaRespuesta() {
+	Trama *pTrama;
+
+	do pTrama = LectorPuertoCOM::recuperarInstancia()->lectura();
+	while (pTrama == nullptr);
+
+	return pTrama;
 }
 
 void EscritorPuertoCOM::enviarMensaje() {
