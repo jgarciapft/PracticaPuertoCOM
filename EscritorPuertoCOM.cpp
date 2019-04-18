@@ -1,5 +1,4 @@
 #include "EscritorPuertoCOM.h"
-#include "NumeroCiclico.h"
 
 EscritorPuertoCOM *EscritorPuertoCOM::instancia = nullptr;
 const int EscritorPuertoCOM::BUFFER_MAX_CAR = 700;
@@ -16,7 +15,7 @@ const char EscritorPuertoCOM::MSJ_ERR_FICHERO_ENVIO_NO_ENCONTRADO[] = "Error al 
 const char EscritorPuertoCOM::MSJ_INICIO_ENV_FICHERO[] = "Enviando fichero por";
 const char EscritorPuertoCOM::MSJ_FIN_ENV_FICHERO[] = "Fichero enviado";
 const char EscritorPuertoCOM::RUTA_DEF_FICHERO_ENVIO[] = "Fenvio.txt";
-const char EscritorPuertoCOM::RUTA_DEF_FICHERO_ENVIO_ME[] = "Eprotoc.txt";
+const char EscritorPuertoCOM::RUTA_DEF_FICHERO_ENVIO_ME[] = "FProtoc.txt";
 
 EscritorPuertoCOM::EscritorPuertoCOM() {
 	mPuertoCOM = ManejadorPuertoCOM::recuperarInstancia();
@@ -102,7 +101,91 @@ void EscritorPuertoCOM::configurarProtocMaestroEsclavo() {
 }
 
 void EscritorPuertoCOM::maestro_seleccion() {
-	printf("%s\n", "Maestro realizando Seleccion");
+    HANDLE com = ManejadorPuertoCOM::recuperarInstancia()->getHandle();
+    fstream fFichero;                                        // Flujo asociado al fichero de envío del que leer el contenido a enviar
+    string cabecera;                                        // Cabecera completa del fichero. Ruta del fichero destino y autor
+    string autor;                                            // Autor del fichero
+    char *cuerpoMensaje = new char[TD_MAX_LON_DATOS +
+                                   1];    // Auxiliar para ir almacenando cada porción del cuerpo del mensaje
+    char *msjNumBytes = new char[TD_MAX_LON_DATOS + 1];    // Mensaje sobre el peso del fichero enviado
+    int pesoFichero = 0;                                    // Peso del fichero enviado. 1 char -> 1 Byte
+    NumeroCiclico genNT = NumeroCiclico(0, 1);            // Generador de número de tramas
+    Trama *pTrama;
+
+    /*ESTABLECIMIENTO*/
+    // El maestro inicia la comunicación pero el esclavo debe confirmaar dicho inicio de comunicación
+
+    genNT.reset();
+    enviarTramaControlConResumen(Trama::llamadaSeleccion());
+    pTrama = esperarTramaCompleta();
+
+
+    /* TRANSFERENCIA*/
+    // El maestro enviará un fichero por tramas a la espera de la confirmación de cada una de ellas.
+    // En cada inicio de etapa diferente deberemos resetear el número de trama
+
+    genNT.reset();
+    fFichero.open(RUTA_DEF_FICHERO_ENVIO_ME, ios::in); // Abrimos el fichero a enviar
+    if (fFichero.is_open()) {
+        EnviarCaracter(com, CONSTANTES::CHAR_INICIO_FICHERO); // Envío de inicio de fichero
+
+        // Lee la cabecera del fichero
+        getline(fFichero, cabecera); // Lee la ruta
+        cabecera.append("\n");
+        getline(fFichero, autor); // Lee el autor
+        autor.append("\n");
+        cabecera.append(autor); // Crea una sola cadena con la cabecera
+
+        // Envía la cabecera
+        enviarBufferTramasConConfirmacion(cabecera.c_str(), CONSTANTES::SELECCION, genNT);
+        printf("%s %s\n", MSJ_INICIO_ENV_FICHERO, autor.c_str());
+
+        // Procesa el contenido del fichero. Enviando las tramas de una en una esperando confirmación del esclavo.
+        while (!fFichero.eof()) {
+
+            fFichero.read(cuerpoMensaje,
+                          TD_MAX_LON_DATOS); // Lee una porción del tamaño de una trama de datos o hasta el EOF
+            cuerpoMensaje[fFichero.gcount()] = CONSTANTES::DELIM_CAD; // Añade delimitador de cadena por seguridad
+
+            // Comprueba que haya contenido a enviar
+            if (fFichero.gcount() > 0) {
+                // Envio de la trama de datos con confirmación (SUPONINEDO QUE NO HAY ERRORES EN LA TRANSMISIÓN)
+                enviarTramaDatosConfirmada(
+                        TramaDatos(CONSTANTES::SINCRONISMO, CONSTANTES::SELECCION, CONSTANTES::STX, genNT.siguiente(),
+                                   static_cast<unsigned char>(fFichero.gcount()), cuerpoMensaje));
+                // Actualización del peso del fichero
+                pesoFichero += static_cast<int>(fFichero.gcount());
+            }
+        }
+
+        EnviarCaracter(com, CONSTANTES::CHAR_FIN_FICHERO); // Envía fin de fichero
+
+        // Envía el número de bytes procesados
+        sprintf(msjNumBytes, "%s %d %s\n", "El fichero tiene un peso de", pesoFichero, "bytes");
+        enviarTramaDatosConfirmada(
+                TramaDatos(CONSTANTES::SINCRONISMO, CONSTANTES::SONDEO, CONSTANTES::STX, genNT.siguiente(),
+                           static_cast<unsigned char>(strlen(msjNumBytes)), msjNumBytes));
+        // Mensaje de final de envío de fichero
+        printf("%s\n", MSJ_FIN_ENV_FICHERO);
+        fFichero.close(); // Cierra el fichero
+    } else {
+        printf("%s \n\tRuta relativa: %s\n", MSJ_ERR_FICHERO_ENVIO_NO_ENCONTRADO, RUTA_DEF_FICHERO_ENVIO);
+    }
+
+    delete[] msjNumBytes; // Libera la memoria asociada al mensaje del peso del fichero enviado
+    delete[] cuerpoMensaje; // Libera la memoria asociada a la cadena del cuerpo del texto del fichero
+
+    /* LIBERACIÓN */
+    // El maestro liberará la comunicación directamenta porque siempre va a ser aceptada por el esclavo.
+    // Reinicia el generador de números de trama
+
+    genNT.reset();
+    // El maestro quiere finalizar la comunicación
+    enviarTramaControlConResumen(Trama::liberacion(CONSTANTES::SELECCION, genNT.siguiente()));
+    // Espera a que el esclavo confirme la finalización
+    do {
+        pTrama = esperarTramaCompleta();
+    } while (pTrama->getC() != CONSTANTES::ACK);
 }
 
 void EscritorPuertoCOM::maestro_sondeo() {
@@ -168,7 +251,34 @@ void EscritorPuertoCOM::esclavo_establecimiento() {
 }
 
 void EscritorPuertoCOM::esclavo_seleccion() {
-	printf("%s\n", "Maestro realizando Seleccion");
+    Trama *pTrama;
+    unsigned char control;
+
+    /* ESTABLECIMIENTO */
+
+    // El esclavo debe esperar un inicio de la comunicación por parte del maestro. Una vez recibido debe confirmarlo
+
+    pTrama = esperarTramaCompleta();
+    enviarTramaControlConResumen(Trama::confirmacionTramaN(CONSTANTES::SELECCION, pTrama->getNT()));
+
+    /* TRANSFERENCIA */
+
+    // Lee tramas hasta que el maestro solicita la liberación
+    do {
+        // Espera una trama completa
+        pTrama = esperarTramaCompleta();
+        control = pTrama->getC();
+        // Envía su respuesta si no es una trama de finalización
+        if (control != CONSTANTES::EOT) {
+            enviarTramaControlConResumen(Trama::confirmacionTramaN(CONSTANTES::SELECCION, pTrama->getNT()));
+        }
+    } while (control != CONSTANTES::EOT);
+
+    /* LIBERACIÓN */
+    printf("hola");
+    // Al llegar a este punto, el esclavo ha recibido una trama EOT
+    enviarTramaControlConResumen(Trama::confirmacionTramaN(CONSTANTES::SELECCION, pTrama->getNT()));
+    delete pTrama;
 }
 
 void EscritorPuertoCOM::esclavo_sondeo() {
