@@ -10,6 +10,7 @@
 #include "Trama.h"
 #include "ManejadorInfoUsuario.h"
 #include "LectorPuertoCOM.h"
+#include "NumeroCiclico.h"
 
 /**
  * Manejador responsable de la escritura sobre el puerto COM
@@ -56,6 +57,10 @@ private:
 	 * Ruta por defecto del fichero fuente enviado por el puerto COM
 	 */
 	static const char RUTA_DEF_FICHERO_ENVIO[];
+	/**
+	 * Ruta por defecto del fichero fuente enviado por el puerto COM mediante el protocolo maestro-esclavo
+	 */
+	static const char RUTA_DEF_FICHERO_ENVIO_ME[];
 	/**
 	 * Máximo número base de caracteres en el buffer
 	 */
@@ -111,7 +116,11 @@ private:
 
 	void esclavo_sondeo();
 
-	Trama *esperarTramaRespuesta();
+	Trama *esperarTramaCompleta();
+
+	boolean enviarTramaDatosConfirmada(TramaDatos tramaDatos);
+
+	Trama elaborarRespuesta(Trama *pTrama);
 
 	/**
 	 * Comprueba si el manejador del puerto COM está inicializado
@@ -129,6 +138,8 @@ private:
 	 */
 	void enviarMensaje();
 
+	void enviarBufferTramasConConfirmacion(const char *buffer, unsigned char d, NumeroCiclico &genNT);
+
 	/**
 	 * Formatea el mensaje y divide el buffer de escritura en tramas para después enviarlas por el puerto COM
 	 *
@@ -136,12 +147,7 @@ private:
 	 */
 	void enviarBufferTramas(const char *buffer);
 
-	/**
-	 * Envía una trama de datos por el puerto COM
-	 *
-	 * @param tramaDatos Trama de datos a enviar
-	 */
-	void enviarTramaDatos(TramaDatos tramaDatos);
+	void enviarTramaControlConResumen(Trama tramaControl);
 
 	/**
 	 * Formatea y envía una trama de control por el pueto COM según el manejador establecido
@@ -152,6 +158,13 @@ private:
 	 * Envía una trama de control por el puerto COM
 	 */
 	void enviarTramaControl(const Trama &tramaControl);
+
+	/**
+	 * Envía una trama de datos por el puerto COM
+	 *
+	 * @param tramaDatos Trama de datos a enviar
+	 */
+	void enviarTramaDatos(TramaDatos tramaDatos);
 
 	/**
 	 * Maneja el evío de un fichero por el puerto COM según el manejador establecido
@@ -205,6 +218,7 @@ public:
 	 * Método accesor del atributo 'idxBuffer'
 	 */
 	int getIdxBuffer();
+
 };
 
 #endif

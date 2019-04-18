@@ -15,10 +15,10 @@ int main() {
 
 	CargadorManejadorPuertoCOM cargadorPCOM = CargadorManejadorPuertoCOM();
 	cargadorPCOM.setNombrePuerto(Principal::COM[ManejadorInfoUsuario::preguntarRespEntRang(Principal::MSJ_SEL_COM,
-																							  Principal::MSJ_ERROR_SEL_COM,
-																							  1,
-																							  sizeof(Principal::COM) /
-																							  sizeof(LPCSTR)) - 1]);
+																						   Principal::MSJ_ERROR_SEL_COM,
+																						   1,
+																						   sizeof(Principal::COM) /
+																						   sizeof(LPCSTR)) - 1]);
 	cargadorPCOM.setVelocidad(Principal::VELOCIDAD_DEF);
 	cargadorPCOM.setNumBitsXByte(Principal::NUM_BITS_X_BYTE_DEF);
 	cargadorPCOM.setParidad(Principal::PARIDAD_DEF);

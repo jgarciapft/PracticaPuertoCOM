@@ -1,4 +1,5 @@
 #include "LectorPuertoCOM.h"
+#include "ManejadorInfoUsuario.h"
 
 const char LectorPuertoCOM::MSJ_ERROR_BCE_INVALIDO[] = "Error al recibir la trama";
 const char LectorPuertoCOM::MSJ_ERROR_BCE_INVALIDO_FCH[] = "Error en la recepcion de la trama del fichero";
@@ -73,7 +74,7 @@ Trama *LectorPuertoCOM::leerTrama(char car) {
 				// Imprime el tipo de trama de control recibida
 				if (getProtocoloActual() != CONSTANTES::MAESTROESCLAVO)
 					printf("%s [%s]\n", "Recibido", tramaAux->toString().c_str());
-				else printf("%s\n", tramaAux->protoc_toString().c_str());
+				else printf("%s\n", ManejadorInfoUsuario::resumenTrama('R', tramaAux).c_str());
 			} else {
 				// Temporales para copiar los datos de la trama genérica en trama de datos
 				unsigned char getS = tramaAux->getS();
@@ -101,6 +102,10 @@ Trama *LectorPuertoCOM::leerTrama(char car) {
 		case 7:
 			dynamic_cast<TramaDatos *>(tramaAux)->calcularBCE(); // Calculamos y almacenamos el BCE de nuestra trama
 
+			// Si se está operando bajo el protocolo maestro-esclavo siempre se muestra el resumen
+			if (getProtocoloActual() == CONSTANTES::MAESTROESCLAVO)
+				printf("%s\n", ManejadorInfoUsuario::resumenTrama('R', tramaAux, car).c_str());
+
 			// Procesar Trama Datos. Comparamos con el BCE de la trama enviada
 			if (dynamic_cast<TramaDatos *>(tramaAux)->getBCE() == static_cast<unsigned char>(car)) {
 				// Determina el tratamiento del campo de datos de la trama de datos recibida correctamente
@@ -113,7 +118,6 @@ Trama *LectorPuertoCOM::leerTrama(char car) {
 				} else { // Se ha recibido otra trama de datos
 					// Muestra por consola la trama recibida
 					if (getProtocoloActual() != CONSTANTES::MAESTROESCLAVO) printf("%s", tramaAux->toString().c_str());
-					else printf("%s\n", dynamic_cast<TramaDatos *>(tramaAux)->protoc_toString(car).c_str());
 				}
 			} else {
 				if (getRecepFichero()) printf("%s\n", MSJ_ERROR_BCE_INVALIDO_FCH);

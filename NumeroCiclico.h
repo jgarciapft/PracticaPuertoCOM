@@ -35,7 +35,7 @@ public:
 	/**
 	 * @return Siguiente número en la serie
 	 */
-	int siguiente();
+	unsigned char siguiente();
 
 	/**
 	 * Reinicia el estado interno del generador

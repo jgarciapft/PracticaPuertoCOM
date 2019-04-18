@@ -5,13 +5,14 @@ NumeroCiclico::NumeroCiclico(int limiteInf, int limiteSup) : limiteInf(limiteInf
 	numeroActual = limiteInf;
 }
 
-int NumeroCiclico::siguiente() {
+unsigned char NumeroCiclico::siguiente() {
 	int sigNumero = numeroActual;
 
 	if (numeroActual < limiteSup) numeroActual++;
 	else reset();
 
-	return sigNumero;
+	// Conversión de número a ASCII
+	return sigNumero + 48;
 }
 
 void NumeroCiclico::reset() {

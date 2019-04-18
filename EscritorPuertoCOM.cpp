@@ -1,4 +1,5 @@
 #include "EscritorPuertoCOM.h"
+#include "NumeroCiclico.h"
 
 EscritorPuertoCOM *EscritorPuertoCOM::instancia = nullptr;
 const int EscritorPuertoCOM::BUFFER_MAX_CAR = 700;
@@ -15,6 +16,7 @@ const char EscritorPuertoCOM::MSJ_ERR_FICHERO_ENVIO_NO_ENCONTRADO[] = "Error al 
 const char EscritorPuertoCOM::MSJ_INICIO_ENV_FICHERO[] = "Enviando fichero por";
 const char EscritorPuertoCOM::MSJ_FIN_ENV_FICHERO[] = "Fichero enviado";
 const char EscritorPuertoCOM::RUTA_DEF_FICHERO_ENVIO[] = "Fenvio.txt";
+const char EscritorPuertoCOM::RUTA_DEF_FICHERO_ENVIO_ME[] = "Eprotoc.txt";
 
 EscritorPuertoCOM::EscritorPuertoCOM() {
 	mPuertoCOM = ManejadorPuertoCOM::recuperarInstancia();
@@ -47,6 +49,7 @@ void EscritorPuertoCOM::escritura() {
 					LectorPuertoCOM::recuperarInstancia()->setProtocoloActual(CONSTANTES::MAESTROESCLAVO);
 					configurarProtocMaestroEsclavo();
 					LectorPuertoCOM::recuperarInstancia()->setProtocoloActual(CONSTANTES::ESTANDAR);
+					printf("%s\n", "FIN DEL PROTOCOLO MAESTRO-ESCLAVO");
 			}
 			break;
 		case CONSTANTES::TECLA_RETROCESO: // RETROCESO
@@ -85,7 +88,7 @@ void EscritorPuertoCOM::configurarProtocMaestroEsclavo() {
 	if (identidadEstacion == 1) {
 		selecOperacion = ManejadorInfoUsuario::preguntarRespEntRang(
 				"Seleccione operacion:\n\t1. Seleccion\n\t2. Sondeo",
-				"Modo desconocido", 1, 2);
+				"Operacion desconocida", 1, 2);
 		switch (selecOperacion) {
 			case 1:
 				maestro_seleccion();
@@ -103,19 +106,56 @@ void EscritorPuertoCOM::maestro_seleccion() {
 }
 
 void EscritorPuertoCOM::maestro_sondeo() {
-	enviarTramaControl(Trama::llamadaSondeo());
-	printf("%s\n", "Maestro realizando Sondeo");
+	Trama *pTrama;
+	unsigned char control;
+	int respCierreCom;
+
+	/* ESTABLECIMIENTO */
+
+	enviarTramaControlConResumen(Trama::llamadaSondeo());
+	pTrama = esperarTramaCompleta();
+	delete pTrama;
+
+	/* TRANSFERENCIA */
+
+	// Lee tramas hasta que se solicita la liberación
+	do {
+		// Espera una trama completa
+		pTrama = esperarTramaCompleta();
+		control = pTrama->getC();
+		// Envía su respuesta si no es una trama de finalización
+		if (control != CONSTANTES::EOT) {
+			enviarTramaControlConResumen(elaborarRespuesta(pTrama));
+			delete pTrama;
+		}
+	} while (control != CONSTANTES::EOT);
+
+	/* LIBERACIÓN */
+
+	// Pregunta al usuario si desea terminar la comunicación, hasta que no la termine insiste
+	do {
+		respCierreCom = ManejadorInfoUsuario::preguntarRespEntRang("Desea terminar la comunicacion?\n\t1. Si\n\t2. No",
+																   "Respuesta desconocida", 1, 2);
+		switch (respCierreCom) {
+			case 1:
+				enviarTramaControlConResumen(Trama::confirmacionTramaN(CONSTANTES::SONDEO, pTrama->getNT()));
+				break;
+			case 2:
+				enviarTramaControlConResumen(Trama::rechazoTramaN(CONSTANTES::SONDEO, pTrama->getNT()));
+				pTrama = esperarTramaCompleta();
+		}
+	} while (respCierreCom != 1);
 }
 
 void EscritorPuertoCOM::esclavo_establecimiento() {
 	Trama *pTrama;
 
-	printf("%s\n", "Esclavo realizando Establecimiento");
-
 	// Determinar el la operación que debe realizar el esclavo según la primera trama
-	pTrama = esperarTramaRespuesta();
+	pTrama = esperarTramaCompleta();
 	// Confirma la operación y llama al procedimiento específico
-	enviarTramaControl(Trama::confirmacionTramaN(pTrama->getD(), pTrama->getNT()));
+	enviarTramaControlConResumen(elaborarRespuesta(pTrama));
+
+	// Determinación de la operación a realizar por el esclavo
 	switch (pTrama->getD()) {
 		case CONSTANTES::SELECCION:
 			esclavo_seleccion();
@@ -123,6 +163,8 @@ void EscritorPuertoCOM::esclavo_establecimiento() {
 		case CONSTANTES::SONDEO:
 			esclavo_sondeo();
 	}
+
+	delete pTrama;
 }
 
 void EscritorPuertoCOM::esclavo_seleccion() {
@@ -130,16 +172,105 @@ void EscritorPuertoCOM::esclavo_seleccion() {
 }
 
 void EscritorPuertoCOM::esclavo_sondeo() {
-	printf("%s\n", "Esclavo realizando Sondeo");
+	HANDLE com = ManejadorPuertoCOM::recuperarInstancia()->getHandle();
+	fstream fFichero; // Flujo asociado al fichero de envío del que leer el contenido a enviar
+	string cabecera; // Cabecera completa del fichero. Ruta del fichero destino y autor
+	string autor; // Autor del fichero
+	char *cuerpoMensaje = new char[TD_MAX_LON_DATOS +
+								   1]; // Auxiliar para ir almacenando cada porción del cuerpo del mensaje
+	char *msjNumBytes = new char[TD_MAX_LON_DATOS + 1]; // Mensaje sobre el peso del fichero enviado
+	int pesoFichero = 0; // Peso del fichero enviado. 1 char -> 1 Byte
+	NumeroCiclico genNT = NumeroCiclico(0, 1); // Generador de número de tramas
+	Trama *pTrama;
+
+	/* TRANSFERENCIA */
+
+	fFichero.open(RUTA_DEF_FICHERO_ENVIO_ME, ios::in); // Abrimos el fichero a enviar
+	if (fFichero.is_open()) {
+		EnviarCaracter(com, CONSTANTES::CHAR_INICIO_FICHERO); // Envío de inicio de fichero
+
+		// Lee la cabecera del fichero
+		getline(fFichero, cabecera); // Lee la ruta
+		cabecera.append("\n");
+		getline(fFichero, autor); // Lee el autor
+		autor.append("\n");
+		cabecera.append(autor); // Crea una sola cadena con la cabecera
+
+		// Envía la cabecera
+		enviarBufferTramasConConfirmacion(cabecera.c_str(), CONSTANTES::SONDEO, genNT);
+		printf("%s %s\n", MSJ_INICIO_ENV_FICHERO, autor.c_str());
+
+		// Procesa el contenido del fichero
+		while (!fFichero.eof()) {
+			fFichero.read(cuerpoMensaje,
+						  TD_MAX_LON_DATOS); // Lee una porción del tamaño de una trama de datos o hasta el EOF
+			cuerpoMensaje[fFichero.gcount()] = CONSTANTES::DELIM_CAD; // Añade delimitador de cadena por seguridad
+
+			// Comprueba que haya contenido a enviar
+			if (fFichero.gcount() > 0) {
+				// Envio de la trama de datos con confirmación (SUPONINEDO QUE NO HAY ERRORES EN LA TRANSMISIÓN)
+				enviarTramaDatosConfirmada(
+						TramaDatos(CONSTANTES::SINCRONISMO, CONSTANTES::SONDEO, CONSTANTES::STX, genNT.siguiente(),
+								   static_cast<unsigned char>(fFichero.gcount()), cuerpoMensaje));
+				// Actualización del peso del fichero
+				pesoFichero += static_cast<int>(fFichero.gcount());
+			}
+		}
+
+		EnviarCaracter(com, CONSTANTES::CHAR_FIN_FICHERO); // Envía fin de fichero
+		// Envía el número de bytes procesados
+		sprintf(msjNumBytes, "%s %d %s\n", "El fichero tiene un peso de", pesoFichero, "bytes");
+		enviarTramaDatosConfirmada(
+				TramaDatos(CONSTANTES::SINCRONISMO, CONSTANTES::SONDEO, CONSTANTES::STX, genNT.siguiente(),
+						   static_cast<unsigned char>(strlen(msjNumBytes)), msjNumBytes));
+		// Mensaje de final de envío de fichero
+		printf("%s\n", MSJ_FIN_ENV_FICHERO);
+		fFichero.close(); // Cierra el fichero
+	} else {
+		printf("%s \n\tRuta relativa: %s\n", MSJ_ERR_FICHERO_ENVIO_NO_ENCONTRADO, RUTA_DEF_FICHERO_ENVIO);
+	}
+
+	delete[] msjNumBytes; // Libera la memoria asociada al mensaje del peso del fichero enviado
+	delete[] cuerpoMensaje; // Libera la memoria asociada a la cadena del cuerpo del texto del fichero
+
+	/* LIBERACIÓN */
+
+	genNT.reset(); // Reinicia el generador de números de trama
+
+	// Se intenta liberar la comunicación hasta que el maestro accede
+	do {
+		enviarTramaControlConResumen(Trama::liberacion(CONSTANTES::SONDEO, genNT.siguiente()));
+		pTrama = esperarTramaCompleta();
+	} while (pTrama->getC() != CONSTANTES::ACK);
 }
 
-Trama *EscritorPuertoCOM::esperarTramaRespuesta() {
+Trama *EscritorPuertoCOM::esperarTramaCompleta() {
 	Trama *pTrama;
 
 	do pTrama = LectorPuertoCOM::recuperarInstancia()->lectura();
 	while (pTrama == nullptr);
 
 	return pTrama;
+}
+
+boolean EscritorPuertoCOM::enviarTramaDatosConfirmada(TramaDatos tramaDatos) {
+	Trama *pTrama;
+	bool esRespuestaCorrecta;
+
+	enviarTramaDatos(tramaDatos); // Envía la trama de datos
+	tramaDatos.calcularBCE();
+	printf("%s\n", ManejadorInfoUsuario::resumenTrama('E', &tramaDatos).c_str());
+	pTrama = esperarTramaCompleta(); // Espera la respuesta
+	// Comprueba que sea respuesta correcta
+	esRespuestaCorrecta = pTrama->getD() == tramaDatos.getD() && pTrama->getC() == CONSTANTES::ACK &&
+						  pTrama->getNT() == tramaDatos.getNT();
+
+	delete pTrama;
+	return esRespuestaCorrecta;
+}
+
+Trama EscritorPuertoCOM::elaborarRespuesta(Trama *pTrama) {
+	return Trama::confirmacionTramaN(pTrama->getD(), pTrama->getNT());
 }
 
 void EscritorPuertoCOM::enviarMensaje() {
@@ -161,6 +292,22 @@ void EscritorPuertoCOM::enviarMensaje() {
 	setIdxBuffer(0); // Reinicia el índice del buffer de escritura
 }
 
+void EscritorPuertoCOM::enviarBufferTramasConConfirmacion(const char *buffer, unsigned char d, NumeroCiclico &genNT) {
+	int idx, auxLen;
+
+	// Divide el mensaje en las tramas necesarias mediante referencias desplazadas al puntero buffer
+	for (idx = 0; idx < strlen(buffer); idx += TD_MAX_LON_DATOS) {
+		auxLen = static_cast<int>(strlen(
+				buffer + idx)); // Auxiliar para comprobar la longitud real de la cadena de la sección buffer + idx
+
+		// Envía la nueva trama creada
+		enviarTramaDatosConfirmada(TramaDatos(CONSTANTES::SINCRONISMO, d, CONSTANTES::STX, genNT.siguiente(),
+											  static_cast<unsigned char>(auxLen > TD_MAX_LON_DATOS ? TD_MAX_LON_DATOS
+																								   : auxLen),
+											  buffer + idx));
+	}
+}
+
 void EscritorPuertoCOM::enviarBufferTramas(const char *buffer) {
 	int idx, auxLen;
 
@@ -178,23 +325,6 @@ void EscritorPuertoCOM::enviarBufferTramas(const char *buffer) {
 
 		// Lectura de datos no exclusiva
 		LectorPuertoCOM::recuperarInstancia()->lectura();
-	}
-}
-
-void EscritorPuertoCOM::enviarTramaDatos(TramaDatos tramaDatos) {
-	HANDLE com = ManejadorPuertoCOM::recuperarInstancia()->getHandle();
-
-	// Calcula el BCE de la trama antes de enviarla
-	tramaDatos.calcularBCE();
-	// Envía el contenido de la trama por partes
-	if (manPrtoCOMAbierto()) { // Comprueba que el puerto COM está operativo
-		EnviarCaracter(com, tramaDatos.getS());
-		EnviarCaracter(com, tramaDatos.getD());
-		EnviarCaracter(com, tramaDatos.getC());
-		EnviarCaracter(com, tramaDatos.getNT());
-		EnviarCaracter(com, tramaDatos.getL());
-		EnviarCadena(com, tramaDatos.getDatos(), tramaDatos.getL());
-		EnviarCaracter(com, tramaDatos.getBCE());
 	}
 }
 
@@ -223,6 +353,11 @@ void EscritorPuertoCOM::configuarTramaControl() {
 	enviarTramaControl(tramaAux);
 }
 
+void EscritorPuertoCOM::enviarTramaControlConResumen(Trama tramaControl) {
+	enviarTramaControl(tramaControl);
+	printf("%s\n", ManejadorInfoUsuario::resumenTrama('E', &tramaControl).c_str());
+}
+
 void EscritorPuertoCOM::enviarTramaControl(const Trama &tramaControl) {
 	HANDLE com = mPuertoCOM->getHandle();
 
@@ -231,6 +366,23 @@ void EscritorPuertoCOM::enviarTramaControl(const Trama &tramaControl) {
 		EnviarCaracter(com, tramaControl.getD());
 		EnviarCaracter(com, tramaControl.getC());
 		EnviarCaracter(com, tramaControl.getNT());
+	}
+}
+
+void EscritorPuertoCOM::enviarTramaDatos(TramaDatos tramaDatos) {
+	HANDLE com = ManejadorPuertoCOM::recuperarInstancia()->getHandle();
+
+	// Calcula el BCE de la trama antes de enviarla
+	tramaDatos.calcularBCE();
+	// Envía el contenido de la trama por partes
+	if (manPrtoCOMAbierto()) { // Comprueba que el puerto COM está operativo
+		EnviarCaracter(com, tramaDatos.getS());
+		EnviarCaracter(com, tramaDatos.getD());
+		EnviarCaracter(com, tramaDatos.getC());
+		EnviarCaracter(com, tramaDatos.getNT());
+		EnviarCaracter(com, tramaDatos.getL());
+		EnviarCadena(com, tramaDatos.getDatos(), tramaDatos.getL());
+		EnviarCaracter(com, tramaDatos.getBCE());
 	}
 }
 
