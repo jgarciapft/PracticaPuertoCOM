@@ -104,22 +104,64 @@ private:
 	 */
 	char *buffer;
 
+	/**
+	 * Configura la identidad de cada estación de trabajo (maestro o esclavo) y, para el maestro, elige la operación a
+	 * realizar. Para configurar correctamente el protocolo primero se debe establecer un esclavo a la espera de que una
+	 * estación maestra le indique la operación a realizar. Después devuelve el control al protocolo estándar
+	 */
 	void configurarProtocMaestroEsclavo();
 
+	/**
+	 * Operación de sonde por parte del maestro. Envía al esclavo el fichero indicado por la ruta
+	 * RUTA_DEF_FICHERO_ENVIO_ME. El maestro termina la comunicación al finalizar el envío del fichero
+	 */
 	void maestro_seleccion();
 
+	/**
+	 * Operación de sondeo por parte del maestro. Hace que el esclavo le envíe el fichero indicado por la ruta
+	 * RUTA_DEF_FICHERO_ENVIO_ME. Cuando el esclavo de indica que ha terminado de enviar el fichero es la voluntad
+	 * del maestro la que indica al cierre preguntando al usuario si quiere cerrar la conexión o mantenerla abierta
+	 */
 	void maestro_sondeo();
 
+	/**
+	 * Fase de establecimiento común a ambas operaciones del esclavo. Espera a recibir una trama de control de la
+	 * estación maestra que indique la operación a realizar
+	 */
 	void esclavo_establecimiento();
 
+	/**
+	 * Operación de selección por parte del esclavo. Recibe el fichero indicado por la ruta RUTA_DEF_FICHERO_ENVIO_ME
+	 * del maestro. El maestro tiene la voluntad de cierre, el esclavo debe aceptarla forzosamente
+	 */
 	void esclavo_seleccion();
 
+	/**
+	 * Operación de sondeo por parte del esclavo. Envía el fichero indicado por la ruta RUTA_DEF_FICHERO_ENVIO_ME.
+	 * La voluntad de cierre la tiene la estación maestra, el esclavo debe preguntar si puede cerrar la comunicación
+	 * hasta que tenga la confirmación por parte del maestro
+	 */
 	void esclavo_sondeo();
 
+	/**
+	 * Espera a que el lector lea una trama completa
+	 *
+	 * @return Trama completa
+	 */
 	Trama *esperarTramaCompleta();
 
-	boolean enviarTramaDatosConfirmada(TramaDatos tramaDatos);
+	/**
+	 * Envía una trama de datos con confirmación mediante trama de control ACK del mismo campo de dirección y de
+	 * número de trama
+	 *
+	 * @param tramaDatos Trama de datos a enviar
+	 * @return Si se obtuvo la respuesta esperada
+	 */
+	boolean enviarTramaDatosConConfirmacion(TramaDatos tramaDatos);
 
+	/**
+	 * @return Trama de respuesta a la especificada por parámetro
+	 */
 	Trama elaborarRespuesta(Trama *pTrama);
 
 	/**
@@ -138,6 +180,14 @@ private:
 	 */
 	void enviarMensaje();
 
+	/**
+	 * Formatea y envía el mensaje almacenado en el buffer de escritura por el puerto COM según el manejador
+	 * establecido con confirmación
+	 *
+	 * @param buffer Buffer de caracteres con delimitador 0 del que formar las tramas
+	 * @param d Campo de dirección de las tramas a enviar
+	 * @param genNT Generador del campo de número de trama
+	 */
 	void enviarBufferTramasConConfirmacion(const char *buffer, unsigned char d, NumeroCiclico &genNT);
 
 	/**
@@ -147,6 +197,11 @@ private:
 	 */
 	void enviarBufferTramas(const char *buffer);
 
+	/**
+	 * Envia la trama de control especificada mostrando su resumen por consola
+	 *
+	 * @param tramaControl Trama de control a enviar
+	 */
 	void enviarTramaControlConResumen(Trama tramaControl);
 
 	/**

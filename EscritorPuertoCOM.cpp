@@ -42,7 +42,7 @@ void EscritorPuertoCOM::escritura() {
 					configuarTramaControl();
 					break;
 				case CONSTANTES::TECLA_F3: // Es F3
-					enviarFichero(false, 0);
+					enviarFichero(false, TD_DEF_DIRECCION);
 					break;
 				case CONSTANTES::TECLA_F4:
 					LectorPuertoCOM::recuperarInstancia()->setProtocoloActual(CONSTANTES::MAESTROESCLAVO);
@@ -240,7 +240,7 @@ Trama *EscritorPuertoCOM::esperarTramaCompleta() {
 	return pTrama;
 }
 
-boolean EscritorPuertoCOM::enviarTramaDatosConfirmada(TramaDatos tramaDatos) {
+boolean EscritorPuertoCOM::enviarTramaDatosConConfirmacion(TramaDatos tramaDatos) {
 	Trama *pTrama;
 	bool esRespuestaCorrecta;
 
@@ -288,10 +288,11 @@ void EscritorPuertoCOM::enviarBufferTramasConConfirmacion(const char *buffer, un
 				buffer + idx)); // Auxiliar para comprobar la longitud real de la cadena de la sección buffer + idx
 
 		// Envía la nueva trama creada
-		enviarTramaDatosConfirmada(TramaDatos(CONSTANTES::SINCRONISMO, d, CONSTANTES::STX, genNT.siguiente(),
-											  static_cast<unsigned char>(auxLen > TD_MAX_LON_DATOS ? TD_MAX_LON_DATOS
-																								   : auxLen),
-											  buffer + idx));
+		enviarTramaDatosConConfirmacion(TramaDatos(CONSTANTES::SINCRONISMO, d, CONSTANTES::STX, genNT.siguiente(),
+												   static_cast<unsigned char>(auxLen > TD_MAX_LON_DATOS
+																			  ? TD_MAX_LON_DATOS
+																			  : auxLen),
+												   buffer + idx));
 	}
 }
 
@@ -416,7 +417,7 @@ void EscritorPuertoCOM::enviarFichero(bool conConfirmacion, unsigned char dir) {
 			if (fFichero.gcount() > 0) {
 				// Envio de la trama de datos con o sin confirmación
 				if (conConfirmacion)
-					enviarTramaDatosConfirmada(
+					enviarTramaDatosConConfirmacion(
 							TramaDatos(CONSTANTES::SINCRONISMO, dir, CONSTANTES::STX, genNT.siguiente(),
 									   static_cast<unsigned char>(fFichero.gcount()), cuerpoMensaje));
 				else
@@ -435,7 +436,7 @@ void EscritorPuertoCOM::enviarFichero(bool conConfirmacion, unsigned char dir) {
 		sprintf(msjNumBytes, "%s %d %s\n", "El fichero tiene un peso de", pesoFichero, "bytes");
 		// Envía el número de bytes procesados con o sin confirmación
 		if (conConfirmacion)
-			enviarTramaDatosConfirmada(
+			enviarTramaDatosConConfirmacion(
 					TramaDatos(CONSTANTES::SINCRONISMO, dir, CONSTANTES::STX, genNT.siguiente(),
 							   static_cast<unsigned char>(strlen(msjNumBytes)), msjNumBytes));
 		else
