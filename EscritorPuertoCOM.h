@@ -169,7 +169,7 @@ private:
 	/**
 	 * Maneja el evío de un fichero por el puerto COM según el manejador establecido
 	 */
-	void enviarFichero();
+	void enviarFichero(bool conConfirmacion, unsigned char dir);
 
 	/**
 	 * Escribe en el buffer con 'echo' el caracter pasado

@@ -42,7 +42,7 @@ void EscritorPuertoCOM::escritura() {
 					configuarTramaControl();
 					break;
 				case CONSTANTES::TECLA_F3: // Es F3
-					enviarFichero();
+					enviarFichero(false, 0);
 					break;
 				case CONSTANTES::TECLA_F4:
 					LectorPuertoCOM::recuperarInstancia()->setProtocoloActual(CONSTANTES::MAESTROESCLAVO);
@@ -101,14 +101,6 @@ void EscritorPuertoCOM::configurarProtocMaestroEsclavo() {
 }
 
 void EscritorPuertoCOM::maestro_seleccion() {
-	HANDLE com = ManejadorPuertoCOM::recuperarInstancia()->getHandle();
-	fstream fFichero; // Flujo asociado al fichero de envío del que leer el contenido a enviar
-	string cabecera; // Cabecera completa del fichero. Ruta del fichero destino y autor
-	string autor; // Autor del fichero
-	char *cuerpoMensaje = new char[TD_MAX_LON_DATOS +
-								   1]; // Auxiliar para ir almacenando cada porción del cuerpo del mensaje
-	char *msjNumBytes = new char[TD_MAX_LON_DATOS + 1]; // Mensaje sobre el peso del fichero enviado
-	int pesoFichero = 0; // Peso del fichero enviado. 1 char -> 1 Byte
 	NumeroCiclico genNT = NumeroCiclico(0, 1); // Generador de número de tramas
 	Trama *pTrama;
 
@@ -124,62 +116,12 @@ void EscritorPuertoCOM::maestro_seleccion() {
 
 	// El maestro enviará un fichero por tramas a la espera de la confirmación de cada una de ellas.
 	// En cada inicio de etapa diferente deberemos resetear el número de trama
-
-	fFichero.open(RUTA_DEF_FICHERO_ENVIO_ME, ios::in); // Abrimos el fichero a enviar
-	if (fFichero.is_open()) {
-		EnviarCaracter(com, CONSTANTES::CHAR_INICIO_FICHERO); // Envío de inicio de fichero
-
-		// Lee la cabecera del fichero
-		getline(fFichero, cabecera); // Lee la ruta
-		cabecera.append("\n");
-		getline(fFichero, autor); // Lee el autor
-		autor.append("\n");
-		cabecera.append(autor); // Crea una sola cadena con la cabecera
-
-		// Envía la cabecera
-		enviarBufferTramasConConfirmacion(cabecera.c_str(), CONSTANTES::SELECCION, genNT);
-		printf("%s %s\n", MSJ_INICIO_ENV_FICHERO, autor.c_str());
-
-		// Procesa el contenido del fichero. Enviando las tramas de una en una esperando confirmación del esclavo.
-		while (!fFichero.eof()) {
-			fFichero.read(cuerpoMensaje,
-						  TD_MAX_LON_DATOS); // Lee una porción del tamaño de una trama de datos o hasta el EOF
-			cuerpoMensaje[fFichero.gcount()] = CONSTANTES::DELIM_CAD; // Añade delimitador de cadena por seguridad
-
-			// Comprueba que haya contenido a enviar
-			if (fFichero.gcount() > 0) {
-				// Envio de la trama de datos con confirmación (SUPONINEDO QUE NO HAY ERRORES EN LA TRANSMISIÓN)
-				enviarTramaDatosConfirmada(
-						TramaDatos(CONSTANTES::SINCRONISMO, CONSTANTES::SELECCION, CONSTANTES::STX, genNT.siguiente(),
-								   static_cast<unsigned char>(fFichero.gcount()), cuerpoMensaje));
-				// Actualización del peso del fichero
-				pesoFichero += static_cast<int>(fFichero.gcount());
-			}
-		}
-
-		EnviarCaracter(com, CONSTANTES::CHAR_FIN_FICHERO); // Envía fin de fichero
-
-		// Envía el número de bytes procesados
-		sprintf(msjNumBytes, "%s %d %s\n", "El fichero tiene un peso de", pesoFichero, "bytes");
-		enviarTramaDatosConfirmada(
-				TramaDatos(CONSTANTES::SINCRONISMO, CONSTANTES::SELECCION, CONSTANTES::STX, genNT.siguiente(),
-						   static_cast<unsigned char>(strlen(msjNumBytes)), msjNumBytes));
-		// Mensaje de final de envío de fichero
-		printf("%s\n", MSJ_FIN_ENV_FICHERO);
-		fFichero.close(); // Cierra el fichero
-	} else {
-		printf("%s \n\tRuta relativa: %s\n", MSJ_ERR_FICHERO_ENVIO_NO_ENCONTRADO, RUTA_DEF_FICHERO_ENVIO);
-	}
-
-	delete[] msjNumBytes; // Libera la memoria asociada al mensaje del peso del fichero enviado
-	delete[] cuerpoMensaje; // Libera la memoria asociada a la cadena del cuerpo del texto del fichero
+	enviarFichero(true, CONSTANTES::SELECCION);
 
 	/* LIBERACIÓN */
 
 	// El maestro liberará la comunicación directamenta porque siempre va a ser aceptada por el esclavo.
-	// Reinicia el generador de números de trama
 
-	genNT.reset();
 	// El maestro finaliza la comunicación
 	enviarTramaControlConResumen(Trama::liberacion(CONSTANTES::SELECCION, genNT.siguiente()));
 	pTrama = esperarTramaCompleta();
@@ -272,76 +214,21 @@ void EscritorPuertoCOM::esclavo_seleccion() {
 }
 
 void EscritorPuertoCOM::esclavo_sondeo() {
-	HANDLE com = ManejadorPuertoCOM::recuperarInstancia()->getHandle();
-	fstream fFichero; // Flujo asociado al fichero de envío del que leer el contenido a enviar
-	string cabecera; // Cabecera completa del fichero. Ruta del fichero destino y autor
-	string autor; // Autor del fichero
-	char *cuerpoMensaje = new char[TD_MAX_LON_DATOS +
-								   1]; // Auxiliar para ir almacenando cada porción del cuerpo del mensaje
-	char *msjNumBytes = new char[TD_MAX_LON_DATOS + 1]; // Mensaje sobre el peso del fichero enviado
-	int pesoFichero = 0; // Peso del fichero enviado. 1 char -> 1 Byte
 	NumeroCiclico genNT = NumeroCiclico(0, 1); // Generador de número de tramas
 	Trama *pTrama;
 
 	/* TRANSFERENCIA */
 
-	fFichero.open(RUTA_DEF_FICHERO_ENVIO_ME, ios::in); // Abrimos el fichero a enviar
-	if (fFichero.is_open()) {
-		EnviarCaracter(com, CONSTANTES::CHAR_INICIO_FICHERO); // Envío de inicio de fichero
-
-		// Lee la cabecera del fichero
-		getline(fFichero, cabecera); // Lee la ruta
-		cabecera.append("\n");
-		getline(fFichero, autor); // Lee el autor
-		autor.append("\n");
-		cabecera.append(autor); // Crea una sola cadena con la cabecera
-
-		// Envía la cabecera
-		enviarBufferTramasConConfirmacion(cabecera.c_str(), CONSTANTES::SONDEO, genNT);
-		printf("%s %s\n", MSJ_INICIO_ENV_FICHERO, autor.c_str());
-
-		// Procesa el contenido del fichero
-		while (!fFichero.eof()) {
-			fFichero.read(cuerpoMensaje,
-						  TD_MAX_LON_DATOS); // Lee una porción del tamaño de una trama de datos o hasta el EOF
-			cuerpoMensaje[fFichero.gcount()] = CONSTANTES::DELIM_CAD; // Añade delimitador de cadena por seguridad
-
-			// Comprueba que haya contenido a enviar
-			if (fFichero.gcount() > 0) {
-				// Envio de la trama de datos con confirmación (SUPONINEDO QUE NO HAY ERRORES EN LA TRANSMISIÓN)
-				enviarTramaDatosConfirmada(
-						TramaDatos(CONSTANTES::SINCRONISMO, CONSTANTES::SONDEO, CONSTANTES::STX, genNT.siguiente(),
-								   static_cast<unsigned char>(fFichero.gcount()), cuerpoMensaje));
-				// Actualización del peso del fichero
-				pesoFichero += static_cast<int>(fFichero.gcount());
-			}
-		}
-
-		EnviarCaracter(com, CONSTANTES::CHAR_FIN_FICHERO); // Envía fin de fichero
-		// Envía el número de bytes procesados
-		sprintf(msjNumBytes, "%s %d %s\n", "El fichero tiene un peso de", pesoFichero, "bytes");
-		enviarTramaDatosConfirmada(
-				TramaDatos(CONSTANTES::SINCRONISMO, CONSTANTES::SONDEO, CONSTANTES::STX, genNT.siguiente(),
-						   static_cast<unsigned char>(strlen(msjNumBytes)), msjNumBytes));
-		// Mensaje de final de envío de fichero
-		printf("%s\n", MSJ_FIN_ENV_FICHERO);
-		fFichero.close(); // Cierra el fichero
-	} else {
-		printf("%s \n\tRuta relativa: %s\n", MSJ_ERR_FICHERO_ENVIO_NO_ENCONTRADO, RUTA_DEF_FICHERO_ENVIO);
-	}
-
-	delete[] msjNumBytes; // Libera la memoria asociada al mensaje del peso del fichero enviado
-	delete[] cuerpoMensaje; // Libera la memoria asociada a la cadena del cuerpo del texto del fichero
+	enviarFichero(true, CONSTANTES::SONDEO);
 
 	/* LIBERACIÓN */
-
-	genNT.reset(); // Reinicia el generador de números de trama
 
 	// Se intenta liberar la comunicación hasta que el maestro accede
 	do {
 		enviarTramaControlConResumen(Trama::liberacion(CONSTANTES::SONDEO, genNT.siguiente()));
 		pTrama = esperarTramaCompleta();
 	} while (pTrama->getC() != CONSTANTES::ACK);
+	delete pTrama;
 }
 
 Trama *EscritorPuertoCOM::esperarTramaCompleta() {
@@ -486,7 +373,7 @@ void EscritorPuertoCOM::enviarTramaDatos(TramaDatos tramaDatos) {
 	}
 }
 
-void EscritorPuertoCOM::enviarFichero() {
+void EscritorPuertoCOM::enviarFichero(bool conConfirmacion, unsigned char dir) {
 	HANDLE com = ManejadorPuertoCOM::recuperarInstancia()->getHandle();
 	fstream fFichero; // Flujo asociado al fichero de envío del que leer el contenido a enviar
 	string cabecera; // Cabecera completa del fichero. Ruta del fichero destino y autor
@@ -495,8 +382,10 @@ void EscritorPuertoCOM::enviarFichero() {
 								   1]; // Auxiliar para ir almacenando cada porción del cuerpo del mensaje
 	char *msjNumBytes = new char[TD_MAX_LON_DATOS + 1]; // Mensaje sobre el peso del fichero enviado
 	int pesoFichero = 0; // Peso del fichero enviado. 1 char -> 1 Byte
+	NumeroCiclico genNT = NumeroCiclico(0, 1);
 
-	fFichero.open(RUTA_DEF_FICHERO_ENVIO, ios::in); // Abrimos el fichero a enviar
+	fFichero.open(conConfirmacion ? RUTA_DEF_FICHERO_ENVIO_ME : RUTA_DEF_FICHERO_ENVIO,
+				  ios::in); // Abrimos el fichero a enviar (depende de si se trabaja con o sin confirmación)
 	if (fFichero.is_open()) {
 		EnviarCaracter(com, CONSTANTES::CHAR_INICIO_FICHERO); // Envío de inicio de fichero
 
@@ -510,7 +399,10 @@ void EscritorPuertoCOM::enviarFichero() {
 
 		/* ENVÍA LA CABECERA */
 
-		enviarBufferTramas(cabecera.c_str());
+		// Envío con o sin confirmación de la cabecera
+		if (conConfirmacion)enviarBufferTramasConConfirmacion(cabecera.c_str(), dir, genNT);
+		else enviarBufferTramas(cabecera.c_str());
+
 		printf("%s %s\n", MSJ_INICIO_ENV_FICHERO, autor.c_str());
 
 		/* PROCESA EL CONTENIDO DEL FICHERO */
@@ -522,22 +414,33 @@ void EscritorPuertoCOM::enviarFichero() {
 
 			// Comprueba que haya contenido a enviar
 			if (fFichero.gcount() > 0) {
-				// Envio de la trama de datos
-				enviarTramaDatos(TramaDatos(CONSTANTES::SINCRONISMO, TD_DEF_DIRECCION, TD_DEF_CONTROL, TD_DEF_NT,
-											static_cast<unsigned char>(fFichero.gcount()), cuerpoMensaje));
+				// Envio de la trama de datos con o sin confirmación
+				if (conConfirmacion)
+					enviarTramaDatosConfirmada(
+							TramaDatos(CONSTANTES::SINCRONISMO, dir, CONSTANTES::STX, genNT.siguiente(),
+									   static_cast<unsigned char>(fFichero.gcount()), cuerpoMensaje));
+				else
+					enviarTramaDatos(TramaDatos(CONSTANTES::SINCRONISMO, TD_DEF_DIRECCION, TD_DEF_CONTROL, TD_DEF_NT,
+												static_cast<unsigned char>(fFichero.gcount()), cuerpoMensaje));
+
 				// Actualización del peso del fichero
 				pesoFichero += static_cast<int>(fFichero.gcount());
 			}
 
-			// Lectura de datos no exclusiva
-			LectorPuertoCOM::recuperarInstancia()->lectura();
+			// Lectura de datos no exclusiva (solo si no hay confirmación)
+			if (!conConfirmacion) LectorPuertoCOM::recuperarInstancia()->lectura();
 		}
 
 		EnviarCaracter(com, CONSTANTES::CHAR_FIN_FICHERO); // Envía fin de fichero
-		// Envía el número de bytes procesados
 		sprintf(msjNumBytes, "%s %d %s\n", "El fichero tiene un peso de", pesoFichero, "bytes");
-		enviarTramaDatos(TramaDatos(CONSTANTES::SINCRONISMO, TD_DEF_DIRECCION, TD_DEF_CONTROL, TD_DEF_NT,
-									static_cast<unsigned char>(strlen(msjNumBytes)), msjNumBytes));
+		// Envía el número de bytes procesados con o sin confirmación
+		if (conConfirmacion)
+			enviarTramaDatosConfirmada(
+					TramaDatos(CONSTANTES::SINCRONISMO, dir, CONSTANTES::STX, genNT.siguiente(),
+							   static_cast<unsigned char>(strlen(msjNumBytes)), msjNumBytes));
+		else
+			enviarTramaDatos(TramaDatos(CONSTANTES::SINCRONISMO, TD_DEF_DIRECCION, TD_DEF_CONTROL, TD_DEF_NT,
+										static_cast<unsigned char>(strlen(msjNumBytes)), msjNumBytes));
 		// Mensaje de final de envío de fichero
 		printf("%s\n", MSJ_FIN_ENV_FICHERO);
 		fFichero.close(); // Cierra el fichero
