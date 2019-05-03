@@ -39,7 +39,7 @@ private:
 	 *
 	 * @param estadoAbierto Nuevo valor de la bandera de estado
 	 */
-	void setEstadoAbierto(boolean estadoAbierto);
+	void setEstadoAbierto(bool estadoAbierto);
 
 public:
 	/**

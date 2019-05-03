@@ -12,6 +12,12 @@
 class TramaDatos : public Trama {
 
 private:
+	/**
+	 * Caracter de susitución del primer caracter de los datos para introducir un error en el BCE
+	 */
+	static const char CHAR_SUSTITUCION_ERROR_BCE;
+
+private:
 
 	/**
 	 * Longitud del mensaje contenido en la trama
@@ -26,23 +32,7 @@ private:
 	 */
 	unsigned char BCE;
 
-	/**
-	 * Método modificador del atributo 'BCE'
-	 *
-	 * @param BCE Nuevo BCE
-	 */
-	void setBCE(unsigned char BCE);
-
 public:
-
-	/**
-	 * @param d Dirección de la trama
-	 * @param nt Número de trama
-	 * @param lon Longitud de los datos
-	 * @param datos Datos a enviar
-	 * @return Trama de datos formateada para trabajar con el protocolo Maestro-Esclavo
-	 */
-	static TramaDatos envioDatosN(unsigned char d, unsigned char nt, unsigned char lon, const char *datos);
 
 	TramaDatos();
 
@@ -52,14 +42,34 @@ public:
 			   const char *datos);
 
 	/**
+	 * Reemplaza el primer caracter de los datos con el caracter CHAR_SUSTITUCION_ERROR_BCE
+	 *
+	 * @return Caracter sustituido
+	 */
+	char sustituirPrimerCaracter();
+
+	/**
+	 * Reestaura el caracter de error introducido artificialmente para causar un error en el BCE
+	 *
+	 * @param charSustituido Caracter que fue sustituido y debe ser restaurado
+	 */
+	void restaurarPrimerCaracter(char charSustituido);
+
+	/**
 	 * @return Puntero a una copia de la instacia actual
 	 */
 	Trama *copia() override;
 
 	/**
-	 * Calcula el BCE para el mensaje contenido en la trama
+	 * Calcula y almacena el BCE para el mensaje contenido en la trama
 	 */
 	void calcularBCE();
+
+	/**
+	 * @param tramaDatos Trama de datos
+	 * @return BCE correspondiente a la trama de datos
+	 */
+	static unsigned char calcularBCE(TramaDatos *tramaDatos);
 
 	/**
 	 * Método accesor del atributo 'L'
@@ -119,6 +129,14 @@ public:
 	 * @return Representación en formato especial para ser mostrado en el resumen de la comunicación de protocolo
 	 */
 	std::string protoc_toString() override;
+
+
+/**
+ * Método modificador del atributo 'BCE'
+ *
+ * @param BCE Nuevo BCE
+ */
+void setBCE(unsigned char BCE);
 };
 
 #endif

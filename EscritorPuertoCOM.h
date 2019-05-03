@@ -105,6 +105,11 @@ private:
 	char *buffer;
 
 	/**
+	 * @return Si la tecla F5 ha sido pulsada
+	 */
+	bool manejadorTeclaF5();
+
+	/**
 	 * Configura la identidad de cada estación de trabajo (maestro o esclavo) y, para el maestro, elige la operación a
 	 * realizar. Para configurar correctamente el protocolo primero se debe establecer un esclavo a la espera de que una
 	 * estación maestra le indique la operación a realizar. Después devuelve el control al protocolo estándar
@@ -157,12 +162,14 @@ private:
 	 * @param tramaDatos Trama de datos a enviar
 	 * @return Si se obtuvo la respuesta esperada
 	 */
-	boolean enviarTramaDatosConConfirmacion(TramaDatos tramaDatos);
+	bool enviarTramaDatosConConfirmacion(TramaDatos tramaDatos);
 
 	/**
+	 * @param pTrama Trama de la que elaborar la respuesta
+	 * @param aceptacion Si se debe confirmar o rechazar la trama
 	 * @return Trama de respuesta a la especificada por parámetro
 	 */
-	Trama elaborarRespuesta(Trama *pTrama);
+	Trama elaborarRespuesta(Trama *pTrama, bool aceptacion);
 
 	/**
 	 * Comprueba si el manejador del puerto COM está inicializado
@@ -215,7 +222,14 @@ private:
 	void enviarTramaControl(const Trama &tramaControl);
 
 	/**
-	 * Envía una trama de datos por el puerto COM
+	 * Envía una trama de datos por el puerto COM, calculando previamente su BCE
+	 *
+	 * @param tramaDatos Trama de datos a enviar
+	 */
+	void enviarTramaDatosCalculoBCE(TramaDatos &tramaDatos);
+
+	/**
+	 * Envía una trama de datos por el puerto COM, calculando previamente su BCE
 	 *
 	 * @param tramaDatos Trama de datos a enviar
 	 */

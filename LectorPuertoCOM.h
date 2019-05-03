@@ -80,6 +80,10 @@ private:
 	 * Bandera que indica qué protocolo domina la comunicación en un instante
 	 */
 	CONSTANTES::PROTOCOLOS protocoloActual;
+	/**
+	 * Bandera que indica si la última trama leida fue correcta
+	 */
+	bool ultimaTramaCorrecta;
 
 	LectorPuertoCOM();
 
@@ -170,6 +174,13 @@ private:
 	 */
 	void setFicheroConfigurado(int ficheroConfigurado);
 
+	/**
+	 * Método modificador del atributo 'ultimaTramaCorrecta'
+	 *
+	 * @param ultimaTramaCorrecta
+	 */
+	void setUltimaTramaCorrecta(bool ultimaTramaCorrecta);
+
 public:
 
 	/**
@@ -217,12 +228,18 @@ public:
 	/**
 	 * @return Protocolo actual
 	 */
-	CONSTANTES::PROTOCOLOS getProtocoloActual() const;
+	CONSTANTES::PROTOCOLOS getProtocoloActual();
+
+	/**
+	 * @return Si la ultima trama leida era correcta
+	 */
+	bool getUltimaTramaCorrecta();
 
 	/**
 	 * @param protocoloActual Nuevo protocolo actual
 	 */
 	void setProtocoloActual(CONSTANTES::PROTOCOLOS protocoloActual);
+
 };
 
 #endif

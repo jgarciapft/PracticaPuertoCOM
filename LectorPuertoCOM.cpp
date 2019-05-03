@@ -16,6 +16,7 @@ LectorPuertoCOM::LectorPuertoCOM() {
 	recepFichero = false;
 	ficheroConfigurado = 0;
 	protocoloActual = CONSTANTES::ESTANDAR;
+	ultimaTramaCorrecta = true;
 }
 
 Trama *LectorPuertoCOM::lectura() {
@@ -58,6 +59,7 @@ Trama *LectorPuertoCOM::leerTrama(char car) {
 		case 1: // Campo de Sincronismo
 			tramaAux = new Trama(); // Instancia la trama base genérica
 			setEsTrama(true);
+			setUltimaTramaCorrecta(true);
 
 			tramaAux->setS(car);
 			break;
@@ -100,14 +102,18 @@ Trama *LectorPuertoCOM::leerTrama(char car) {
 			dynamic_cast<TramaDatos *>(tramaAux)->setDatos(datosRecibidos); // Almacena el mensaje en la trama de datos
 			break;
 		case 7:
-			dynamic_cast<TramaDatos *>(tramaAux)->calcularBCE(); // Calculamos y almacenamos el BCE de nuestra trama
+//			dynamic_cast<TramaDatos *>(tramaAux)->calcularBCE(); // Calculamos y almacenamos el BCE de nuestra trama
+			unsigned char BCECalculado = TramaDatos::calcularBCE(dynamic_cast<TramaDatos *>(tramaAux));
+			dynamic_cast<TramaDatos *>(tramaAux)->setBCE(car); // Almacenamos el BCE recibido
+
 
 			// Si se está operando bajo el protocolo maestro-esclavo siempre se muestra el resumen
 			if (getProtocoloActual() == CONSTANTES::MAESTROESCLAVO)
-				printf("%s\n", ManejadorInfoUsuario::resumenTrama('R', tramaAux, car).c_str());
+				printf("%s\n", ManejadorInfoUsuario::resumenTrama('R', tramaAux, BCECalculado).c_str());
 
 			// Procesar Trama Datos. Comparamos con el BCE de la trama enviada
-			if (dynamic_cast<TramaDatos *>(tramaAux)->getBCE() == static_cast<unsigned char>(car)) {
+//			if (dynamic_cast<TramaDatos *>(tramaAux)->getBCE() == static_cast<unsigned char>(car)) {
+			if (BCECalculado == static_cast<unsigned char>(car)) {
 				// Determina el tratamiento del campo de datos de la trama de datos recibida correctamente
 				if (getRecepFichero() && !ficheroEstaConfigurado()) {
 					// Se está recibiendo la cabecera de un fichero
@@ -119,9 +125,11 @@ Trama *LectorPuertoCOM::leerTrama(char car) {
 					// Muestra por consola la trama recibida
 					if (getProtocoloActual() != CONSTANTES::MAESTROESCLAVO) printf("%s", tramaAux->toString().c_str());
 				}
-			} else {
+			} else { // Ocurrió un error en la transmisión
 				if (getRecepFichero()) printf("%s\n", MSJ_ERROR_BCE_INVALIDO_FCH);
 				else printf("%s\n", MSJ_ERROR_BCE_INVALIDO);
+
+				setUltimaTramaCorrecta(false); // Pone la bandera de trama recibida correctamente a falso
 			}
 
 			delete[] datosRecibidos; // Libera la cadena auxiliar de lectura
@@ -229,6 +237,14 @@ int LectorPuertoCOM::getFicheroConfigurado() {
 	return ficheroConfigurado;
 }
 
+CONSTANTES::PROTOCOLOS LectorPuertoCOM::getProtocoloActual() {
+	return protocoloActual;
+}
+
+bool LectorPuertoCOM::getUltimaTramaCorrecta() {
+	return ultimaTramaCorrecta;
+}
+
 void LectorPuertoCOM::setIdxTrama(int idxTrama) {
 	this->idxTrama = idxTrama;
 }
@@ -256,10 +272,10 @@ void LectorPuertoCOM::setFicheroConfigurado(int ficheroConfigurado) {
 		if (!fFichero.is_open()) fFichero.open(getRutaFchRecep(), ios::out);
 }
 
-CONSTANTES::PROTOCOLOS LectorPuertoCOM::getProtocoloActual() const {
-	return protocoloActual;
+void LectorPuertoCOM::setProtocoloActual(CONSTANTES::PROTOCOLOS protocoloActual) {
+	this->protocoloActual = protocoloActual;
 }
 
-void LectorPuertoCOM::setProtocoloActual(CONSTANTES::PROTOCOLOS protocoloActual) {
-	LectorPuertoCOM::protocoloActual = protocoloActual;
+void LectorPuertoCOM::setUltimaTramaCorrecta(bool ultimaTramaCorrecta) {
+	this->ultimaTramaCorrecta = ultimaTramaCorrecta;
 }

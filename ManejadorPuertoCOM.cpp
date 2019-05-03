@@ -37,6 +37,6 @@ bool ManejadorPuertoCOM::getEstadoAbierto() {
 	return estadoAbierto;
 }
 
-void ManejadorPuertoCOM::setEstadoAbierto(boolean estadoAbierto) {
+void ManejadorPuertoCOM::setEstadoAbierto(bool estadoAbierto) {
 	this->estadoAbierto = estadoAbierto;
 }

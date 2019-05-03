@@ -1,5 +1,7 @@
 #include "TramaDatos.h"
 
+const char TramaDatos::CHAR_SUSTITUCION_ERROR_BCE = 231; // Código ASCII extendido del caracter 'ç'
+
 TramaDatos::TramaDatos() {
 	datos = nullptr;
 	L = 0;
@@ -19,19 +21,39 @@ TramaDatos::TramaDatos(unsigned char S, unsigned char D, unsigned char C, unsign
 	this->BCE = 0;
 }
 
+char TramaDatos::sustituirPrimerCaracter() {
+	char sustituido = datos[0];
+
+	char *datosMod = const_cast<char *>(datos);
+	datosMod[0] = CHAR_SUSTITUCION_ERROR_BCE;
+	setDatos(datosMod);
+
+	return sustituido;
+}
+
+void TramaDatos::restaurarPrimerCaracter(char charSustituido) {
+	char *datosMod = const_cast<char *>(datos);
+	datosMod[0] = charSustituido;
+	setDatos(datosMod);
+}
+
 Trama *TramaDatos::copia() {
 	return new TramaDatos(this);
 }
 
 void TramaDatos::calcularBCE() {
-	auto BCE = static_cast<unsigned char>(datos[0]);
+	setBCE(calcularBCE(this));
+}
+
+unsigned char TramaDatos::calcularBCE(TramaDatos *tramaDatos) {
+	auto BCE = static_cast<unsigned char>(tramaDatos->getDatos()[0]);
 
 	// Calculo del BCE
-	for (int i = 1; i < getL(); i++)
-		BCE ^= datos[i];
+	for (int i = 1; i < tramaDatos->getL(); i++)
+		BCE ^= tramaDatos->getDatos()[i];
 
-	// Actualiza el BCE. Controla que no valga 0 ni 255
-	setBCE(static_cast<unsigned char>(BCE == 0 || BCE == 255 ? 1 : BCE));
+	// Controla que no valga 0 ni 255
+	return static_cast<unsigned char>(BCE == 0 || BCE == 255 ? 1 : BCE);
 }
 
 unsigned char TramaDatos::getL() {
@@ -95,11 +117,4 @@ std::string TramaDatos::protoc_toString() {
 	delete cad;
 
 	return basicString;
-}
-
-TramaDatos TramaDatos::envioDatosN(unsigned char d, unsigned char nt, unsigned char lon, const char *datos) {
-	TramaDatos tramaDatos = TramaDatos(CONSTANTES::SINCRONISMO, d, CONSTANTES::STX, nt, lon, datos);
-	tramaDatos.calcularBCE();
-
-	return tramaDatos;
 }
