@@ -102,7 +102,6 @@ Trama *LectorPuertoCOM::leerTrama(char car) {
 			dynamic_cast<TramaDatos *>(tramaAux)->setDatos(datosRecibidos); // Almacena el mensaje en la trama de datos
 			break;
 		case 7:
-//			dynamic_cast<TramaDatos *>(tramaAux)->calcularBCE(); // Calculamos y almacenamos el BCE de nuestra trama
 			unsigned char BCECalculado = TramaDatos::calcularBCE(dynamic_cast<TramaDatos *>(tramaAux));
 			dynamic_cast<TramaDatos *>(tramaAux)->setBCE(car); // Almacenamos el BCE recibido
 
@@ -112,7 +111,6 @@ Trama *LectorPuertoCOM::leerTrama(char car) {
 				printf("%s\n", ManejadorInfoUsuario::resumenTrama('R', tramaAux, BCECalculado).c_str());
 
 			// Procesar Trama Datos. Comparamos con el BCE de la trama enviada
-//			if (dynamic_cast<TramaDatos *>(tramaAux)->getBCE() == static_cast<unsigned char>(car)) {
 			if (BCECalculado == static_cast<unsigned char>(car)) {
 				// Determina el tratamiento del campo de datos de la trama de datos recibida correctamente
 				if (getRecepFichero() && !ficheroEstaConfigurado()) {
