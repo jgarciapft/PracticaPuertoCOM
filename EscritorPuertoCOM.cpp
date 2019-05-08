@@ -66,6 +66,10 @@ bool EscritorPuertoCOM::manejadorTeclaF5() {
 	return getch() == CONSTANTES::TECLA_FUNCION && getch() == CONSTANTES::TECLA_F5;
 }
 
+bool EscritorPuertoCOM::manejadorTeclaEsc() {
+	return getch() == CONSTANTES::ESCAPE;
+}
+
 void EscritorPuertoCOM::leerCarEcho(char car) {
 	if (!bufferLleno()) { // Comprueba que el buffer no esté lleno
 		switch (car) { // Determina tratamiento del caracter a almacenar
@@ -444,6 +448,13 @@ void EscritorPuertoCOM::enviarFichero(bool conConfirmacion, unsigned char dir) {
 		/* PROCESA EL CONTENIDO DEL FICHERO */
 
 		while (!fFichero.eof()) {
+
+			// Manejador de aborto del programa
+			if (kbhit() && manejadorTeclaEsc()) {
+				setFinCaracter(true); // Activa la bandera de salida de aplicación
+				break; // Salta el bucle que lee el fichero y pasa a la liberación de la comunicación
+			}
+
 			fFichero.read(cuerpoMensaje,
 						  TD_MAX_LON_DATOS); // Lee una porción del tamaño de una trama de datos o hasta el EOF
 			cuerpoMensaje[fFichero.gcount()] = CONSTANTES::DELIM_CAD; // Añade delimitador de cadena por seguridad

@@ -110,6 +110,11 @@ private:
 	bool manejadorTeclaF5();
 
 	/**
+	 * @return Si la tecla escape ESC ha sido pulsada
+	 */
+	bool manejadorTeclaEsc();
+
+	/**
 	 * Configura la identidad de cada estación de trabajo (maestro o esclavo) y, para el maestro, elige la operación a
 	 * realizar. Para configurar correctamente el protocolo primero se debe establecer un esclavo a la espera de que una
 	 * estación maestra le indique la operación a realizar. Después devuelve el control al protocolo estándar
@@ -287,7 +292,6 @@ public:
 	 * Método accesor del atributo 'idxBuffer'
 	 */
 	int getIdxBuffer();
-
 };
 
 #endif
