@@ -101,6 +101,13 @@ public:
 	void setDatos(char *datos);
 
 	/**
+	* Método modificador del atributo 'BCE'
+	*
+	* @param BCE Nuevo BCE
+	*/
+	void setBCE(unsigned char BCE);
+
+	/**
 	 * Método modificador global
 	 *
 	 * @param S Nuevo valor del caracter de sincronismo
@@ -129,14 +136,6 @@ public:
 	 * @return Representación en formato especial para ser mostrado en el resumen de la comunicación de protocolo
 	 */
 	std::string protoc_toString() override;
-
-
-/**
- * Método modificador del atributo 'BCE'
- *
- * @param BCE Nuevo BCE
- */
-void setBCE(unsigned char BCE);
 };
 
 #endif
