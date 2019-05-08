@@ -101,7 +101,6 @@ std::string TramaDatos::protoc_toString(unsigned char BCECalculado) {
 	sprintf(cad, "%s\t%d", base.c_str(), BCECalculado);
 
 	const std::basic_string<char> &basicString = std::string(cad);
-	delete cad;
 
 	return basicString;
 }
@@ -114,7 +113,6 @@ std::string TramaDatos::protoc_toString() {
 	sprintf(cad, "%s\t%d", base.c_str(), BCE);
 
 	const std::basic_string<char> &basicString = std::string(cad);
-	delete cad;
 
 	return basicString;
 }

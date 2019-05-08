@@ -29,7 +29,6 @@ string ManejadorInfoUsuario::resumenTrama(char dir, Trama *trama) {
 
 	sprintf(cad, "%c\t%s", dir, protocToString.c_str());
 	const basic_string<char> &basicString = string(cad);
-	delete cad;
 
 	return basicString;
 }
@@ -40,7 +39,6 @@ string ManejadorInfoUsuario::resumenTrama(char dir, Trama *trama, unsigned char 
 
 	sprintf(cad, "%c\t%s", dir, protocToString.c_str());
 	const basic_string<char> &basicString = string(cad);
-	delete cad;
 
 	return basicString;
 }

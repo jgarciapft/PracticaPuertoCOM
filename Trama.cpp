@@ -81,7 +81,6 @@ std::string Trama::protoc_toString() {
 	sprintf(cad, "%c\t%s\t%c", D, tipoTrama.c_str(), NT);
 
 	const std::basic_string<char> &basicString = std::string(cad);
-	delete cad;
 
 	return basicString;
 }
