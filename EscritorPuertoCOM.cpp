@@ -15,7 +15,7 @@ const char EscritorPuertoCOM::MSJ_ERR_FICHERO_ENVIO_NO_ENCONTRADO[] = "Error al 
 const char EscritorPuertoCOM::MSJ_INICIO_ENV_FICHERO[] = "Enviando fichero por";
 const char EscritorPuertoCOM::MSJ_FIN_ENV_FICHERO[] = "Fichero enviado";
 const char EscritorPuertoCOM::RUTA_DEF_FICHERO_ENVIO[] = "Fenvio.txt";
-const char EscritorPuertoCOM::RUTA_DEF_FICHERO_ENVIO_ME[] = "FProtoc.txt";
+const char EscritorPuertoCOM::RUTA_DEF_FICHERO_ENVIO_ME[] = "EProtoc.txt";
 
 EscritorPuertoCOM::EscritorPuertoCOM() {
 	mPuertoCOM = ManejadorPuertoCOM::recuperarInstancia();
@@ -62,12 +62,23 @@ void EscritorPuertoCOM::escritura() {
 	}
 }
 
-bool EscritorPuertoCOM::manejadorTeclaF5() {
-	return getch() == CONSTANTES::TECLA_FUNCION && getch() == CONSTANTES::TECLA_F5;
+int EscritorPuertoCOM::queTecla() {
+	char primerCar = getch();
+
+	if (manejadorTeclaEsc(primerCar))
+		return 0;
+	if (primerCar == CONSTANTES::TECLA_FUNCION && manejadorTeclaF5())
+		return 5;
+
+	return -1;
 }
 
-bool EscritorPuertoCOM::manejadorTeclaEsc() {
-	return getch() == CONSTANTES::ESCAPE;
+bool EscritorPuertoCOM::manejadorTeclaF5() {
+	return getch() == CONSTANTES::TECLA_F5;
+}
+
+bool EscritorPuertoCOM::manejadorTeclaEsc(char teclaLeida) {
+	return teclaLeida == CONSTANTES::ESCAPE;
 }
 
 void EscritorPuertoCOM::leerCarEcho(char car) {
@@ -256,14 +267,20 @@ bool EscritorPuertoCOM::enviarTramaDatosConConfirmacion(TramaDatos tramaDatos) {
 	Trama *pTrama;
 	bool esRespuestaCorrecta;
 	char charSustiuido = ' ';
+	int tecla;
 
 	// Si se ha pulsado F5 se activa la bandera de introducción de error
 
 	// Comprueba si se ha pulsado F5 para introducir un error
-	if (kbhit() && manejadorTeclaF5()) {
-		tramaDatos.calcularBCE();
-		charSustiuido = tramaDatos.sustituirPrimerCaracter();
-		enviarTramaDatos(tramaDatos);
+	if (kbhit()) {
+		tecla = queTecla();
+		if (tecla == 5) {
+			tramaDatos.calcularBCE();
+			charSustiuido = tramaDatos.sustituirPrimerCaracter();
+			enviarTramaDatos(tramaDatos);
+		} else if (tecla == 0) {
+			return true;
+		}
 	} else {
 		enviarTramaDatosCalculoBCE(tramaDatos); // Envía la trama de datos sin introducir errores
 	}
@@ -282,7 +299,7 @@ bool EscritorPuertoCOM::enviarTramaDatosConConfirmacion(TramaDatos tramaDatos) {
 	}
 
 	delete pTrama;
-	return esRespuestaCorrecta;
+	return false;
 }
 
 Trama EscritorPuertoCOM::elaborarRespuesta(Trama *pTrama, bool aceptacion) {
@@ -450,7 +467,7 @@ void EscritorPuertoCOM::enviarFichero(bool conConfirmacion, unsigned char dir) {
 		while (!fFichero.eof()) {
 
 			// Manejador de aborto del programa
-			if (kbhit() && manejadorTeclaEsc()) {
+			if (!conConfirmacion && kbhit() && queTecla() == 0) {
 				setFinCaracter(true); // Activa la bandera de salida de aplicación
 				break; // Salta el bucle que lee el fichero y pasa a la liberación de la comunicación
 			}
@@ -462,11 +479,16 @@ void EscritorPuertoCOM::enviarFichero(bool conConfirmacion, unsigned char dir) {
 			// Comprueba que haya contenido a enviar
 			if (fFichero.gcount() > 0) {
 				// Envio de la trama de datos con o sin confirmación
-				if (conConfirmacion)
-					enviarTramaDatosConConfirmacion(
+				if (conConfirmacion) {
+
+					bool esFin = enviarTramaDatosConConfirmacion(
 							TramaDatos(CONSTANTES::SINCRONISMO, dir, CONSTANTES::STX, genNT.siguiente(),
 									   static_cast<unsigned char>(fFichero.gcount()), cuerpoMensaje));
-				else {
+					if (esFin) {
+						setFinCaracter(true);
+						break;
+					}
+				} else {
 					tramaDatos = TramaDatos(CONSTANTES::SINCRONISMO, TD_DEF_DIRECCION, TD_DEF_CONTROL,
 											TD_DEF_NT,
 											static_cast<unsigned char>(fFichero.gcount()),

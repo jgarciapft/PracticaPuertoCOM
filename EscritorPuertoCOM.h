@@ -105,6 +105,11 @@ private:
 	char *buffer;
 
 	/**
+	 * @return Qué tecla fue pulsada si se pulsó alguna. 5 para F5, 0 para Escape y -1 para otra tecla
+	 */
+	int queTecla();
+
+	/**
 	 * @return Si la tecla F5 ha sido pulsada
 	 */
 	bool manejadorTeclaF5();
@@ -112,7 +117,7 @@ private:
 	/**
 	 * @return Si la tecla escape ESC ha sido pulsada
 	 */
-	bool manejadorTeclaEsc();
+	bool manejadorTeclaEsc(char teclaLeida);
 
 	/**
 	 * Configura la identidad de cada estación de trabajo (maestro o esclavo) y, para el maestro, elige la operación a
@@ -165,7 +170,7 @@ private:
 	 * número de trama
 	 *
 	 * @param tramaDatos Trama de datos a enviar
-	 * @return Si se obtuvo la respuesta esperada
+	 * @return Si se obtuvo una petición de fin
 	 */
 	bool enviarTramaDatosConConfirmacion(TramaDatos tramaDatos);
 
